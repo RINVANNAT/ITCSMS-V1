@@ -262,16 +262,20 @@ class DistributionDepartmentController extends Controller
         }
     }
 
-    public function export($academic_year_id)
+    public function export($grade_id, $academic_year_id)
     {
         try {
+            $academicYear = AcademicYear::find($academic_year_id);
+            $grade = Grade::find($grade_id);
+
             $studentAnnualIds = DistributionDepartmentResult::where([
-                'academic_year_id' => $academic_year_id
+                'academic_year_id' => $academicYear->id,
+                'grade_id' => $grade->id
             ])->pluck('student_annual_id');
 
             if (count($studentAnnualIds) > 0) {
-                return Excel::create('Distribution Department ' . $academic_year_id, function ($excel) use ($academic_year_id, $studentAnnualIds) {
-                    $excel->setTitle('Distribution Department ' . $academic_year_id);
+                return Excel::create('Distribution Department ' . $academicYear->name_latin, function ($excel) use ($grade, $academicYear, $studentAnnualIds) {
+                    $excel->setTitle('Distribution Department ' . $academicYear->name_latin);
 
                     $departments = Department::with('department_options')
                         ->where('is_specialist', true)
@@ -284,7 +288,8 @@ class DistributionDepartmentController extends Controller
                                 $result = DistributionDepartmentResult::where([
                                     'distribution_department_results.department_id' => $department->id,
                                     'distribution_department_results.department_option_id' => $option->id,
-                                    'distribution_department_results.academic_year_id' => $academic_year_id
+                                    'distribution_department_results.academic_year_id' => $academicYear->id,
+                                    'distribution_department_results.grade_id' => $grade->id,
                                 ])
                                     ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
                                     ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
@@ -295,14 +300,15 @@ class DistributionDepartmentController extends Controller
                                     ->orderBy('students.name_latin', 'asc')
                                     ->get();
                                 if (count($result) > 0) {
-                                    $this->getSheet($excel, $department, $option, $result);
+                                    $this->getSheet($excel, $department, $option, $result, $academicYear, $grade);
                                 }
                             }
                         }
 
                         $result = DistributionDepartmentResult::where([
                             'distribution_department_results.department_id' => $department->id,
-                            'distribution_department_results.academic_year_id' => $academic_year_id,
+                            'distribution_department_results.academic_year_id' => $academicYear->id,
+                            'distribution_department_results.grade_id' => $grade->id,
                             'distribution_department_results.department_option_id' => null
                         ])
                             ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
@@ -313,7 +319,7 @@ class DistributionDepartmentController extends Controller
                             ->orderBy('students.name_latin', 'asc')
                             ->get();
                         if (count($result) > 0) {
-                            $this->getSheet($excel, $department, null, $result);
+                            $this->getSheet($excel, $department, null, $result, $academicYear, $grade);
                         }
                     }
                 })->export('xlsx');
@@ -324,10 +330,9 @@ class DistributionDepartmentController extends Controller
         }
     }
 
-    private function getSheet($excel, $department, $departmentOption = null, $data)
+    private function getSheet($excel, $department, $departmentOption = null, $data, AcademicYear $academicYear, Grade $grade)
     {
-        $academicYear = AcademicYear::find($data[0]->academic_year_id);
-        $excel->sheet($department->code . ($departmentOption != null ? $departmentOption->code : ''), function ($sheet) use ($data, $department, $departmentOption, $academicYear) {
+        $excel->sheet($department->code . ($departmentOption != null ? $departmentOption->code : ''), function ($sheet) use ($data, $department, $departmentOption, $academicYear, $grade) {
             // header
             $sheet->mergeCells('A3:C3');
             $sheet->cell('A3', function ($cell) use ($department, $academicYear) {
@@ -348,9 +353,9 @@ class DistributionDepartmentController extends Controller
             });
 
             $sheet->mergeCells('A1:E1');
-            $sheet->cell('A1', function ($cell) use ($department) {
+            $sheet->cell('A1', function ($cell) use ($department, $grade) {
                 $cell->setAlignment('center');
-                $cell->setValue('បំនែងចែកដេប៉ាតឺម៉ង់ថ្នាក់ឆ្នាំទី៣');
+                $cell->setValue('បំនែងចែកដេប៉ាតឺម៉ង់ថ្នាក់ឆ្នាំទី  ' . ($grade->id == 1 ? '២' : '៣'));
                 $cell->setFont(array(
                     'bold' => true,
                     'size' => 14
@@ -510,14 +515,15 @@ class DistributionDepartmentController extends Controller
         }
     }
 
-    public function exportAll(Request $request)
+    public function exportAll($grade_id, $academic_year_id)
     {
         try {
-            $academicYear = AcademicYear::find($request->academic_year_id);
-            $academic_year_id = $request->academic_year_id;
+            $academicYear = AcademicYear::find($academic_year_id);
+            $grade = Grade::find($grade_id);
 
             $result = DistributionDepartmentResult::where([
-                'distribution_department_results.academic_year_id' => $academic_year_id,
+                'distribution_department_results.academic_year_id' => $academicYear->id,
+                'distribution_department_results.grade_id' => $grade->id,
             ])
                 ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
                 ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
@@ -526,10 +532,11 @@ class DistributionDepartmentController extends Controller
                 ->select('distribution_department_results.*', 'students.*', 'departments.code as dept_code', 'genders.code as sex')
                 ->orderBy('students.name_latin', 'asc')
                 ->get();
+
             if (count($result) > 0) {
-                return Excel::create('Distribution Department Result ' . $academicYear->name_latin, function ($excel) use ($academic_year_id, $academicYear, $result) {
+                return Excel::create('Distribution Department Result ' . $academicYear->name_latin, function ($excel) use ($academic_year_id, $academicYear, $result, $grade) {
                     $excel->setTitle('Distribution Department Result ' . $academic_year_id);
-                    $this->getSheetAll($excel, $result, $academicYear);
+                    $this->getSheetAll($excel, $result, $academicYear, $grade);
                 })->export('xlsx');
 
             } else {
@@ -540,14 +547,14 @@ class DistributionDepartmentController extends Controller
         }
     }
 
-    private function getSheetAll($excel, $data, AcademicYear $academicYear)
+    private function getSheetAll($excel, $data, AcademicYear $academicYear, Grade $grade)
     {
-        $excel->sheet('Result', function ($sheet) use ($data, $academicYear) {
+        $excel->sheet('Result', function ($sheet) use ($data, $academicYear, $grade) {
             // header
             $sheet->mergeCells('A1:E1');
-            $sheet->cell('A1', function ($cell) {
+            $sheet->cell('A1', function ($cell) use ($academicYear, $grade){
                 $cell->setAlignment('center');
-                $cell->setValue('បំនែងចែកដេប៉ាតឺម៉ង់ថ្នាក់ឆ្នាំទី៣');
+                $cell->setValue('បំនែងចែកដេប៉ាតឺម៉ង់ថ្នាក់ឆ្នាំទី  ' . ($grade->id == 1 ? '២' : '៣'));
                 $cell->setFont(array(
                     'bold' => true,
                     'size' => 14
