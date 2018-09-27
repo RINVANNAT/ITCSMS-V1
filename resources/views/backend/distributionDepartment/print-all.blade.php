@@ -78,12 +78,15 @@
                             <th>សេចក្តីផ្សេងៗ</th>
                         </tr>
                         @foreach($result as $key => $item)
+                            @php
+                                $deptOption = get_department_option_code($item->department_option_id)
+                            @endphp
                             <tr>
                                 <td class="text-center">{{ $key+1 }}</td>
                                 <td>{{ $item->id_card }}</td>
                                 <td>{{ $item->name_latin }}</td>
                                 <td class="text-center">{{ $item->sex }}</td>
-                                <td class="text-center">{{ $item->dept_code }}</td>
+                                <td class="text-center">{{ $item->dept_code }}{{ $deptOption }}</td>
                                 <td></td>
                             </tr>
                         @endforeach
