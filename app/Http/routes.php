@@ -1,6 +1,7 @@
 <?php
 
 Route::group(['middleware' => 'web'], function () {
+     Route::get('/export-data', 'ExportDataController@export');
     /**
      * Switch between the included languages
      */
