@@ -743,6 +743,7 @@ trait AjaxCRUDTimetableController
     {
         $data = request()->all();
         $group_id = is_null($data['group_id']) ? null : $data['group_id'];
+        
         $course_programs = Course::where([
             ['department_id', $data['department_id']],
             ['degree_id', $data['degree_id']],
