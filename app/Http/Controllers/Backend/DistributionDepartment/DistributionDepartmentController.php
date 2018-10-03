@@ -13,6 +13,7 @@ use App\Models\Grade;
 use App\Models\StudentAnnual;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\Datatables\Datatables;
 
@@ -90,7 +91,7 @@ class DistributionDepartmentController extends Controller
 
                     if (count($items) > 0) {
                         if ($request->grade_id == 1) {
-                            $score = number_format((float)$items[0]->score_1);
+                            $score = (float) $items[0]->score_1;
                         } else {
                             $score = number_format((float)((((float)$items[0]->socre_1)) + (((float)$items[0]->score_2) * 2)) / 3, 2);
                         }
@@ -180,7 +181,7 @@ class DistributionDepartmentController extends Controller
                                         // check each student
                                         // there are two ways to set student into department
                                         // in case department is not enough or current and previous student has the same score
-                                        if (!is_null($department['option_id'])) {
+                                        if (!is_null($data[$i]['department_option_id'])) {
                                             $departmentOptionIdSelected = $department['option_id'];
                                             if (($data[$i]['department_id'] == $department['department_id']) && ($data[$i]['department_option_id'] == $department['option_id'])) {
                                                 if (($department['total'] > 0) || ($data[$i]['score'] == $prevStudentScore)) {
@@ -192,15 +193,16 @@ class DistributionDepartmentController extends Controller
                                                     break;
                                                 }
                                             }
-                                        }
-                                        if (($data[$i]['department_id'] == $department['department_id']) && is_null($department['option_id'])) {
-                                            if ($department['total'] > 0 || ($data[$i]['score'] == $prevStudentScore)) {
-                                                $department['total']--;
-                                                $departmentIdSelected = $department['department_id'];
-                                                $prioritySelected = $data[$i]['priority'];
-                                                $departmentOptionIdSelected = $department['option_id'];
-                                                $isBreak = true;
-                                                break;
+                                        } else {
+                                            if ($data[$i]['department_id'] == $department['department_id']) {
+                                                if ($department['total'] > 0 || ($data[$i]['score'] == $prevStudentScore)) {
+                                                    $department['total']--;
+                                                    $departmentIdSelected = $department['department_id'];
+                                                    $prioritySelected = $data[$i]['priority'];
+                                                    $departmentOptionIdSelected = $department['option_id'];
+                                                    $isBreak = true;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -592,6 +594,7 @@ class DistributionDepartmentController extends Controller
                 $sheet->cell('C' . $row, $item->studentAnnual->student->name_latin);
                 $sheet->cell('D' . $row, $item->sex);
                 $sheet->cell('E' . $row, $item->dept_code . $deptOption);
+                $sheet->cell('F' . $row, $item->total_score);
                 $row++;
                 $nb++;
             }
