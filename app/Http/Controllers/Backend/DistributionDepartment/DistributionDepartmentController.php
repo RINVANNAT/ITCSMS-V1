@@ -93,7 +93,7 @@ class DistributionDepartmentController extends Controller
                         if ($request->grade_id == 1) {
                             $score = (float) $items[0]->score_1;
                         } else {
-                            $score = number_format((float)((((float)$items[0]->socre_1)) + (((float)$items[0]->score_2) * 2)) / 3, 2);
+                            $score = ( (float) $items[0]->socre_1 + (((float)$items[0]->score_2) * 2)) / 3;
                         }
                         foreach ($items as $item) {
                             $item->score = $score;
