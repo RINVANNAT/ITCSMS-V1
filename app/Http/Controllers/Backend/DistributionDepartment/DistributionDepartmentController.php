@@ -147,11 +147,13 @@ class DistributionDepartmentController extends Controller
                     } else {
                         array_push($departments, ['department_id' => (int)$key, 'option_id' => null, 'total' => (int)$dept]);
                     }
-                    $totalStudentAnnualFormRequest += (int)$dept;
+                    $totalStudentAnnualFormRequest += (int) $dept;
                 }
 
+                $prevStudentScore = 0;
+
                 if ($totalStudentAnnualFormRequest == count($studentAnnualDistributionDepartments)) {
-                    foreach ($studentAnnualDistributionDepartments as $annualDistributionDepartment) {
+                    foreach ($studentAnnualDistributionDepartments as $key => $annualDistributionDepartment) {
                         // take an student annual
                         $data = DistributionDepartment::where([
                             'student_annual_id' => $annualDistributionDepartment->student_annual_id,
@@ -160,7 +162,12 @@ class DistributionDepartmentController extends Controller
                         ])
                             ->select('id', 'student_annual_id', 'score', 'department_id', 'priority', 'department_option_id')
                             ->orderBy('priority', 'asc')
-                            ->get()->toArray();
+                            ->get()
+                            ->toArray();
+
+                        if ($key > 0) {
+                            $prevStudentScore = (float) $studentAnnualDistributionDepartments[$key-1]->score;
+                        }
 
                         $departmentIdSelected = null;
                         $departmentOptionIdSelected = null;
@@ -170,11 +177,8 @@ class DistributionDepartmentController extends Controller
 
                         if (count($data) > 0) {
                             for ($i = 0; $i < count($data); $i++) {
-                                $prevStudentScore = 0;
-                                if ($i > 0) {
-                                    $prevStudentScore = (float)$data[$i - 1]['score'];
-                                }
-                                $score = $data[$i]['score'];
+                                $score = (float) $data[$i]['score'];
+                                Log::info(['equal' => ($score == $prevStudentScore)]);
                                 $student_annual_id = $data[$i]['student_annual_id'];
                                 foreach ($departments as &$department) {
                                     if ($department['total'] > 0) {
@@ -184,8 +188,16 @@ class DistributionDepartmentController extends Controller
                                         if (!is_null($data[$i]['department_option_id'])) {
                                             $departmentOptionIdSelected = $department['option_id'];
                                             if (($data[$i]['department_id'] == $department['department_id']) && ($data[$i]['department_option_id'] == $department['option_id'])) {
-                                                if (($department['total'] > 0) || ($data[$i]['score'] == $prevStudentScore)) {
+                                                if (($department['total'] > 0)) {
                                                     $department['total']--;
+                                                    $departmentIdSelected = $department['department_id'];
+                                                    $prioritySelected = $data[$i]['priority'];
+                                                    $departmentOptionIdSelected = $department['option_id'];
+                                                    $isBreak = true;
+                                                    break;
+                                                }
+
+                                                if ($score == $prevStudentScore) {
                                                     $departmentIdSelected = $department['department_id'];
                                                     $prioritySelected = $data[$i]['priority'];
                                                     $departmentOptionIdSelected = $department['option_id'];
@@ -195,8 +207,16 @@ class DistributionDepartmentController extends Controller
                                             }
                                         } else {
                                             if ($data[$i]['department_id'] == $department['department_id']) {
-                                                if ($department['total'] > 0 || ($data[$i]['score'] == $prevStudentScore)) {
+                                                if ($department['total'] > 0) {
                                                     $department['total']--;
+                                                    $departmentIdSelected = $department['department_id'];
+                                                    $prioritySelected = $data[$i]['priority'];
+                                                    $departmentOptionIdSelected = $department['option_id'];
+                                                    $isBreak = true;
+                                                    break;
+                                                }
+
+                                                if ($score == $prevStudentScore) {
                                                     $departmentIdSelected = $department['department_id'];
                                                     $prioritySelected = $data[$i]['priority'];
                                                     $departmentOptionIdSelected = $department['option_id'];
