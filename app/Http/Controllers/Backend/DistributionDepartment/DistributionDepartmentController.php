@@ -13,7 +13,6 @@ use App\Models\Grade;
 use App\Models\StudentAnnual;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\Datatables\Datatables;
 
@@ -630,25 +629,38 @@ class DistributionDepartmentController extends Controller
                 'grade_id' => $grade->id
             ])->get();
             foreach ($distributionDepartment as $item) {
-
-                $result = DistributionDepartmentResult::where([
-                    'distribution_department_results.academic_year_id' => $academicYear->id,
-                    'distribution_department_results.grade_id' => $grade->id,
-                    'distribution_department_results.department_id' => $item->department_id
-                ]);
-
+                $result = null;
                 if (!is_null($item->department_option_id)) {
-                    $result->where('distribution_department_results.department_option_id', $item->department_option_id);
+                    $result = DistributionDepartmentResult::where([
+                        'distribution_department_results.academic_year_id' => $academicYear->id,
+                        'distribution_department_results.grade_id' => $grade->id,
+                        'distribution_department_results.department_id' => $item->department_id,
+                        'distribution_department_results.department_option_id' => $item->department_option_id
+                    ])
+                        ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
+                        ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
+                        ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                        ->join('genders', 'genders.id', '=', 'students.gender_id')
+                        ->select('distribution_department_results.*', 'students.*', 'departments.code as dept_code', 'genders.code as sex')
+                        ->orderBy('students.name_latin', 'asc')
+                        ->get();
+                } else {
+                    $result = DistributionDepartmentResult::where([
+                        'distribution_department_results.academic_year_id' => $academicYear->id,
+                        'distribution_department_results.grade_id' => $grade->id,
+                        'distribution_department_results.department_id' => $item->department_id
+                    ])
+                        ->whereNull('distribution_department_results.department_option_id')
+                        ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
+                        ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
+                        ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                        ->join('genders', 'genders.id', '=', 'students.gender_id')
+                        ->select('distribution_department_results.*', 'students.*', 'departments.code as dept_code', 'genders.code as sex')
+                        ->orderBy('students.name_latin', 'asc')
+                        ->get();
                 }
 
-                $result->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
-                    ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
-                    ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
-                    ->join('genders', 'genders.id', '=', 'students.gender_id')
-                    ->select('distribution_department_results.*', 'students.*', 'departments.code as dept_code', 'genders.code as sex')
-                    ->orderBy('students.name_latin', 'asc');
-
-                array_push($data, $result->get());
+                array_push($data, $result);
             }
         }
 
