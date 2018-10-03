@@ -153,7 +153,7 @@
 					{data: 'total_score', name: 'total_score'},
 					{data: 'priority', name: 'priority', orderable: false, searchable: false}
 				],
-				order: [[5, 'desc']]
+				order: [[2, 'asc']]
 			})
 
 			$(document).on('change', '#academicYear, #grade', function (e) {

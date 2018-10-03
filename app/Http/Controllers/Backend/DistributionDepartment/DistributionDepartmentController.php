@@ -13,6 +13,7 @@ use App\Models\Grade;
 use App\Models\StudentAnnual;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\Datatables\Datatables;
 
@@ -248,7 +249,7 @@ class DistributionDepartmentController extends Controller
             $result = DistributionDepartmentResult::with('department', 'departmentOption', 'studentAnnual')
                 ->where(['academic_year_id' => $academic_year_id, 'grade_id' => $grade_id])
                 ->select('distribution_department_results.*')
-                ->latest();
+                ->get();
             return Datatables::of($result)
                 ->editColumn('department_option', function ($result) {
                     if (is_null($result->department_option_id)) {

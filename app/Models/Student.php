@@ -34,12 +34,23 @@ class Student extends Model
 		'candidate_id',
 		"create_uid",
 		"write_uid",
+        "full_name_latin"
 	];
 
 	public $table = "students";
 
+    protected $appends = [
+        'full_name_latin'
+    ];
+
+    public function getFullNameLatinAttribute ()
+    {
+        return strtoupper($this->name_latin);
+    }
+
 	public $searchable = [
 		"name_latin",
+		"full_name_latin",
 		"name_kh",
 	];
 
@@ -111,12 +122,4 @@ class Student extends Model
 		//"photo" => 'required|mimes:png,jpg,jpeg'
 	];
 
-//	protected $appends = [
-//	    'full_name_latin'
-//    ];
-//
-//    public function getFullNameLatinAttribute ()
-//    {
-//        return strtoupper($this->name_latin);
-//    }
 }
