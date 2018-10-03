@@ -474,6 +474,7 @@ class DistributionDepartmentController extends Controller
                 $studentAnnualId = $studentAnnualId->student_annual_id;
                 $distributionDepartment = DistributionDepartment::where([
                     'student_annual_id' => $studentAnnualId,
+                    'academic_year_id' => $request->academic_year_id,
                     'grade_id' => $request->grade_id
                 ])->get();
                 $depts = [];
