@@ -90,7 +90,7 @@ class DistributionDepartmentController extends Controller
 
                     if (count($items) > 0) {
                         if ($request->grade_id == 1) {
-                            $score = number_format((float)$items[0]->score_1);
+                            $score = (float) $items[0]->score_1;
                         } else {
                             $score = number_format((float)((((float)$items[0]->socre_1)) + (((float)$items[0]->score_2) * 2)) / 3, 2);
                         }
