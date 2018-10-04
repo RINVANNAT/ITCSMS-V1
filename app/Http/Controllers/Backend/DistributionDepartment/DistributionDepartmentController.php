@@ -143,9 +143,9 @@ class DistributionDepartmentController extends Controller
                     }
                     $tmp = explode('_', $key);
                     if (count($tmp) > 1) {
-                        array_push($departments, ['department_id' => (int)$tmp[0], 'option_id' => (int)$tmp[1], 'total' => (int)$dept]);
+                        array_push($departments, ['department_id' => (int) $tmp[0], 'option_id' => (int)$tmp[1], 'total' => (int)$dept]);
                     } else {
-                        array_push($departments, ['department_id' => (int)$key, 'option_id' => null, 'total' => (int)$dept]);
+                        array_push($departments, ['department_id' => (int) $key, 'option_id' => null, 'total' => (int)$dept]);
                     }
                     $totalStudentAnnualFormRequest += (int) $dept;
                 }
@@ -176,73 +176,39 @@ class DistributionDepartmentController extends Controller
                         $prioritySelected = null;
                         $isBreak = false;
                         $student_annual_id = null;
-                        $score = $annualDistributionDepartment->score;
 
                         if (count($data) > 0) {
                             for ($i = 0; $i < count($data); $i++) {
-                                // $score = (float) $data[$i]['score'];
+                                $score = (float) $data[$i]['score'];
                                 $student_annual_id = $data[$i]['student_annual_id'];
                                 foreach ($departments as &$department) {
-                                    // check each student
-                                    // there are two ways to set student into department
-                                    // in case department is not enough or current and previous student has the same score
-                                    if (!is_null($data[$i]['department_option_id'])) {
-                                        if (($department['total'] > 0)) {
-                                            if (($data[$i]['department_id'] == $department['department_id']) && ($data[$i]['department_option_id'] == $department['option_id'])) {
-                                                $department['total']--;
-                                                $departmentIdSelected = $department['department_id'];
-                                                $prioritySelected = $data[$i]['priority'];
-                                                $departmentOptionIdSelected = $department['option_id'];
-                                                $isBreak = true;
-                                                break;
-                                            }
+                                    if ($department['total'] > 0) {
+                                        if (($data[$i]['department_id'] == $department['department_id']) && ($data[$i]['department_option_id'] == $department['option_id'])) {
+                                            $departmentIdSelected = $department['department_id'];
+                                            $prioritySelected = $data[$i]['priority'];
+                                            $departmentOptionIdSelected = $department['option_id'];
+                                            $isBreak = true;
+                                            $department['total'] -= 1;
+                                            break;
                                         }
-
-                                        if ($prevStudentScore !== null && $score == $prevStudentScore) {
-                                            $distributionDepartmentResult = DistributionDepartmentResult::where([
-                                                'student_annual_id' => $prevStudentAnnualId,
-                                                'academic_year_id' => $request->academic_year_id,
-                                                'grade_id' => $request->grade_id
-                                            ])->first();
-                                            if ($distributionDepartmentResult instanceof DistributionDepartmentResult) {
-                                                if ($data[$i]['department_id'] == $distributionDepartmentResult->department_id && $data[$i]['department_option_id'] == $distributionDepartmentResult->department_option_id) {
-                                                    $departmentIdSelected = $distributionDepartmentResult->department_id;
-                                                    $prioritySelected = $data[$i]['priority'];
-                                                    $departmentOptionIdSelected = $distributionDepartmentResult->department_option_id;
-                                                    $isBreak = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-
                                     } else {
-                                        if ($department['total'] > 0) {
-                                            if ($data[$i]['department_id'] == $department['department_id']) {
-                                                $department['total']--;
-                                                $departmentIdSelected = $department['department_id'];
-                                                $prioritySelected = $data[$i]['priority'];
-                                                $departmentOptionIdSelected = $department['option_id'];
-                                                $isBreak = true;
-                                                break;
-                                            }
-                                        }
-
-                                        if ($prevStudentScore !== null && $score == $prevStudentScore) {
+                                        if ($prevStudentScore !== null && (float) $score === (float) $prevStudentScore) {
                                             $distributionDepartmentResult = DistributionDepartmentResult::where([
                                                 'student_annual_id' => $prevStudentAnnualId,
+                                                'department_id' => $department['department_id'],
+                                                'department_option_id' => $department['option_id'],
                                                 'academic_year_id' => $request->academic_year_id,
                                                 'grade_id' => $request->grade_id
                                             ])->first();
                                             if ($distributionDepartmentResult instanceof DistributionDepartmentResult) {
-                                                if ($distributionDepartmentResult->department_id == $data[$i]['department_id']) {
-                                                    if ($data[$i]['department_id'] == $distributionDepartmentResult->department_id) {
-                                                        $departmentIdSelected = $distributionDepartmentResult->department_id;
-                                                        $prioritySelected = $data[$i]['priority'];
-                                                        $departmentOptionIdSelected = null;
-                                                        $isBreak = true;
-                                                        break;
-                                                    }
+                                                $departmentIdSelected = $distributionDepartmentResult->department_id;
+                                                $prioritySelected = $data[$i]['priority'];
+                                                $departmentOptionIdSelected = $distributionDepartmentResult->department_option_id;
+                                                if ($department['total'] > 0) {
+                                                    $department['total'] -= 1;
                                                 }
+                                                $isBreak = true;
+                                                break;
                                             }
                                         }
                                     }
@@ -263,6 +229,7 @@ class DistributionDepartmentController extends Controller
                             }
                         }
                     }
+                    dd($departments);
                     return redirect()->route('distribution-department.index');
                 } else {
                     return redirect()->back()->withFlashDanger('The amount student annuals are not match between ' . $totalStudentAnnualFormRequest . ' and ' . count($studentAnnualDistributionDepartments));
