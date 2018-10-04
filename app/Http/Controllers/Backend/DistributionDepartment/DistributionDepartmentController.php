@@ -73,7 +73,6 @@ class DistributionDepartmentController extends Controller
             'grade_id' => 'required'
         ]);
         try {
-            // calculate final score = (score_1 * 2) + (score_2 * 3)
             $distributionDepartments = DistributionDepartment::where([
                 'academic_year_id' => $request->academic_year_id,
                 'grade_id' => $request->grade_id,
@@ -93,7 +92,7 @@ class DistributionDepartmentController extends Controller
                         if ($request->grade_id == 1) {
                             $score = (float) $items[0]->score_1;
                         } else {
-                            $score = ( (float) $items[0]->socre_1 + (((float)$items[0]->score_2) * 2)) / 3;
+                            $score = ( (float) $items[0]->score_1 + (((float)$items[0]->score_2) * 2) ) / 3;
                         }
                         foreach ($items as $item) {
                             $item->score = $score;
