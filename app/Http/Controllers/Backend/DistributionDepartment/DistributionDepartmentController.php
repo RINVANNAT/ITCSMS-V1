@@ -13,6 +13,7 @@ use App\Models\Grade;
 use App\Models\StudentAnnual;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\Datatables\Datatables;
 
@@ -92,7 +93,7 @@ class DistributionDepartmentController extends Controller
                         if ($request->grade_id == 1) {
                             $score = (float) $items[0]->score_1;
                         } else {
-                            $score = number_format((float)((((float)$items[0]->socre_1)) + (((float)$items[0]->score_2) * 2)) / 3, 2);
+                            $score = ( (float) $items[0]->socre_1 + (((float)$items[0]->score_2) * 2)) / 3;
                         }
                         foreach ($items as $item) {
                             $item->score = $score;
@@ -146,11 +147,14 @@ class DistributionDepartmentController extends Controller
                     } else {
                         array_push($departments, ['department_id' => (int)$key, 'option_id' => null, 'total' => (int)$dept]);
                     }
-                    $totalStudentAnnualFormRequest += (int)$dept;
+                    $totalStudentAnnualFormRequest += (int) $dept;
                 }
 
+                $prevStudentScore = 0;
+                $prevStudentAnnualId = null;
+
                 if ($totalStudentAnnualFormRequest == count($studentAnnualDistributionDepartments)) {
-                    foreach ($studentAnnualDistributionDepartments as $annualDistributionDepartment) {
+                    foreach ($studentAnnualDistributionDepartments as $key => $annualDistributionDepartment) {
                         // take an student annual
                         $data = DistributionDepartment::where([
                             'student_annual_id' => $annualDistributionDepartment->student_annual_id,
@@ -159,7 +163,13 @@ class DistributionDepartmentController extends Controller
                         ])
                             ->select('id', 'student_annual_id', 'score', 'department_id', 'priority', 'department_option_id')
                             ->orderBy('priority', 'asc')
-                            ->get()->toArray();
+                            ->get()
+                            ->toArray();
+
+                        if ($key > 0) {
+                            $prevStudentScore = (float) $studentAnnualDistributionDepartments[$key-1]->score;
+                            $prevStudentAnnualId = $studentAnnualDistributionDepartments[$key-1]->student_annual_id;
+                        }
 
                         $departmentIdSelected = null;
                         $departmentOptionIdSelected = null;
@@ -169,38 +179,64 @@ class DistributionDepartmentController extends Controller
 
                         if (count($data) > 0) {
                             for ($i = 0; $i < count($data); $i++) {
-                                $prevStudentScore = 0;
-                                if ($i > 0) {
-                                    $prevStudentScore = (float)$data[$i - 1]['score'];
-                                }
-                                $score = $data[$i]['score'];
+                                $score = (float) $data[$i]['score'];
                                 $student_annual_id = $data[$i]['student_annual_id'];
                                 foreach ($departments as &$department) {
-                                    if ($department['total'] > 0) {
-                                        // check each student
-                                        // there are two ways to set student into department
-                                        // in case department is not enough or current and previous student has the same score
-                                        if (!is_null($department['option_id'])) {
-                                            $departmentOptionIdSelected = $department['option_id'];
-                                            if (($data[$i]['department_id'] == $department['department_id']) && ($data[$i]['department_option_id'] == $department['option_id'])) {
-                                                if (($department['total'] > 0) || ($data[$i]['score'] == $prevStudentScore)) {
-                                                    $department['total']--;
-                                                    $departmentIdSelected = $department['department_id'];
-                                                    $prioritySelected = $data[$i]['priority'];
-                                                    $departmentOptionIdSelected = $department['option_id'];
-                                                    $isBreak = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        if (($data[$i]['department_id'] == $department['department_id']) && is_null($department['option_id'])) {
-                                            if ($department['total'] > 0 || ($data[$i]['score'] == $prevStudentScore)) {
+                                    // check each student
+                                    // there are two ways to set student into department
+                                    // in case department is not enough or current and previous student has the same score
+                                    if (!is_null($data[$i]['department_option_id'])) {
+                                        if (($data[$i]['department_id'] == $department['department_id']) && ($data[$i]['department_option_id'] == $department['option_id'])) {
+                                            if (($department['total'] > 0)) {
                                                 $department['total']--;
                                                 $departmentIdSelected = $department['department_id'];
                                                 $prioritySelected = $data[$i]['priority'];
                                                 $departmentOptionIdSelected = $department['option_id'];
                                                 $isBreak = true;
                                                 break;
+                                            }
+                                            if ($prevStudentScore !== null && $score == $prevStudentScore) {
+                                                $distributionDepartmentResult = DistributionDepartmentResult::where([
+                                                    'student_annual_id' => $prevStudentAnnualId,
+                                                    'academic_year_id' => $request->academic_year_id,
+                                                    'grade_id' => $request->grade_id
+                                                ])->first();
+                                                if ($distributionDepartmentResult instanceof DistributionDepartmentResult) {
+                                                    if ($data[$i]['department_id'] == $distributionDepartmentResult->department_id && $data[$i]['department_option_id'] == $distributionDepartmentResult->department_option_id) {
+                                                        $departmentIdSelected = $distributionDepartmentResult->department_id;
+                                                        $prioritySelected = $data[$i]['priority'];
+                                                        $departmentOptionIdSelected = $distributionDepartmentResult->department_option_id;
+                                                        $isBreak = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        if ($data[$i]['department_id'] == $department['department_id']) {
+                                            if ($department['total'] > 0) {
+                                                $department['total']--;
+                                                $departmentIdSelected = $department['department_id'];
+                                                $prioritySelected = $data[$i]['priority'];
+                                                $departmentOptionIdSelected = $department['option_id'];
+                                                $isBreak = true;
+                                                break;
+                                            }
+                                            if ($prevStudentScore !== null && $score == $prevStudentScore) {
+                                                $distributionDepartmentResult = DistributionDepartmentResult::where([
+                                                    'student_annual_id' => $prevStudentAnnualId,
+                                                    'academic_year_id' => $request->academic_year_id,
+                                                    'grade_id' => $request->grade_id
+                                                ])->first();
+                                                if ($distributionDepartmentResult instanceof DistributionDepartmentResult) {
+                                                    if ($data[$i]['department_id'] == $distributionDepartmentResult->department_id) {
+                                                        $departmentIdSelected = $distributionDepartmentResult->department_id;
+                                                        $prioritySelected = $data[$i]['priority'];
+                                                        $departmentOptionIdSelected = null;
+                                                        $isBreak = true;
+                                                        break;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -274,52 +310,54 @@ class DistributionDepartmentController extends Controller
             ])->pluck('student_annual_id');
 
             if (count($studentAnnualIds) > 0) {
-                return Excel::create('Distribution Department ' . $academicYear->name_latin, function ($excel) use ($grade, $academicYear, $studentAnnualIds) {
+                $departmentChose = DistributionDepartment::where([
+                    'academic_year_id' => $academicYear->id,
+                    'grade_id' => $grade->id,
+                    'student_annual_id' => $studentAnnualIds[0]
+                ])->get();
+
+                return Excel::create('Distribution Department ' . $academicYear->name_latin, function ($excel) use ($grade, $academicYear, $studentAnnualIds, $departmentChose) {
                     $excel->setTitle('Distribution Department ' . $academicYear->name_latin);
 
-                    $departments = Department::with('department_options')
-                        ->where('is_specialist', true)
-                        ->orderBy('name_en', 'asc')
-                        ->get();
+                    foreach ($departmentChose as $choix) {
+                        $department = Department::find($choix->department_id);
+                        $department_option = null;
+                        $result = null;
 
-                    foreach ($departments as $department) {
-                        if (count($department->department_options) > 0) {
-                            foreach ($department->department_options as $option) {
-                                $result = DistributionDepartmentResult::where([
+                        if ($choix->department_option_id !== null) {
+                            $department_option = DepartmentOption::find($choix->department_option_id);
+                            $result = DistributionDepartmentResult::join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
+                                ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
+                                ->join('departmentOptions', 'departmentOptions.id', '=', 'distribution_department_results.department_option_id')
+                                ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                                ->join('genders', 'genders.id', '=', 'students.gender_id')
+                                ->where([
                                     'distribution_department_results.department_id' => $department->id,
-                                    'distribution_department_results.department_option_id' => $option->id,
+                                    'distribution_department_results.department_option_id' => $department_option->id,
                                     'distribution_department_results.academic_year_id' => $academicYear->id,
                                     'distribution_department_results.grade_id' => $grade->id,
                                 ])
-                                    ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
-                                    ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
-                                    ->join('departmentOptions', 'departmentOptions.id', '=', 'distribution_department_results.department_option_id')
-                                    ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
-                                    ->join('genders', 'genders.id', '=', 'students.gender_id')
-                                    ->select('distribution_department_results.*', 'departments.*', 'studentAnnuals.*', 'students.*', 'genders.code as sex')
-                                    ->orderBy('students.name_latin', 'asc')
-                                    ->get();
-                                if (count($result) > 0) {
-                                    $this->getSheet($excel, $department, $option, $result, $academicYear, $grade);
-                                }
-                            }
+                                ->select('distribution_department_results.*', 'departments.*', 'studentAnnuals.*', 'students.*', 'genders.code as sex')
+                                ->orderBy('students.name_latin', 'asc')
+                                ->get();
+                        } else {
+                            $result = DistributionDepartmentResult::join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
+                                ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
+                                ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                                ->join('genders', 'genders.id', '=', 'students.gender_id')
+                                ->where([
+                                    'distribution_department_results.department_id' => $department->id,
+                                    'distribution_department_results.academic_year_id' => $academicYear->id,
+                                    'distribution_department_results.grade_id' => $grade->id,
+                                ])
+                                ->whereNull('distribution_department_results.department_option_id')
+                                ->select('distribution_department_results.*', 'departments.*', 'studentAnnuals.*', 'students.*', 'genders.code as sex')
+                                ->orderBy('students.name_latin', 'asc')
+                                ->get();
                         }
 
-                        $result = DistributionDepartmentResult::where([
-                            'distribution_department_results.department_id' => $department->id,
-                            'distribution_department_results.academic_year_id' => $academicYear->id,
-                            'distribution_department_results.grade_id' => $grade->id,
-                            'distribution_department_results.department_option_id' => null
-                        ])
-                            ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
-                            ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
-                            ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
-                            ->join('genders', 'genders.id', '=', 'students.gender_id')
-                            ->select('distribution_department_results.*', 'departments.*', 'studentAnnuals.*', 'students.*', 'genders.code as sex')
-                            ->orderBy('students.name_latin', 'asc')
-                            ->get();
                         if (count($result) > 0) {
-                            $this->getSheet($excel, $department, null, $result, $academicYear, $grade);
+                            $this->getSheet($excel, $department, $department_option, $result, $academicYear, $grade);
                         }
                     }
                 })->export('xlsx');
@@ -592,6 +630,7 @@ class DistributionDepartmentController extends Controller
                 $sheet->cell('C' . $row, $item->studentAnnual->student->name_latin);
                 $sheet->cell('D' . $row, $item->sex);
                 $sheet->cell('E' . $row, $item->dept_code . $deptOption);
+                $sheet->cell('F' . $row, $item->total_score);
                 $row++;
                 $nb++;
             }
