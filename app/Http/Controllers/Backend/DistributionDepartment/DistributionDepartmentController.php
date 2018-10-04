@@ -226,6 +226,7 @@ class DistributionDepartmentController extends Controller
                                                 break;
                                             }
                                         }
+
                                         if ($prevStudentScore !== null && $score == $prevStudentScore) {
                                             $distributionDepartmentResult = DistributionDepartmentResult::where([
                                                 'student_annual_id' => $prevStudentAnnualId,
@@ -233,12 +234,14 @@ class DistributionDepartmentController extends Controller
                                                 'grade_id' => $request->grade_id
                                             ])->first();
                                             if ($distributionDepartmentResult instanceof DistributionDepartmentResult) {
-                                                if ($data[$i]['department_id'] == $distributionDepartmentResult->department_id) {
-                                                    $departmentIdSelected = $distributionDepartmentResult->department_id;
-                                                    $prioritySelected = $data[$i]['priority'];
-                                                    $departmentOptionIdSelected = null;
-                                                    $isBreak = true;
-                                                    break;
+                                                if ($distributionDepartmentResult->department_id == $data[$i]['department_id']) {
+                                                    if ($data[$i]['department_id'] == $distributionDepartmentResult->department_id) {
+                                                        $departmentIdSelected = $distributionDepartmentResult->department_id;
+                                                        $prioritySelected = $data[$i]['priority'];
+                                                        $departmentOptionIdSelected = null;
+                                                        $isBreak = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
