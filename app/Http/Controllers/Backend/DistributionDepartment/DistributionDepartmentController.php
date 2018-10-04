@@ -229,7 +229,6 @@ class DistributionDepartmentController extends Controller
                             }
                         }
                     }
-                    dd($departments);
                     return redirect()->route('distribution-department.index');
                 } else {
                     return redirect()->back()->withFlashDanger('The amount student annuals are not match between ' . $totalStudentAnnualFormRequest . ' and ' . count($studentAnnualDistributionDepartments));
