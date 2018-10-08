@@ -28,6 +28,7 @@ use App\Models\Semester;
 use App\Repositories\Backend\Schedule\Timetable\TimetableRepositoryContract;
 use App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -394,11 +395,11 @@ class TimetableController extends Controller
     {
         $timetable = Timetable::find($request->id);
         $timetableSlots = $timetable->timetableSlots;
-        if(count($timetableSlots)>0) {
-            foreach ($timetableSlots as $timetableSlot){
+        if (count($timetableSlots) > 0) {
+            foreach ($timetableSlots as $timetableSlot) {
                 $slot = Slot::find($timetableSlot->slot_id);
-                if($slot instanceof Slot){
-                    $slot->time_remaining = ($timetableSlot->durations+$slot->time_remaining);
+                if ($slot instanceof Slot) {
+                    $slot->time_remaining = ($timetableSlot->durations + $slot->time_remaining);
                     $slot->updated_at = Carbon::now();
                     $slot->update();
                 }
@@ -407,6 +408,44 @@ class TimetableController extends Controller
         if ($timetable instanceof Timetable) {
             DB::table('timetables')->where('id', '=', $request->id)->delete();
             return Response::json(['status' => true], 200);
+        }
+    }
+
+
+    public function reset(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $sessions = Timetable::join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
+                ->where([
+                    'timetables.academic_year_id' => $request->academic_year_id,
+                    'timetables.department_id' => $request->department_id,
+                    'timetables.option_id' => $request->department_option_id,
+                    'timetables.degree_id' => $request->degree_id,
+                    'timetables.grade_id' => $request->grade_id,
+                    'timetables.semester_id' => $request->semester_id,
+                    'timetables.week_id' => $request->week_id,
+                    'timetables.group_id' => $request->group_id
+                ])
+                ->select('timetable_slots.*')
+                ->get();
+
+            foreach ($sessions as $session) {
+                $slot = Slot::find($session->slot_id);
+                if ($slot instanceof Slot) {
+                    $slot->time_used -= (float) $session->durations;
+                    $slot->time_remaining += (float) $session->durations;
+                    if ($slot->update()) {
+                        $session->delete();
+                    }
+                }
+            }
+
+            DB::commit();
+            return message_success($sessions);
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return message_error($exception->getMessage());
         }
     }
 }

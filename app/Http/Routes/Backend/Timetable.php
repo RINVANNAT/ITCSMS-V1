@@ -26,6 +26,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/search_course_program', 'TimetableController@search_course_program')->name('search_course_program');
     Route::post('timetables/assign_lecturer_to_course_program', 'TimetableController@assign_lecturer_to_course_program')->name('assign_lecturer_to_course_program');
     Route::post('timetables/assign_lecturer_to_timetable_slot', 'TimetableController@assign_lecturer_to_timetable_slot')->name('assign_lecturer_to_timetable_slot');
+    Route::post('timetables/reset', 'TimetableController@reset')->name('reset'); // rest by filter option
 
     /** timetable assignment */
     Route::post('timetables/export_course_program', 'TimetableController@export_course_program')->name('export_course_program');
@@ -61,7 +62,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/export/file', 'TimetableController@export_file')->name('timetables.export_file');
 
     /** Check available room */
-    Route::group(['prefix' => 'timetables/check-available-room'], function (){
+    Route::group(['prefix' => 'timetables/check-available-room'], function () {
         Route::get('', 'CheckAvailableRoomController@index')->name('check-available-room.index');
         Route::get('/get_rooms', 'CheckAvailableRoomController@get_rooms')->name('check-available-room.get_rooms');
         Route::post('/get-unavailable-room-info', 'CheckAvailableRoomController@get_unavailable_room_info')->name('check-available-room.get_unavailable_room_info');

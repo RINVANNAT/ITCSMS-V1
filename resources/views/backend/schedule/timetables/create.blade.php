@@ -39,7 +39,7 @@
 @stop
 
 @section('content')
-    <div class="row">
+    <div class="row app">
         <div class="col-md-12">
             <div class="box box-success">
                 <div class="box-header with-border">
@@ -81,6 +81,13 @@
                                     id="btn_clone"
                                     title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
                                 {{ trans('buttons.backend.schedule.timetable.clone') }}
+                            </button>
+                            <button class="btn btn-primary btn-sm btn-reset-timetable"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    @click="reset"
+                                    title="Reset">
+                                Reset
                             </button>
                             @endauth
 
@@ -137,8 +144,54 @@
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
+    <script type="text/javascript" src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
+
 
     <script type="text/javascript">
+
+        var params = {
+            academic_year_id: $('select[name=academicYear]').val(),
+            department_id: $('select[name=department]').val(),
+            department_option_id: $('select[name=option]').val(),
+            degree_id: $('select[name=degree]').val(),
+            grade_id: $('select[name=grade]').val(),
+            group_id: $('select[name=group]').val(),
+            semester_id: $('select[name=semester]').val(),
+            week_id: $('select[name=weekly]').val()
+        }
+
+        new Vue({
+            el: '.app',
+            data () {
+                return {
+                    message: []
+                }
+            },
+            methods: {
+                reset () {
+                    axios.post('/admin/schedule/timetables/reset', {
+                        academic_year_id: $('select[name=academicYear]').val(),
+                        department_id: $('select[name=department]').val(),
+                        department_option_id: $('select[name=option]').val(),
+                        degree_id: $('select[name=degree]').val(),
+                        grade_id: $('select[name=grade]').val(),
+                        group_id: $('select[name=group]').val(),
+                        semester_id: $('select[name=semester]').val(),
+                        week_id: $('select[name=weekly]').val()
+                    }).then((response) => {
+                        if (response.data.code == 1) {
+                            get_timetable_slots();
+                            get_timetable();
+                            drag_course_session();
+                        } {
+                            notify('error', 'Reset', 'Error')
+                        }
+                    })
+                }
+            }
+        })
+
         /*Drag course session into timetable.*/
         function drag_course_session() {
             @if(access()->allow('drag-course-session'))
@@ -335,6 +388,7 @@
         }
         /** create timetable slot */
         function create_timetable_slots(copiedEventObject) {
+            console.log(copiedEventObject)
             toggleLoading(true);
             $.ajax({
                 type: 'POST',
@@ -520,6 +574,7 @@
                 drop: function (date) {
 
                     var originalEventObject = $(this).data('event');
+                    console.log('originalEventObject =====> ', originalEventObject)
                     var copiedEventObject = $.extend({}, originalEventObject);
 
                     var datetime = moment(date, 'YYYY-MM-DD HH:mm:ss');
@@ -1016,9 +1071,9 @@
                                     '</span>' +
                                     '<span class="text course-name">' + val.course_name + '</span><br>';
                                 if (val.teacher_name === null) {
-                                    course_session_item += '<span style="margin-left: 28px;" class="teacher-name bg-danger badge">Unsigned</span><br/>';
+                                    course_session_item += '<span style="margin-left: 28px;" class="teacher_name bg-danger badge">Unsigned</span><br/>';
                                 } else {
-                                    course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                                    course_session_item += '<span style="margin-left: 28px;" class="leacher_name">' + val.teacher_name + '</span><br/>';
                                 }
                                 if (val.tp !== 0) {
                                     course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
@@ -1033,8 +1088,8 @@
                                         '<span class="times">' + val.remaining + '</span> H'
                                 }
                                 course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
-                                course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
-                            });
+                                course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>'
+                            })
 
                             $('.courses.todo-list').html(course_session_item);
                             drag_course_session()

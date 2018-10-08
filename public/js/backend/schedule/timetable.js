@@ -11,13 +11,14 @@ $(document).on('click', '.btn_export_course_program', function (event) {
         group_id: $('select[name=group]').val(),
         semester_id: $('select[name=semester]').val(),
     }).then(function (response) {
-        if (response.data.status) {
-            get_course_programs();
-            notify('info', 'Slots was exported', 'Export Courses');
+        if (response.data.code == 1) {
+            get_course_programs()
+            notify('info', 'There are ' + response.data.data + ' programs exported!', 'Export Course Programs')
+        } else {
+            notify('info', response.data.message, 'Export Course Programs')
         }
         toggleLoading(false);
     }).catch(function (error) {
-        console.info(error);
         notify('error', 'Slots was not exported', 'Export Courses');
     });
 });
@@ -291,4 +292,9 @@ function assign_lecturer_to_course_program() {
             })
         }
     })
+}
+
+
+function reset() {
+    console.log($('#options-filter').formData())
 }
