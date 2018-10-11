@@ -375,3 +375,30 @@ li.select2-results__option {
 ul.select2-results__options li.select2-results__option:hover {
     background-color: #dddddd;
 }
+
+.sticky-wrapper {
+    position: fixed;
+    bottom: 0px;
+    background: #dad8d8;
+    width: 100%;
+    z-index: 1;
+    color: #000;
+    padding: 10px;
+    border-width: 0px 1px 1px;
+    border-top-style: initial;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-color: rgb(221, 221, 221);
+    border-top-color: rgb(221, 221, 221);
+    border-left-color: rgb(221, 221, 221);
+    border-image: initial;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.sticky-content {
+    width: auto;
+    overflow-x: auto;
+    white-space: nowrap;
+}
