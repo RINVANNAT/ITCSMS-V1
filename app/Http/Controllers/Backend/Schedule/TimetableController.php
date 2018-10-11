@@ -416,7 +416,7 @@ class TimetableController extends Controller
     {
         DB::beginTransaction();
         try {
-            $sessions = Timetable::join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
+            $timetable_slots = Timetable::join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
                 ->where([
                     'timetables.academic_year_id' => $request->academic_year_id,
                     'timetables.department_id' => $request->department_id,
@@ -430,19 +430,19 @@ class TimetableController extends Controller
                 ->select('timetable_slots.*')
                 ->get();
 
-            foreach ($sessions as $session) {
-                $slot = Slot::find($session->slot_id);
+            foreach ($timetable_slots as $timetable_slot) {
+                $slot = Slot::find($timetable_slot->slot_id);
                 if ($slot instanceof Slot) {
-                    $slot->time_used -= (float) $session->durations;
-                    $slot->time_remaining += (float) $session->durations;
+                    $slot->time_used -= (float) $timetable_slot->durations;
+                    $slot->time_remaining += (float) $timetable_slot->durations;
                     if ($slot->update()) {
-                        $session->delete();
+                        $timetable_slot->delete();
                     }
                 }
             }
 
             DB::commit();
-            return message_success($sessions);
+            return message_success($timetable_slots);
         } catch (\Exception $exception) {
             DB::rollback();
             return message_error($exception->getMessage());
