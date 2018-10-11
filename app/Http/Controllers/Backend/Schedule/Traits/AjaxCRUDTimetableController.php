@@ -206,7 +206,9 @@ trait AjaxCRUDTimetableController
                 'courses.name_en as course_name',
                 'slots.lecturer_id as lecturer_id',
                 'employees.name_latin as teacher_name'
-            )->get();
+            )
+            ->orderBy('courses.name_en', 'asc')
+            ->get();
         return array('status' => true, 'data' => $slots, 'code' => 200);
     }
 
@@ -751,6 +753,8 @@ trait AjaxCRUDTimetableController
             ['semester_id', $data['semester_id']]
         ])->get();
 
+        $amountCourseProgramImported = 0;
+
         if (count($course_programs) > 0) {
             foreach ($course_programs as $course_program) {
                 $slots = Slot::where([
@@ -760,70 +764,69 @@ trait AjaxCRUDTimetableController
                     ['group_id', $group_id],
                 ])->get();
                 if (count($slots) == 0) {
-                    for ($i = 0; $i < 3; $i++) {
-                        if ($i == 0) {
-                            if ($course_program->time_tp > 0) {
-                                DB::transaction(function () use ($data, $course_program, $group_id) {
-                                    $newSlot = new Slot();
-                                    $newSlot->time_tp = $course_program->time_tp;
-                                    $newSlot->time_td = 0;
-                                    $newSlot->time_course = 0;
-                                    $newSlot->academic_year_id = $data['academic_year_id'];
-                                    $newSlot->course_program_id = $course_program->id;
-                                    $newSlot->lecturer_id = null;
-                                    $newSlot->semester_id = $data['semester_id'];
-                                    $newSlot->time_used = 0;
-                                    $newSlot->group_id = $group_id;
-                                    $newSlot->time_remaining = $course_program->time_tp;
-                                    $newSlot->created_uid = auth()->user()->id;
-                                    $newSlot->write_uid = auth()->user()->id;
-                                    $newSlot->save();
-                                });
-                            }
-                        } else if ($i == 1) {
-                            if ($course_program->time_td > 0) {
-                                DB::transaction(function () use ($data, $course_program, $group_id) {
-                                    $newSlot = new Slot();
-                                    $newSlot->time_tp = 0;
-                                    $newSlot->time_td = $course_program->time_td;
-                                    $newSlot->time_course = 0;
-                                    $newSlot->lecturer_id = null;
-                                    $newSlot->academic_year_id = $data['academic_year_id'];
-                                    $newSlot->course_program_id = $course_program->id;
-                                    $newSlot->semester_id = $data['semester_id'];
-                                    $newSlot->group_id = $group_id;
-                                    $newSlot->time_used = 0;
-                                    $newSlot->time_remaining = $course_program->time_td;
-                                    $newSlot->created_uid = auth()->user()->id;
-                                    $newSlot->write_uid = auth()->user()->id;
-                                    $newSlot->save();
-                                });
-                            }
-                        } else if ($i == 2) {
-                            if ($course_program->time_course > 0) {
-                                DB::transaction(function () use ($data, $course_program, $group_id) {
-                                    $newSlot = new Slot();
-                                    $newSlot->time_tp = 0;
-                                    $newSlot->time_td = 0;
-                                    $newSlot->time_course = $course_program->time_course;
-                                    $newSlot->lecturer_id = null;
-                                    $newSlot->academic_year_id = $data['academic_year_id'];
-                                    $newSlot->course_program_id = $course_program->id;
-                                    $newSlot->semester_id = $data['semester_id'];
-                                    $newSlot->group_id = $group_id;
-                                    $newSlot->time_used = 0;
-                                    $newSlot->time_remaining = $course_program->time_course;
-                                    $newSlot->created_uid = auth()->user()->id;
-                                    $newSlot->write_uid = auth()->user()->id;
-                                    $newSlot->save();
-                                });
-                            }
-                        }
+                    if ($course_program->time_tp > 0) {
+                        DB::transaction(function () use ($data, $course_program, $group_id, &$amountCourseProgramImported) {
+                            $newSlot = new Slot();
+                            $newSlot->time_tp = $course_program->time_tp;
+                            $newSlot->time_td = 0;
+                            $newSlot->time_course = 0;
+                            $newSlot->academic_year_id = $data['academic_year_id'];
+                            $newSlot->course_program_id = $course_program->id;
+                            $newSlot->lecturer_id = null;
+                            $newSlot->semester_id = $data['semester_id'];
+                            $newSlot->time_used = 0;
+                            $newSlot->group_id = $group_id;
+                            $newSlot->time_remaining = $course_program->time_tp;
+                            $newSlot->created_uid = auth()->user()->id;
+                            $newSlot->write_uid = auth()->user()->id;
+                            $newSlot->save();
+                            $amountCourseProgramImported++;
+                        });
+                    }
+                    if ($course_program->time_td > 0) {
+                        DB::transaction(function () use ($data, $course_program, $group_id, &$amountCourseProgramImported) {
+                            $newSlot = new Slot();
+                            $newSlot->time_tp = 0;
+                            $newSlot->time_td = $course_program->time_td;
+                            $newSlot->time_course = 0;
+                            $newSlot->lecturer_id = null;
+                            $newSlot->academic_year_id = $data['academic_year_id'];
+                            $newSlot->course_program_id = $course_program->id;
+                            $newSlot->semester_id = $data['semester_id'];
+                            $newSlot->group_id = $group_id;
+                            $newSlot->time_used = 0;
+                            $newSlot->time_remaining = $course_program->time_td;
+                            $newSlot->created_uid = auth()->user()->id;
+                            $newSlot->write_uid = auth()->user()->id;
+                            $newSlot->save();
+                            $amountCourseProgramImported++;
+                        });
+                    }
+                    if ($course_program->time_course > 0) {
+                        DB::transaction(function () use ($data, $course_program, $group_id, &$amountCourseProgramImported) {
+                            $newSlot = new Slot();
+                            $newSlot->time_tp = 0;
+                            $newSlot->time_td = 0;
+                            $newSlot->time_course = $course_program->time_course;
+                            $newSlot->lecturer_id = null;
+                            $newSlot->academic_year_id = $data['academic_year_id'];
+                            $newSlot->course_program_id = $course_program->id;
+                            $newSlot->semester_id = $data['semester_id'];
+                            $newSlot->group_id = $group_id;
+                            $newSlot->time_used = 0;
+                            $newSlot->time_remaining = $course_program->time_course;
+                            $newSlot->created_uid = auth()->user()->id;
+                            $newSlot->write_uid = auth()->user()->id;
+                            $newSlot->save();
+                            $amountCourseProgramImported++;
+                        });
                     }
                 }
             }
+            return message_success($amountCourseProgramImported);
+        } else {
+            return message_error('There are 0 courses are program found.');
         }
-        return array('status' => true, 'message' => 'Operation is successfully.');
     }
 
     /**
@@ -1043,7 +1046,7 @@ trait AjaxCRUDTimetableController
             })
             ->select(
                 'slots.id as id',
-                'slots.course_program_id as course_session_id',
+                'slots.course_program_id as course_program_id',
                 'slots.time_tp as tp',
                 'slots.time_td as td',
                 'slots.time_course as tc',

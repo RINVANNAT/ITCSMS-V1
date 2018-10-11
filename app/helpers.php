@@ -5,7 +5,7 @@
  *
  */
 
-if (! function_exists('app_name')) {
+if (!function_exists('app_name')) {
     /**
      * Helper to grab the application name
      *
@@ -17,7 +17,7 @@ if (! function_exists('app_name')) {
     }
 }
 
-if (! function_exists('access')) {
+if (!function_exists('access')) {
     /**
      * Access (lol) the Access:: facade as a simple function
      */
@@ -27,7 +27,7 @@ if (! function_exists('access')) {
     }
 }
 
-if (! function_exists('javascript')) {
+if (!function_exists('javascript')) {
     /**
      * Access the javascript helper
      */
@@ -37,7 +37,7 @@ if (! function_exists('javascript')) {
     }
 }
 
-if (! function_exists('gravatar')) {
+if (!function_exists('gravatar')) {
     /**
      * Access the gravatar helper
      */
@@ -47,7 +47,7 @@ if (! function_exists('gravatar')) {
     }
 }
 
-if (! function_exists('getFallbackLocale')) {
+if (!function_exists('getFallbackLocale')) {
     /**
      * Get the fallback locale
      *
@@ -59,7 +59,7 @@ if (! function_exists('getFallbackLocale')) {
     }
 }
 
-if (! function_exists('getLanguageBlock')) {
+if (!function_exists('getLanguageBlock')) {
 
     /**
      * Get the language block with a fallback
@@ -71,8 +71,8 @@ if (! function_exists('getLanguageBlock')) {
     function getLanguageBlock($view, $data = [])
     {
         $components = explode("lang", $view);
-        $current  = $components[0]."lang.".app()->getLocale().".".$components[1];
-        $fallback  = $components[0]."lang.".getFallbackLocale().".".$components[1];
+        $current = $components[0] . "lang." . app()->getLocale() . "." . $components[1];
+        $fallback = $components[0] . "lang." . getFallbackLocale() . "." . $components[1];
 
         if (view()->exists($current)) {
             return view($current, $data);
@@ -82,7 +82,7 @@ if (! function_exists('getLanguageBlock')) {
     }
 }
 
-if (! function_exists('month_mois')) {
+if (!function_exists('month_mois')) {
     /**
      * Convert english month to french
      *
@@ -123,7 +123,7 @@ if (! function_exists('month_mois')) {
     }
 }
 
-if (! function_exists('day_jour')) {
+if (!function_exists('day_jour')) {
     /**
      * Convert english day to french
      *
@@ -154,7 +154,7 @@ if (! function_exists('day_jour')) {
     }
 }
 
-if (! function_exists('to_fr_number')) {
+if (!function_exists('to_fr_number')) {
     /**
      * Convert english day to french
      *
@@ -163,21 +163,21 @@ if (! function_exists('to_fr_number')) {
      */
     function to_fr_number($number)
     {
-        return str_replace(".",",",$number);
+        return str_replace(".", ",", $number);
     }
 }
-if (! function_exists('get_grading')) {
+if (!function_exists('get_grading')) {
     /**
      * Convert score to grading
      *
      * @param $score
      * @return String
      */
-    function get_grading($score, $passedScore=50)
+    function get_grading($score, $passedScore = 50)
     {
         $basePassedScore = 50;
         $interval = $basePassedScore - $passedScore;
-        $reduceScoreInterval = ($interval)/9;
+        $reduceScoreInterval = ($interval) / 9;
 
         $scoreA = 85 - ($reduceScoreInterval * 3);
         $scoreBPlus = 80 - ($reduceScoreInterval * 1);
@@ -189,7 +189,7 @@ if (! function_exists('get_grading')) {
 
         $grade = "";
 
-        if($score >= $scoreA){
+        if ($score >= $scoreA) {
             $grade = "A";
         } else if ($score >= $scoreBPlus) {
             $grade = "B<sup>+</sup>";
@@ -203,24 +203,24 @@ if (! function_exists('get_grading')) {
             $grade = "D";
         } else if ($score >= $scoreE) {
             $grade = "E";
-        }  else {
+        } else {
             $grade = "F";
         }
         return $grade;
     }
 }
-if (! function_exists('get_gpa')) {
+if (!function_exists('get_gpa')) {
     /**
      * Convert score to gpa
      *
      * @param $score
      * @return String
      */
-    function get_gpa($score, $passedScore=50)
+    function get_gpa($score, $passedScore = 50)
     {
         $basePassedScore = 50;
         $interval = $basePassedScore - $passedScore;
-        $reduceScoreInterval = ($interval)/9;
+        $reduceScoreInterval = ($interval) / 9;
 
         $scoreA = 85 - ($reduceScoreInterval * 3);
         $scoreBPlus = 80 - ($reduceScoreInterval * 1);
@@ -232,7 +232,7 @@ if (! function_exists('get_gpa')) {
 
         $gpa = "";
 
-        if($score >= $scoreA){
+        if ($score >= $scoreA) {
             $gpa = "4.0";
         } else if ($score >= $scoreBPlus) {
             $gpa = "3.5";
@@ -246,7 +246,7 @@ if (! function_exists('get_gpa')) {
             $gpa = "1.5";
         } else if ($score >= $scoreE) {
             $gpa = "1.0";
-        }  else if ($score == "N/A") {
+        } else if ($score == "N/A") {
             $gpa = "N/A";
         } else {
             $gpa = "0.00";
@@ -256,18 +256,18 @@ if (! function_exists('get_gpa')) {
     }
 }
 
-if (! function_exists('get_english_mention')) {
+if (!function_exists('get_english_mention')) {
     /**
      * Convert score to mention in english
      *
      * @param $score
      * @return String
      */
-    function get_english_mention($score, $passedScore=50)
+    function get_english_mention($score, $passedScore = 50)
     {
         $basePassedScore = 50;
         $interval = $basePassedScore - $passedScore;
-        $reduceScoreInterval = ($interval)/9;
+        $reduceScoreInterval = ($interval) / 9;
 
         $scoreA = 85 - ($reduceScoreInterval * 3);
         $scoreBPlus = 80 - ($reduceScoreInterval * 1);
@@ -278,7 +278,7 @@ if (! function_exists('get_english_mention')) {
         $scoreE = $scoreD - 5;
 
         $mention = "";
-        if($score >= $scoreA){
+        if ($score >= $scoreA) {
             $mention = "Excellent";
         } else if ($score >= $scoreBPlus) {
             $mention = "Very Good";
@@ -292,24 +292,24 @@ if (! function_exists('get_english_mention')) {
             $mention = "Poor";
         } else if ($score >= $scoreE) {
             $mention = "Very Poor";
-        }  else {
+        } else {
             $mention = "Failure";
         }
         return $mention;
     }
 }
-if (! function_exists('get_french_mention')) {
+if (!function_exists('get_french_mention')) {
     /**
      * Convert score to mention in french
      *
      * @param $score
      * @return String
      */
-    function get_french_mention($score, $passedScore=50)
+    function get_french_mention($score, $passedScore = 50)
     {
         $basePassedScore = 50;
         $interval = $basePassedScore - $passedScore;
-        $reduceScoreInterval = ($interval)/9;
+        $reduceScoreInterval = ($interval) / 9;
 
         $scoreA = 85 - ($reduceScoreInterval * 3);
         $scoreBPlus = 80 - ($reduceScoreInterval * 1);
@@ -320,7 +320,7 @@ if (! function_exists('get_french_mention')) {
         $scoreE = $scoreD - 5;
 
         $mention = "";
-        if($score >= $scoreA){
+        if ($score >= $scoreA) {
             $mention = "Excellent";
         } else if ($score >= $scoreBPlus) {
             $mention = "Très Bien";
@@ -334,13 +334,13 @@ if (! function_exists('get_french_mention')) {
             $mention = "Faible";
         } else if ($score >= $scoreE) {
             $mention = "Très Faible";
-        }  else {
+        } else {
             $mention = "Insuffisant";
         }
         return $mention;
     }
 }
-if (! function_exists('to_khmer_number')) {
+if (!function_exists('to_khmer_number')) {
     /**
      * Convert english day to french
      *
@@ -352,37 +352,37 @@ if (! function_exists('to_khmer_number')) {
         $elements = trim($number);
         $elements = str_split($elements);
         $kh_number = "";
-        foreach($elements as $element) {
+        foreach ($elements as $element) {
             switch ($element) {
                 case "0":
-                    $kh_number = $kh_number."០";
+                    $kh_number = $kh_number . "០";
                     break;
                 case "1":
-                    $kh_number = $kh_number."១";
+                    $kh_number = $kh_number . "១";
                     break;
                 case "2":
-                    $kh_number = $kh_number."២";
+                    $kh_number = $kh_number . "២";
                     break;
                 case "3":
-                    $kh_number = $kh_number."៣";
+                    $kh_number = $kh_number . "៣";
                     break;
                 case "4":
-                    $kh_number = $kh_number."៤";
+                    $kh_number = $kh_number . "៤";
                     break;
                 case "5":
-                    $kh_number = $kh_number."៥";
+                    $kh_number = $kh_number . "៥";
                     break;
                 case "6":
-                    $kh_number = $kh_number."៦";
+                    $kh_number = $kh_number . "៦";
                     break;
                 case "7":
-                    $kh_number = $kh_number."៧";
+                    $kh_number = $kh_number . "៧";
                     break;
                 case "8":
-                    $kh_number = $kh_number."៨";
+                    $kh_number = $kh_number . "៨";
                     break;
                 case "9":
-                    $kh_number = $kh_number."៩";
+                    $kh_number = $kh_number . "៩";
                     break;
                 default:
                     break;
@@ -391,7 +391,7 @@ if (! function_exists('to_khmer_number')) {
         return $kh_number;
     }
 }
-if (! function_exists('to_khmer_gender')) {
+if (!function_exists('to_khmer_gender')) {
     /**
      * Convert english day to french
      *
@@ -401,14 +401,14 @@ if (! function_exists('to_khmer_gender')) {
     function to_khmer_gender($gender)
     {
         $a = strtolower($gender);
-        if($a == "m" || $a == "male") {
+        if ($a == "m" || $a == "male") {
             return "ប្រុស";
         } else {
             return "ស្រី";
         }
     }
 }
-if (! function_exists('to_latin_gender')) {
+if (!function_exists('to_latin_gender')) {
     /**
      * Convert english day to french
      *
@@ -418,14 +418,14 @@ if (! function_exists('to_latin_gender')) {
     function to_latin_gender($gender)
     {
         $a = strtolower($gender);
-        if($a == "m" || $a == "male") {
+        if ($a == "m" || $a == "male") {
             return "Male";
         } else {
             return "Female";
         }
     }
 }
-if (! function_exists('to_khmer_month')) {
+if (!function_exists('to_khmer_month')) {
     /**
      * Convert english day to french
      *
@@ -465,7 +465,7 @@ if (! function_exists('to_khmer_month')) {
     }
 }
 
-if (! function_exists('convert_degree')) {
+if (!function_exists('convert_degree')) {
     /**
      * Convert string number to day
      *
@@ -491,7 +491,8 @@ if (! function_exists('convert_degree')) {
     }
 }
 
-function message_success ($data) {
+function message_success($data)
+{
     $response = [
         'code' => 1,
         'data' => $data,
@@ -500,7 +501,8 @@ function message_success ($data) {
     return $response;
 }
 
-function message_error ($message) {
+function message_error($message)
+{
     $response = [
         'code' => 0,
         'data' => [],
@@ -509,7 +511,7 @@ function message_error ($message) {
     return $response;
 }
 
-if (! function_exists('get_order_alpha_numeric')) {
+if (!function_exists('get_order_alpha_numeric')) {
     /**
      * Convert number to alpha numeric number
      *
@@ -535,17 +537,47 @@ if (! function_exists('get_order_alpha_numeric')) {
     }
 }
 
-if (! function_exists('get_department_option_code')) {
+if (!function_exists('get_department_option_code')) {
     /**
      * @param null $department_option
      * @return null
      */
-    function get_department_option_code($department_option=null)
+    function get_department_option_code($department_option = null)
     {
         if (is_null($department_option)) {
             return null;
         } else {
             return \App\Models\DepartmentOption::find($department_option)->code;
         }
+    }
+}
+
+if (!function_exists('message_success')) {
+    /**
+     * @param $data
+     * @return array
+     */
+    function message_success($data)
+    {
+        return array(
+            'code' => 1,
+            'status' => true,
+            'data' => $data
+        );
+    }
+}
+
+if (!function_exists('message_error')) {
+    /**
+     * @param $message
+     * @return array
+     */
+    function message_error($message)
+    {
+        return array(
+            'code' => 0,
+            'status' => false,
+            'message' => $message
+        );
     }
 }

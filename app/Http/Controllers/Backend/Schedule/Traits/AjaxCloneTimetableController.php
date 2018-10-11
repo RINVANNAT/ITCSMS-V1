@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Backend\Schedule\Traits;
 use App\Http\Requests\Backend\Schedule\Timetable\CloneTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\FormCloneTimetableRequest;
 use App\Models\Group;
-use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 /**
@@ -87,9 +85,9 @@ trait AjaxCloneTimetableController
             if ($timetable instanceof Timetable) {
                 // process clone
                 $weeks = $request->weeks;
-                if(count($weeks) >0) {
+                if (count($weeks) > 0) {
                     foreach ($weeks as $week) {
-                        if($week == $request->week_id) {
+                        if ($week == $request->week_id) {
                             continue;
                         }
                         $newTimetable = Timetable::where([
@@ -103,7 +101,7 @@ trait AjaxCloneTimetableController
                             ['group_id', $request->group_id == null ? null : $request->group_id]
                         ])->first();
 
-                        if(! ($newTimetable instanceof Timetable)){
+                        if (!($newTimetable instanceof Timetable)) {
                             $newTimetable = $timetable->replicate(); // duplicate and update
                             $newTimetable->week_id = $week;
                             $newTimetable->created_at = Carbon::now();
@@ -115,7 +113,7 @@ trait AjaxCloneTimetableController
                         foreach ($newTimetableSlots as $newTimetableSlot) {
                             $newSlot = Slot::find($newTimetableSlot->slot_id);
                             $newSlot->time_remaining += $newTimetableSlot->durations;
-                            if($newSlot->update()) {
+                            if ($newSlot->update()) {
                                 $newTimetableSlot->delete();
                             }
                         }
@@ -124,13 +122,13 @@ trait AjaxCloneTimetableController
 
                         foreach ($timetable_slots as $timetable_slot) {
                             $slot = Slot::find($timetable_slot->slot_id);
-                            if($slot->time_remaining >= $timetable_slot->durations) {
+                            if ($slot->time_remaining >= $timetable_slot->durations) {
                                 $findTimetableSlots = TimetableSlot::where([
                                     ['course_program_id', $timetable_slot->course_program_id],
                                     ['slot_id', $slot->id],
                                     ['timetable_id', $newTimetable->id],
                                 ])->get();
-                                if(!(count($findTimetableSlots)>0)){
+                                if (!(count($findTimetableSlots) > 0)) {
                                     $this->timetableSlotRepo->copied_timetable_slot($slot, $newTimetable, $timetable_slot);
                                 }
                             }
@@ -138,7 +136,7 @@ trait AjaxCloneTimetableController
                     }
                 }
             }
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             $result['code'] = $e->getCode();
             $result['message'] = $e->getMessage();
             $result['status'] = false;

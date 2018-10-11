@@ -674,6 +674,8 @@ class DistributionDepartmentController extends Controller
             }
         }
 
+        $academicYear = AcademicYear::find((int) $academicYear->id + 1);
+
         if (count($data) > 0) {
             return SnappyPdf::loadView('backend.distributionDepartment.print-each-department', compact('academicYear', 'grade', 'data'))
                 ->setOption('encoding', 'utf-8')
@@ -699,6 +701,8 @@ class DistributionDepartmentController extends Controller
             ->select('distribution_department_results.*', 'students.*', 'departments.code as dept_code', 'genders.code as sex')
             ->orderBy('students.name_latin', 'asc')
             ->get();
+
+        $academicYear = AcademicYear::find((int) $academicYear->id + 1);
 
         if (count($result) > 0) {
             return SnappyPdf::loadView('backend.distributionDepartment.print-all', compact('academicYear', 'grade', 'result'))

@@ -63,7 +63,7 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h3 class="title text-center text-bold">បំនែងចែកដេប៉ាតឺម៉ងថ្នាក់ឆ្នាំទី  {{ $grade->id == 1 ? '២' : '៣' }}</h3>
+                <h3 class="title text-center text-bold">បំនែងចែកដេប៉ាតឺម៉ង់ថ្នាក់ឆ្នាំទី  {{ $grade->id == 1 ? '២' : '៣' }}</h3>
                 <h4 class="sub-title text-center text-bold">ឆ្នាំសិក្សា {{ $academicYear->name_kh }}</h4>
             </div>
             <div class="col-xs-12">
