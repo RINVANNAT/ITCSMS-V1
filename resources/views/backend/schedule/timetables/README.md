@@ -19,5 +19,5 @@
 
 - Fullcalendar
 - jQuery
-- 
+- Vue
  

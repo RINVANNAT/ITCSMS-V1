@@ -11,18 +11,14 @@ class TimetableGroupTableSeeder extends Seeder
      */
     public function run()
     {
-        $groups = \App\Models\Group::all();
+        \App\Models\Schedule\Timetable\TimetableGroup::truncate();
 
-        foreach ($groups as $group) {
-            if (!is_null($group->code)) {
-                (new \App\Models\Schedule\Timetable\TimetableGroup())->create([
-                    'name_kh' => $group->name_kh,
-                    'name_en' => $group->name_kh,
-                    'name_fr' => $group->name_fr,
-                    'code' => $group->code,
-                    'description' => ''
-                ]);
-            }
+        $arrayGroups = array_merge(range('A', 'Z'), range(1, 38));
+
+        foreach ($arrayGroups as $group) {
+            (new \App\Models\Schedule\Timetable\TimetableGroup())->create([
+                'code' => $group
+            ]);
         }
     }
 }

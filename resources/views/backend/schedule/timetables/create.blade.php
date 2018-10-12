@@ -116,10 +116,10 @@
 
                 <div class="box-body">
                     <div class="row">
-                        <div class="col-md-9 col-sm-12 col-xs-12">
+                        <div class="col-md-9">
                             <div id="timetable" class="view-timetable"></div>
                         </div>
-                        <div class="col-md-3 col-sm-12 col-xs-12">
+                        <div class="col-md-3">
                             @include('backend.schedule.timetables.includes.partials.courses-sessions')
                             @include('backend.schedule.timetables.includes.partials.rooms')
                         </div>
@@ -149,18 +149,6 @@
 
 
     <script type="text/javascript">
-
-        var params = {
-            academic_year_id: $('select[name=academicYear]').val(),
-            department_id: $('select[name=department]').val(),
-            department_option_id: $('select[name=option]').val(),
-            degree_id: $('select[name=degree]').val(),
-            grade_id: $('select[name=grade]').val(),
-            group_id: $('select[name=group]').val(),
-            semester_id: $('select[name=semester]').val(),
-            week_id: $('select[name=weekly]').val()
-        }
-
         new Vue({
             el: '.app',
             data () {

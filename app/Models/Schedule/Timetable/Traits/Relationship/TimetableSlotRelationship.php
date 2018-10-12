@@ -7,6 +7,7 @@ use App\Models\Room;
 use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableGroup;
 
 /**
  * Class TimetableSlotRelationship
@@ -60,5 +61,13 @@ trait TimetableSlotRelationship
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'lecturer_id');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function group ()
+    {
+        return $this->belongsTo(TimetableGroup::class);
     }
 }

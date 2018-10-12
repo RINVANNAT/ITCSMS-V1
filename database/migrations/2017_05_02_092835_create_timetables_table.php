@@ -17,7 +17,6 @@ class CreateTimetablesTable extends Migration
 
             Schema::create('timetables', function (Blueprint $table) {
                 $table->increments('id');
-
                 $table->integer('academic_year_id')->unsigned();
                 $table->integer('department_id')->unsigned();
                 $table->integer('degree_id')->unsigned();
@@ -25,10 +24,7 @@ class CreateTimetablesTable extends Migration
                 $table->integer('option_id')->nullable();
                 $table->integer('semester_id')->unsigned();
                 $table->integer('week_id')->unsigned();
-                $table->integer('group_id')->nullable();
-
                 $table->boolean('completed')->default(false);
-
                 $table->integer('created_uid');
                 $table->integer('updated_uid');
 
