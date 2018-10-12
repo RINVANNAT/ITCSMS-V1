@@ -137,15 +137,6 @@
     </select>
 @endif
 
-<select name="group"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="{{ trans('inputs.backend.schedule.timetable.options.group') }}">
-    @foreach($groups as $group)
-        <option value="{{ $group['id'] }}">{{ $group['code'] }}</option>
-    @endforeach
-</select>
-
 @if(isset($weeks))
     <select name="weekly"
             data-toggle="tooltip"

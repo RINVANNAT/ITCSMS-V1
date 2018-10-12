@@ -45,33 +45,6 @@
                 <div class="box-header with-border">
                     <div class="mailbox-controls">
                         <div class="pull-right">
-                            {{--<div class="btn-group">
-                                <button class="btn btn-warning dropdown-toggle btn-sm"
-                                        data-toggle="dropdown"
-                                        aria-haspopup="true"
-                                        aria-expanded="false">
-                                    <span class="fa fa-cog"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_language" checked name="filter_language"/> Show Language Session</label></a></li>
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_alphabet_group" name="filter_alphabet_group"/> Get Alphabet Group</label></a></li>
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_number_group" name="filter_number_group"/> Get Number Group</label></a></li>
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox"/> Others</label></a></li>
-                                </ul>
-                            </div>--}}
-
-                            {{--@permission('generate-timetable')
-                            <a href="#">
-                                <button class="btn btn-primary btn-sm"
-                                        data-placement="right"
-                                        title="Tooltip on top"
-                                        disabled="true">
-                                    {{ trans('buttons.backend.schedule.timetable.generate') }}
-                                </button>
-                            </a>
-                            @endauth--}}
-
                             @permission('clone-timetable')
                             <button class="btn btn-success btn-sm btn_clone_timetable"
                                     data-toggle="modal"
@@ -1039,51 +1012,51 @@
                         option: $('select[name=option]').val(),
                         grade: $('select[name=grade]').val(),
                         semester: $('select[name=semester]').val(),
-                        group: $('select[name=group]').val(),
                         week: $('select[name=weekly]').val(),
                         query: query
                     },
                     success: function (response) {
                         if (response.status === true) {
                             var course_session_item = '';
-                            $.each(response.course_sessions, function (key, val) {
-                                if (val.teacher_name === null) {
-                                    course_session_item += '<li class="course-item disabled">';
-                                }
-                                else {
-                                    course_session_item += '<li class="course-item">';
-                                }
-                                course_session_item += '<span class="handle ui-sortable-handle">' +
-                                    '<i class="fa fa-ellipsis-v"></i> ' +
-                                    '<i class="fa fa-ellipsis-v"></i>' +
-                                    '</span>' +
-                                    '<span class="text course-name">' + val.course_name + '</span><br>';
-                                if (val.teacher_name === null) {
-                                    course_session_item += '<span style="margin-left: 28px;" class="teacher_name bg-danger badge">Unsigned</span><br/>';
-                                } else {
-                                    course_session_item += '<span style="margin-left: 28px;" class="leacher_name">' + val.teacher_name + '</span><br/>';
-                                }
-                                if (val.tp !== 0) {
-                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
-                                        '<span class="times">' + val.remaining + '</span> H'
-                                }
-                                else if (val.td !== 0) {
-                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
-                                        '<span class="times">' + val.remaining + '</span> H'
-                                }
-                                else {
-                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
-                                        '<span class="times">' + val.remaining + '</span> H'
-                                }
-                                course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
-                                course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>'
-                            })
+                            if (response.course_sessions.length > 0) {
+	                            $.each(response.course_sessions, function (key, val) {
+		                            if (val.teacher_name === null) {
+			                            course_session_item += '<li class="course-item disabled">';
+		                            }
+		                            else {
+			                            course_session_item += '<li class="course-item">';
+		                            }
+		                            course_session_item += '<span class="handle ui-sortable-handle">' +
+			                            '<i class="fa fa-ellipsis-v"></i> ' +
+			                            '<i class="fa fa-ellipsis-v"></i>' +
+			                            '</span>' +
+			                            '<span class="text course-name">' + val.course_name + '</span><br>';
+		                            if (val.teacher_name === null) {
+			                            course_session_item += '<span style="margin-left: 28px;" class="teacher_name bg-danger badge">Unsigned</span><br/>';
+		                            } else {
+			                            course_session_item += '<span style="margin-left: 28px;" class="leacher_name">' + val.teacher_name + '</span><br/>';
+		                            }
+		                            if (val.tp !== 0) {
+			                            course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
+				                            '<span class="times">' + val.remaining + '</span> H'
+		                            }
+		                            else if (val.td !== 0) {
+			                            course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
+				                            '<span class="times">' + val.remaining + '</span> H'
+		                            }
+		                            else {
+			                            course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
+				                            '<span class="times">' + val.remaining + '</span> H'
+		                            }
+		                            course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
+		                            course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>'
+	                            })
 
-                            $('.courses.todo-list').html(course_session_item);
-                            drag_course_session()
-                        }
-                        else {
-                            $('.courses.todo-list').html("<li class='course-item'>There are no course sessions created yet.</li>");
+	                            $('.courses.todo-list').html(course_session_item);
+	                            drag_course_session()
+                            } else {
+	                            $('.courses.todo-list').html("<li class='course-item'>The 0 courses are found.</li>");
+                            }
                         }
                     },
                     error: function () {
