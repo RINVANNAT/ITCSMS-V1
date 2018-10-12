@@ -36,6 +36,7 @@ class TimetableSlot extends Model
 
         self::creating(function ($model) {
             $model->created_uid = auth()->user()->id;
+            $model->updated_uid = auth()->user()->id;
         });
 
         self::updating(function ($model) {

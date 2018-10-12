@@ -28,10 +28,8 @@ class EloquentTimetableRepository implements TimetableRepositoryContract
             ['grade_id', $request->grade],
             ['option_id', $request->option == null ? null : $request->option],
             ['semester_id', $request->semester],
-            ['week_id', $request->weekly],
-            ['group_id', $request->group == null ? null : $request->group]
-        ])
-            ->first();
+            ['week_id', $request->weekly]
+        ])->first();
 
         if ($timetable instanceof Timetable) {
             return $timetable;
@@ -47,23 +45,23 @@ class EloquentTimetableRepository implements TimetableRepositoryContract
      */
     public function create_timetable(CreateTimetableRequest $request)
     {
-        $newTimetable = new Timetable();
+        try {
+            $newTimetable = new Timetable();
+            $newTimetable->academic_year_id = $request->academicYear;
+            $newTimetable->department_id = $request->department;
+            $newTimetable->degree_id = $request->degree;
+            $newTimetable->grade_id = $request->grade;
+            $newTimetable->option_id = $request->option == null ? null : $request->option;
+            $newTimetable->semester_id = $request->semester;
+            $newTimetable->week_id = $request->weekly;
 
-        $newTimetable->academic_year_id = $request->academicYear;
-        $newTimetable->department_id = $request->department;
-        $newTimetable->degree_id = $request->degree;
-        $newTimetable->grade_id = $request->grade;
-        $newTimetable->option_id = $request->option == null ? null : $request->option;
-        $newTimetable->semester_id = $request->semester;
-        $newTimetable->week_id = $request->weekly;
-        $newTimetable->group_id = $request->group == null ? null : $request->group;
-        $newTimetable->created_uid = auth()->user()->id;
-        $newTimetable->updated_uid = auth()->user()->id;
-
-        if ($newTimetable->save()) {
-            return $newTimetable;
+            if ($newTimetable->save()) {
+                return $newTimetable;
+            }
+            return false;
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
         }
-        return false;
     }
 
     /**
