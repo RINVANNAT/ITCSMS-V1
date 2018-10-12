@@ -14,11 +14,9 @@ class CreateTimetableGroupsTable extends Migration
     {
         Schema::create('timetable_groups', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name_kh')->nullable();
-            $table->string('name_en')->nullable();
-            $table->string('name_fr')->nullable();
+            $table->integer('parent_id')->nullable();
             $table->string('code');
-            $table->string('description');
+            $table->string('description')->nullable();;
             $table->timestamps();
         });
     }

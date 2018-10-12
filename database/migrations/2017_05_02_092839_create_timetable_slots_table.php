@@ -14,18 +14,16 @@ class CreateTimetableSlotsTable extends Migration
     {
         Schema::create('timetable_slots', function (Blueprint $table) {
             $table->increments('id');
-
             $table->integer('timetable_id')->unsigned();
             $table->integer('course_program_id')->unsigned();
             $table->integer('slot_id')->unsigned();
             $table->integer('lecturer_id')->unsigned()->nullable();
+            $table->integer('group_id')->nullable();
             $table->integer('room_id')->nullable();
             $table->integer('group_merge_id')->unsiged();
-
             $table->string('course_name');
             $table->string('type');
             $table->double('durations')->unsigned();
-
             $table->dateTime('start');
             $table->dateTime('end');
             $table->integer('created_uid');
@@ -56,6 +54,10 @@ class CreateTimetableSlotsTable extends Migration
                 ->on('employees')
                 ->onDelete('cascade');
 
+            $table->foreign('group_id')
+                ->references('id')
+                ->on('timetable_groups')
+                ->onDelete('cascade');
 
             $table->timestamps();
         });
