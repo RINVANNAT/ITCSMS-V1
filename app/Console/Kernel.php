@@ -45,5 +45,13 @@ class Kernel extends ConsoleKernel
 
         /** Testing Simple Console */
         // $schedule->command('log:demo')->everyMinute();
+        $schedule->command('backup:run')
+            ->timezone('Asia/Phnom_Penh')
+            ->daily()
+            ->at('8:00');
+        $schedule->command('backup:run')
+            ->timezone('Asia/Phnom_Penh')
+            ->daily()
+            ->at('17:00');
     }
 }

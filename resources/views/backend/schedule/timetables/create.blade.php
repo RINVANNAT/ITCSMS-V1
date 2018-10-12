@@ -34,6 +34,19 @@
         .bg-red {
             background-color: #dd4b39 !important;
         }
+        .timetable_group {
+            cursor: pointer;
+            padding: 10px !important;
+            background: #fff;
+            border: 1px solid #ddd;
+            margin: 5px;
+            text-align: center;
+        }
+        .timetable_group_width {
+            height: 280px;
+            overflow-y: auto;
+            background-color: #f1f1f1;
+        }
     </style>
 
 @stop
@@ -789,7 +802,7 @@
                 $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
                 $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
                 $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
-            get_course_programs();
+                get_course_programs();
             @else
                 get_options($('select[name="department"] :selected').val());
                 get_weeks($('select[name="semester"] :selected').val());
@@ -1072,6 +1085,11 @@
             $(document).on('keyup', '#search-employee', function () {
                 let query = $(this).val();
                 get_employees(query);
+            })
+
+            $(document).on('keyup', '#search-timetable-group', function () {
+                let query = $(this).val();
+                get_timetable_group(query);
             })
 
             $('#t-cog').click(function () {
