@@ -659,9 +659,6 @@
                         '</a>';
                     return $(object);
                 },
-                eventOverlap: function (stillEvent, movingEvent) {
-                    return stillEvent.allDay && movingEvent.allDay
-                },
                 eventResize: function (event, delta, revertFunc) {
                     var end = event.end.format();
                     resize_timetable_slot(event.id, end, revertFunc);

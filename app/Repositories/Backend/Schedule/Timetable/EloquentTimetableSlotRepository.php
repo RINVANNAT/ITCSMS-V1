@@ -476,6 +476,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function copied_timetable_slot(Slot $slot, Timetable $timetable, TimetableSlot $timetableSlot)
     {
+        DB::beginTransaction();
         try {
             $newMergeTimetableSlot = new MergeTimetableSlot();
             $newMergeTimetableSlot->start = $timetableSlot->start;
@@ -497,12 +498,12 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
 
                 $newTimetableSlot->start = $timetableSlot->start;
                 $newTimetableSlot->end = $timetableSlot->end;
-                $newTimetableSlot->created_uid = auth()->user()->id;
-                $newTimetableSlot->updated_uid = auth()->user()->id;
                 $newTimetableSlot->save();
+                DB::commit();
                 return true;
             }
         } catch (\Exception $e) {
+            DB::rollback();
             return false;
         }
     }

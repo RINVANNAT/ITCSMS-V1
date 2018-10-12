@@ -11,7 +11,7 @@ class TimetableGroupTableSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Schedule\Timetable\TimetableGroup::truncate();
+        // \App\Models\Schedule\Timetable\TimetableGroup::truncate();
 
         $arrayGroups = array_merge(range('A', 'Z'), range(1, 38));
 
