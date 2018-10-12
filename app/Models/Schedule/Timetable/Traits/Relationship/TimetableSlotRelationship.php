@@ -66,8 +66,8 @@ trait TimetableSlotRelationship
     /**
      * @return mixed
      */
-    public function group ()
+    public function groups ()
     {
-        return $this->belongsTo(TimetableGroup::class);
+        return $this->belongsToMany(TimetableGroup::class, 'timetable_group_sessions', 'timetable_slot_id', 'timetable_group_id');
     }
 }

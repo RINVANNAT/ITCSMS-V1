@@ -578,7 +578,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
                 // convert from array object to collection object.
-                $itemTimetableSlot = TimetableSlot::with('employee')->find($timetable_slot->id);
+                $itemTimetableSlot = TimetableSlot::with('employee', 'groups')->find($timetable_slot->id);
                 $timetableSlot = new Collection($itemTimetableSlot);
 
                 // find and prepare groups to render when timetable slot merge together
