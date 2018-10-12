@@ -14,7 +14,6 @@ class CreateSlotsTable extends Migration
     {
         Schema::create('slots', function (Blueprint $table) {
             $table->increments('id');
-
             $table->integer('time_tp')->default(0);
             $table->integer('time_td')->default(0);
             $table->integer('time_course')->default(0);
@@ -22,10 +21,8 @@ class CreateSlotsTable extends Migration
             $table->integer('course_program_id')->unsigned();
             $table->integer('semester_id')->unsigned();
             $table->integer('lecturer_id')->unsigned()->nullable();
-            $table->integer('group_id')->unsigned()->nullable();
             $table->double('time_used')->nullable();
             $table->double('time_remaining')->nullable();
-
             $table->integer('created_uid')->unsigned();
             $table->integer('write_uid')->unsigned()->nullable();
 
@@ -38,11 +35,6 @@ class CreateSlotsTable extends Migration
             $table->foreign('academic_year_id')
                 ->references('id')
                 ->on('academicYears')
-                ->onDelete('cascade');
-
-            $table->foreign('group_id')
-                ->references('id')
-                ->on('groups')
                 ->onDelete('cascade');
 
             $table->foreign('semester_id')

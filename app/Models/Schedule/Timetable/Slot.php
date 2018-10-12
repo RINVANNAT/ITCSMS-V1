@@ -22,7 +22,6 @@ class Slot extends Model
         'lecturer_id',
         'semester_id',
         'time_used',
-        'group_id',
         'time_remaining',
         'created_uid',
         'write_uid'

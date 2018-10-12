@@ -45,7 +45,7 @@
                 <div class="box-header with-border">
                     <div class="mailbox-controls">
                         <div class="pull-right">
-                            <div class="btn-group">
+                            {{--<div class="btn-group">
                                 <button class="btn btn-warning dropdown-toggle btn-sm"
                                         data-toggle="dropdown"
                                         aria-haspopup="true"
@@ -59,9 +59,9 @@
                                     <li role="separator" class="divider"></li>
                                     <li><a href="javascript:void(0)"><label><input type="checkbox"/> Others</label></a></li>
                                 </ul>
-                            </div>
+                            </div>--}}
 
-                            @permission('generate-timetable')
+                            {{--@permission('generate-timetable')
                             <a href="#">
                                 <button class="btn btn-primary btn-sm"
                                         data-placement="right"
@@ -70,7 +70,7 @@
                                     {{ trans('buttons.backend.schedule.timetable.generate') }}
                                 </button>
                             </a>
-                            @endauth
+                            @endauth--}}
 
                             @permission('clone-timetable')
                             <button class="btn btn-success btn-sm btn_clone_timetable"
