@@ -12,6 +12,11 @@
                        aria-controls="lecturer"
                        role="tab"
                        data-toggle="tab"><i class="fa fa-users"></i> Lecturer</a></li>
+                <li role="presentation">
+                    <a href="#timetableGroup"
+                       aria-controls="group"
+                       role="tab"
+                       data-toggle="tab"><i class="fa fa-th-large"></i> Group</a></li>
             </ul>
             <div class="tab-content">
                 <div role="tabpanel"
@@ -52,6 +57,31 @@
                 <div role="tabpanel"
                      class="tab-pane"
                      id="lecturer">
+                    <div class="box box-default" style="border: 1px solid #dddddd; border-top: 0;">
+                        <div class="box-header with-border">
+                            <div class="form-group">
+                                <input type="text"
+                                       style="border-radius: 4px !important;"
+                                       class="form-control"
+                                       id="search-employee"
+                                       name="employee_query"
+                                       placeholder="Find lecturer..."/>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="select2-results">
+                                <ul class="select2-results__options"
+                                    role="tree"
+                                    id="employee-viewer"
+                                    aria-expanded="true"
+                                    aria-hidden="false"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel"
+                     class="tab-pane"
+                     id="timetableGroup">
                     <div class="box box-default" style="border: 1px solid #dddddd; border-top: 0;">
                         <div class="box-header with-border">
                             <div class="form-group">
