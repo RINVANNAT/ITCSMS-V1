@@ -88,18 +88,18 @@
                                 <input type="text"
                                        style="border-radius: 4px !important;"
                                        class="form-control"
-                                       id="search-employee"
+                                       id="search-timetable-group"
                                        name="employee_query"
-                                       placeholder="Find lecturer..."/>
+                                       placeholder="Find group..."/>
                             </div>
                         </div>
                         <div class="box-body">
-                            <div class="select2-results">
-                                <ul class="select2-results__options"
-                                    role="tree"
-                                    id="employee-viewer"
-                                    aria-expanded="true"
-                                    aria-hidden="false"></ul>
+                            <div class="timetable_group_width">
+                                @foreach ($timetable_groups as $group)
+                                    <div class="col-md-2 timetable_group">
+                                        {{$group->code}}
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>

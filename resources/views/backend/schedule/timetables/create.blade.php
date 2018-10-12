@@ -34,6 +34,19 @@
         .bg-red {
             background-color: #dd4b39 !important;
         }
+        .timetable_group {
+            cursor: pointer;
+            padding: 10px !important;
+            background: #fff;
+            border: 1px solid #ddd;
+            margin: 5px;
+            text-align: center;
+        }
+        .timetable_group_width {
+            height: 280px;
+            overflow-y: auto;
+            background-color: #f1f1f1;
+        }
     </style>
 
 @stop
@@ -1099,6 +1112,11 @@
             $(document).on('keyup', '#search-employee', function () {
                 let query = $(this).val();
                 get_employees(query);
+            })
+
+            $(document).on('keyup', '#search-timetable-group', function () {
+                let query = $(this).val();
+                get_timetable_group(query);
             })
 
             $('#t-cog').click(function () {

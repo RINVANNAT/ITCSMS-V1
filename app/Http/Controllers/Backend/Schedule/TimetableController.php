@@ -22,6 +22,7 @@ use App\Models\Grade;
 use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableGroup;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
@@ -272,6 +273,8 @@ class TimetableController extends Controller
         $groups = $this->timetableSlotRepo->sort_groups($groups);
         $weeks = Week::where('semester_id', $semester)->get();
 
+        $timetableGroups = TimetableGroup::all();
+
         if (isset($createTimetablePermissionConfiguration)) {
             if (access()->allow('create-timetable') && (strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at))) {
                 return view('backend.schedule.timetables.create')->with([
@@ -286,7 +289,8 @@ class TimetableController extends Controller
                     'groups' => $groups,
                     'options_' => $options_,
                     'weeks_' => $weeks,
-                    'degrees' => $degrees
+                    'degrees' => $degrees,
+                    'timetable_groups' => $timetableGroups
                 ]);
             }
         } else {
@@ -302,7 +306,8 @@ class TimetableController extends Controller
                 'groups' => $groups,
                 'options_' => $options_,
                 'weeks_' => $weeks,
-                'degrees' => $degrees
+                'degrees' => $degrees,
+                'timetable_groups' => $timetableGroups
             ]);
         }
 
