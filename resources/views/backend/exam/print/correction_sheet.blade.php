@@ -113,7 +113,7 @@
                     </table>
                     <div class="footer">
 
-                        <span>Attention: Nombre des etudiants peut etre 26 ou 27 (Annee {{ $academic_year->id - 1 }})</span>
+                        <span>Attention: Nombre des etudiants peut etre 27 ou 28 (Annee {{ $academic_year->id - 1 }})</span>
 
                     </div>
                 </div>
