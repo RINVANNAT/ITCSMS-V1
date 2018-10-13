@@ -243,7 +243,7 @@ class CandidateController extends Controller
 
         $provinces = Origin::lists('name_kh','id');
         $gdeGrades = GdeGrade::lists('name_en','id');
-        $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code','asc')->get();
+        $departments = Department::where('is_specialist',true)->where('parent_id',11)->where('code','!=','GTR')->orderBy('code','asc')->get();
         $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
 
         if($studentBac2!=null){
