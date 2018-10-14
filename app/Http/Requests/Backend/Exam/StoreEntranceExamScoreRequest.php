@@ -37,9 +37,9 @@ class StoreEntranceExamScoreRequest extends Request
 
         foreach($this->request->get('candidate_id') as $index => $val)
         {
-            $rules['score_c.' . $index] = 'required|max:2';
-            $rules['score_w.' . $index] = 'required|max:2';
-            $rules['score_na.' . $index] = 'required|max:2';
+            $rules['score_c.' . $index] = 'required|max:3';
+            $rules['score_w.' . $index] = 'required|max:3';
+            $rules['score_na.' . $index] = 'required|max:3';
         }
 
 
