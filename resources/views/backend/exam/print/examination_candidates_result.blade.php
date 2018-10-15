@@ -68,9 +68,9 @@
     @foreach($candidateRes as $key => $candidatesResults)
 
         <?php
-            $first_chunk = array_slice($candidatesResults,0,20);
-            $remaining_chunk = array_slice($candidatesResults,20);
-            $candidatesResults = array_chunk($remaining_chunk, 22);
+            $first_chunk = array_slice($candidatesResults,0,22);
+            $remaining_chunk = array_slice($candidatesResults,22);
+            $candidatesResults = array_chunk($remaining_chunk, 24);
             array_unshift($candidatesResults,$first_chunk);
         ?>
         <?php   $page_number = 1;
