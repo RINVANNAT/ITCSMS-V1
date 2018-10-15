@@ -100,7 +100,7 @@
                         <th class="left">ឈ្មោះជាឡាតាំង</th>
                         <th width="1cm" class="center">ភេទ</th>
                         <th width="2.5cm" class="center">ថ្ងៃខែឆ្នាំកំណើត</th>
-                        <th width="2.5cm" class="center">ខេត្ត</th>
+                        {{--<th width="2.5cm" class="center">ខេត្ត</th>--}}
                     </tr>
 
                     @foreach($candidatesResult as $result)
@@ -120,7 +120,7 @@
                             <td class="left font_small">{{strtoupper($result->name_latin)}}</td>
                             <td class="center">{{$result->gender}}</td>
                             <td class="center">{{\Carbon\Carbon::createFromFormat('Y-m-d H:i:s',$result->dob)->formatLocalized("%d/%b/%Y")}}</td>
-                            <td class="center font_small">{{$result->origin}}</td>
+                            {{--<td class="center font_small">{{$result->origin}}</td>--}}
                         </tr>
                     @endforeach
                 </table>
