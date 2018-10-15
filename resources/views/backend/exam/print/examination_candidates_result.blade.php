@@ -137,7 +137,7 @@
 
                         <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                             <div class="col-sm-12 no-padding text-center">
-                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៧
+                                រាជធានីភ្នំពេញ ថ្ងៃទី ១៥ ខែ តុលា ឆ្នាំ ២០១៨
                             </div>
                             <div class="col-sm-12 no-padding text-center">
                                 នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
@@ -149,7 +149,7 @@
 
                 <div class="footer">
                     <hr style="margin-top: 5px; margin-bottom: 10px"/>
-                    <span>Concours d'entree ITC {{ $academic_year->id - 1 }}</span>
+                    <span>Concours d'entrée ITC {{ $academic_year->id - 1 }}</span>
                     <span class="pull-right">Page {{$page_number}} sur {{$total_page}}</span>
                 </div>
             </div>
