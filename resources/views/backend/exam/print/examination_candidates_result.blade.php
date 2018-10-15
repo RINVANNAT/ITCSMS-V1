@@ -52,7 +52,7 @@
                 width: 1.8cm !important;
             }
             .footer {
-                bottom: 20px !important;
+                bottom: 10px !important;
             }
             .page {
                 height: 285mm !important;
