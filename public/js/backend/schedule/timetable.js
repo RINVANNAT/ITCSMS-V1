@@ -300,42 +300,17 @@ function reset() {
 
 function get_timetable_group(query = null) {
     console.log(query)
-    axios.post('/admin/schedule/timetables/get_timetable_groups', {
+    axios.post('/admin/schedule/timetables/search_timetable_groups', {
         query: query
     }).then(response => {
         if (response.data.data.length > 0) {
-            let employee_template = '';
-            response.data.data.forEach((employee) => {
-                employee_template += `
-                    <li class="select2-results__option"
-                        role="treeitem"
-                        aria-selected="false">
-                        <div class="select2-result-repository clearfix">
-                            <div class="select2-result-repository__avatar">
-                                <img src="/img/profiles/avatar.png">
-                            </div>
-                            <div class="select2-result-repository__meta">
-                                <div class="select2-result-repository__title">` + (employee.id_card == null ? 'No ID Card' : employee.id_card) + ` | ` + employee.employee_name_kh + `</div>
-                                <div class="select2-result-repository__description">` + employee.employee_name_latin + `</div>
-                                <div class="select2-result-repository__statistics">
-                                    <div class="select2-result-repository__forks">
-                                        <i class="fa fa-bank"></i> ` + employee.department_code + `
-                                    </div>
-                                    <div class="select2-result-repository__stargazers">
-                                        <i class="fa fa-venus-mars"></i> ` + employee.gender_code + `
-                                    </div>
-                                </div>
-                            </div>
-                            <span class="lecturer_id hidden">` + employee.employee_id + `</span>
-                        </div>
-                    </li>
-                `;
+            let group_template = '';
+            response.data.data.forEach((group) => {
+            	group_template += `<div class="col-md-2 timetable_group">`+ group.code +`</div>`;
             });
-            $('.timetable_group').html(employee_template);
-            console.log($('.timetable_group'))
+            $('.timetable_group_width').html(group_template);
         } else {
-            console.log(23)
-            $('#employee-viewer').html('<h1>NO EMPLOYEES</h1>');
+            $('.timetable_group_width').html('<h1 style="text-align: center">NO GROUPS</h1>');
         }
     })
 }

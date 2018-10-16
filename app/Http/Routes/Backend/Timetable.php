@@ -46,6 +46,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/get_employees', 'TimetableController@get_employees')->name('admin.schedule.timetables.get_employees');
     Route::post('timetables/search_rooms', 'TimetableController@search_rooms')->name('admin.schedule.timetables.search_rooms');
     Route::post('timetables/filter-courses-sessions', 'TimetableController@filterCoursesSessions')->name('admin.schedule.timetables.filterCoursesSessions');
+    Route::post('timetables/search_timetable_groups', 'TimetableController@searchTimetableGroup')->name('admin.schedule.timetables.searchTimetableGroup');
 
     /** Clone route. */
     Route::post('timetables/clone', 'TimetableController@cloneTimetable')->name('admin.schedule.timetables.clone');

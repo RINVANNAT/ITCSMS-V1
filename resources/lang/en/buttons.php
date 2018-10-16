@@ -50,6 +50,9 @@ return [
                     'clone' => 'Clone',
                     'close' => 'Close'
                 ],
+                'modal_reset' => [
+                    'reset' => 'Reset'
+                ],
                 'assignment_permission' => 'Assignment Permission'
             ]
         ]

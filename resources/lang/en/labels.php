@@ -1040,6 +1040,9 @@ return [
                         'all_groups' => 'All Groups'
                     ]
                 ],
+                'modal_reset' => [
+                    'title' => 'Reset Timetable'
+                ],
                 'courses_sessions' => 'Courses Sessions',
                 'rooms' => 'Rooms',
                 'table' => [

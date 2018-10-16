@@ -428,11 +428,14 @@ class TimetableController extends Controller
                     'timetables.option_id' => $request->department_option_id,
                     'timetables.degree_id' => $request->degree_id,
                     'timetables.grade_id' => $request->grade_id,
-                    'timetables.semester_id' => $request->semester_id,
-                    'timetables.week_id' => $request->week_id,
-                    'timetables.group_id' => $request->group_id
-                ])
-                ->select('timetable_slots.*')
+                    'timetables.semester_id' => $request->semester_id
+                ]);
+
+            if ($request->selected_week != 'all') {
+                $timetable_slots = $timetable_slots->whereIn('timetables.week_id', $request->selected_week);
+            }
+
+            $timetable_slots = $timetable_slots->select('timetable_slots.*')
                 ->get();
 
             foreach ($timetable_slots as $timetable_slot) {
@@ -441,7 +444,7 @@ class TimetableController extends Controller
                     $slot->time_used -= (float) $timetable_slot->durations;
                     $slot->time_remaining += (float) $timetable_slot->durations;
                     if ($slot->update()) {
-                        $timetable_slot->delete();
+                        TimetableSlot::find($timetable_slot->id)->delete();
                     }
                 }
             }
@@ -452,5 +455,9 @@ class TimetableController extends Controller
             DB::rollback();
             return message_error($exception->getMessage());
         }
+    }
+
+    public function searchTimetableGroup() {
+        return message_success(TimetableGroup::where('code', 'ilike', "%" . request('query') . "%")->get());
     }
 }

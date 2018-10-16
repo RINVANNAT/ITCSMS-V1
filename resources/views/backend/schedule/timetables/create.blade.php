@@ -45,9 +45,11 @@
                                 {{ trans('buttons.backend.schedule.timetable.clone') }}
                             </button>
                             <button class="btn btn-primary btn-sm btn-reset-timetable"
+                                    data-toggle="modal"
+                                    data-target="#reset-timetable"
                                     data-toggle="tooltip"
                                     data-placement="top"
-                                    @click="reset"
+                                    id="btn_reset"
                                     title="Reset">
                                 Reset
                             </button>
@@ -93,6 +95,7 @@
         </div>
     </div>
     @include('backend.schedule.timetables.includes.modals.clone')
+    @include('backend.schedule.timetables.includes.modals.reset')
 @stop
 
 @section('after-scripts-end')
@@ -759,6 +762,38 @@
             $('#conflict').fadeOut();
         }
 
+        function reset_timetable() {
+            let selected_week = []
+            $('.render_weeks input:checked').each(function() {
+                selected_week.push(parseInt($(this).val()));
+            });
+            if ($('input[id="all-weeks"]').is(':checked') == true) {
+                selected_week = 'all'
+            }
+            axios.post('/admin/schedule/timetables/reset', {
+                academic_year_id: $('select[name=academicYear]').val(),
+                department_id: $('select[name=department]').val(),
+                department_option_id: $('select[name=option]').val(),
+                degree_id: $('select[name=degree]').val(),
+                grade_id: $('select[name=grade]').val(),
+                group_id: $('select[name=group]').val(),
+                semester_id: $('select[name=semester]').val(),
+                week_id: $('select[name=weekly]').val(),
+                selected_week: selected_week
+            }).then((response) => {
+                if (response.data.code === 1) {
+                    get_course_programs()
+                    get_timetable_slots()
+                    get_timetable()
+                    drag_course_session()
+                    notify('info', 'Timetable successfully reset.', 'Reset Timetable')
+                } else {
+                    notify('error', 'Reset', 'Error')
+                }
+                $('#reset-timetable').modal('hide');
+            })
+        }
+
         $(function () {
             // popup export course session btn.
             $('.btn_export_course_session').popover({
@@ -1063,6 +1098,10 @@
             $(document).on('keyup', '#search-timetable-group', function () {
                 let query = $(this).val();
                 get_timetable_group(query);
+            })
+
+            $(document).on('click', '#submit_reset', function () {
+                reset_timetable()
             })
 
             $('#t-cog').click(function () {
