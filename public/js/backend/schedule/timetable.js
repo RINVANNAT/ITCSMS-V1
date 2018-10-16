@@ -299,7 +299,6 @@ function reset() {
 }
 
 function get_timetable_group(query = null) {
-    console.log(query)
     axios.post('/admin/schedule/timetables/search_timetable_groups', {
         query: query
     }).then(response => {

@@ -457,6 +457,22 @@ class TimetableController extends Controller
         }
     }
 
+    public function storeTimetableGroup (Request $request) {
+        if ( $request->name != '') {
+            $newGroup = new TimetableGroup();
+            if ($request->parent_id != '') {
+                $newGroup->parent_id = $request->parent_id;
+            }
+            $newGroup->code = $request->name;
+
+            if($newGroup->save()) {
+                return message_success($newGroup);
+            }
+        } else {
+            return message_error('message error');
+        }
+    }
+
     public function searchTimetableGroup() {
         return message_success(TimetableGroup::where('code', 'ilike', "%" . request('query') . "%")->get());
     }
