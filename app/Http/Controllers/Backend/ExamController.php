@@ -2949,9 +2949,10 @@ class ExamController extends Controller
     public function printCandidateErrorScore($examId, Request $request) {
 
         $errors = $this->exams->getErrorScore($examId,$request->get('course_id'));
+        $academic_year = Exam::find($examId)->first()->academic_year_id + 1;
         $courseName = $request->get('course_name');
 
-        return view('backend.exam.print.candidate_score_error', compact('errors', 'courseName'));
+        return view('backend.exam.print.candidate_score_error', compact('errors', 'courseName', 'academic_year'));
     }
 
     public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section

@@ -87,8 +87,8 @@
 
                 @if($page_number == 1)
                     <center>
-                    <h3>បញ្ជីរាយឈ្មោះបេក្ខជន ជាប់ {{$key}} ចូលរៀនថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋាន</h3>
-                    <h3>នៅ​ វបក សម្រាប់ឆ្នាំសិក្សា ២០១៧-២០១៨</h3>
+                    <h3>បញ្ជីរាយឈ្មោះបេក្ខជន ជាប់់់ {{$key}} ចូលរៀនថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋាន</h3>
+                    <h3>នៅ​ វបក សម្រាប់ឆ្នាំសិក្សា ២០១៨-២០១៩</h3>
                     </center>
                 @endif
                 <table class="table table-bordered" width="100%">
@@ -100,7 +100,7 @@
                         <th class="left">ឈ្មោះជាឡាតាំង</th>
                         <th width="1cm" class="center">ភេទ</th>
                         <th width="2.5cm" class="center">ថ្ងៃខែឆ្នាំកំណើត</th>
-                        <th width="2.5cm" class="center">ខេត្ត</th>
+                        {{--<th width="2.5cm" class="center">ខេត្ត</th>--}}
                     </tr>
 
                     @foreach($candidatesResult as $result)
@@ -120,7 +120,7 @@
                             <td class="left font_small">{{strtoupper($result->name_latin)}}</td>
                             <td class="center">{{$result->gender}}</td>
                             <td class="center">{{\Carbon\Carbon::createFromFormat('Y-m-d H:i:s',$result->dob)->formatLocalized("%d/%b/%Y")}}</td>
-                            <td class="center font_small">{{$result->origin}}</td>
+                            {{--<td class="center font_small">{{$result->origin}}</td>--}}
                         </tr>
                     @endforeach
                 </table>
@@ -137,7 +137,7 @@
 
                         <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                             <div class="col-sm-12 no-padding text-center">
-                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៧
+                                រាជធានីភ្នំពេញ ថ្ងៃទី ១៥ ខែ តុលា ឆ្នាំ ២០១៨
                             </div>
                             <div class="col-sm-12 no-padding text-center">
                                 នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
@@ -149,7 +149,7 @@
 
                 <div class="footer">
                     <hr style="margin-top: 5px; margin-bottom: 10px"/>
-                    <span>Concours d'entree ITC {{ $academic_year->id - 1 }}</span>
+                    <span>Concours d'entrée ITC {{ $academic_year->id - 1 }}</span>
                     <span class="pull-right">Page {{$page_number}} sur {{$total_page}}</span>
                 </div>
             </div>
