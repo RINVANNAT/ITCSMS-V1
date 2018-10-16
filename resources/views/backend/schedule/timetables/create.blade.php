@@ -109,42 +109,13 @@
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
+
     <script type="text/javascript" src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
     <script type="text/javascript" src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/backend/schedule/index.js') }}"></script>
 
 
     <script type="text/javascript">
-        new Vue({
-            el: '.app',
-            data () {
-                return {
-                    message: []
-                }
-            },
-            methods: {
-                reset () {
-                    axios.post('/admin/schedule/timetables/reset', {
-                        academic_year_id: $('select[name=academicYear]').val(),
-                        department_id: $('select[name=department]').val(),
-                        department_option_id: $('select[name=option]').val(),
-                        degree_id: $('select[name=degree]').val(),
-                        grade_id: $('select[name=grade]').val(),
-                        group_id: $('select[name=group]').val(),
-                        semester_id: $('select[name=semester]').val(),
-                        week_id: $('select[name=weekly]').val()
-                    }).then((response) => {
-                        if (response.data.code == 1) {
-                            get_timetable_slots();
-                            get_timetable();
-                            drag_course_session();
-                        } {
-                            notify('error', 'Reset', 'Error')
-                        }
-                    })
-                }
-            }
-        })
-
         /*Drag course session into timetable.*/
         function drag_course_session() {
             @if(access()->allow('drag-course-session'))
@@ -598,32 +569,27 @@
                         object += '</div>';
                     }
 
-                    if (typeof event.slotsForLanguage === 'undefined') {
+                    if (!event.hasOwnProperty('slotsForLanguage')) {
                         object += '<div class="side-room">' +
                             '<div class="room-name">';
 
                         // check conflict and render room
-                        if (event.room !== null && event.building !== null) {
+                        if (event.hasOwnProperty('room') && event.room !== null) {
                             if (event.conflict_room === true) {
-                                object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
+                                object += '<p class="fc-room bg-danger badge">' + event.room.building.code + '-' + event.room.name + '</p>';
                             } else {
-                                object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
+                                object += '<p class="fc-room">' + event.room.building.code + '-' + event.room.name + '</p>';
                             }
                         }
                         object += '</div>';
 
                         // render groups
-                        if (typeof event.groups !== 'undefined') {
+                        if (event.hasOwnProperty('groups') && event.groups.length > 0) {
                             if (event.groups.length > 0) {
                                 var groups = '<p>Gr: ';
-                                for (var i = 0; i < event.groups.length; i++) {
-                                    if (event.groups[i] !== null) {
-                                        groups += event.groups[i].code + ' ';
-                                    }
-                                    else {
-                                        groups = '';
-                                    }
-                                }
+                                event.groups.forEach((eachGroup) => {
+                                	groups += eachGroup.code + ' '
+                                })
                                 groups += '</p>';
                             }
                             object += groups;

@@ -13,6 +13,7 @@ use App\Models\Room;
 use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableGroupSession;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -37,7 +38,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         $newMergeTimetableSlot = $this->create_merge_timetable_slot($request);
         if ($newMergeTimetableSlot instanceof MergeTimetableSlot) {
-            $slot = Slot::find($request->slot_id);
+            $slot = Slot::with('groups')->find($request->slot_id);
             if ($slot instanceof Slot) {
                 $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
                 if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
@@ -62,6 +63,15 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                             $slot->time_remaining = $slot->time_remaining - $duration;
                             $slot->updated_at = Carbon::now();
                             $slot->update();
+                        }
+
+                        if (count($slot->groups) > 0) {
+                            foreach ($slot->groups as $group) {
+                                $newTimetableGroupSession = new TimetableGroupSession();
+                                $newTimetableGroupSession->timetable_slot_id = $newTimetableSlot->id;
+                                $newTimetableGroupSession->timetable_group_id = $group->id;
+                                $newTimetableGroupSession->save();
+                            }
                         }
                         return $newTimetableSlot;
                     } catch (\Exception $e) {

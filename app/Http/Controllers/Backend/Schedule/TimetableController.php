@@ -23,6 +23,7 @@ use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableGroup;
+use App\Models\Schedule\Timetable\TimetableGroupSlot;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
@@ -441,8 +442,8 @@ class TimetableController extends Controller
             foreach ($timetable_slots as $timetable_slot) {
                 $slot = Slot::find($timetable_slot->slot_id);
                 if ($slot instanceof Slot) {
-                    $slot->time_used -= (float) $timetable_slot->durations;
-                    $slot->time_remaining += (float) $timetable_slot->durations;
+                    $slot->time_used -= (float)$timetable_slot->durations;
+                    $slot->time_remaining += (float)$timetable_slot->durations;
                     if ($slot->update()) {
                         TimetableSlot::find($timetable_slot->id)->delete();
                     }
@@ -475,5 +476,23 @@ class TimetableController extends Controller
 
     public function searchTimetableGroup() {
         return message_success(TimetableGroup::where('code', 'ilike', "%" . request('query') . "%")->get());
+    }
+
+    public function assignGroup (Request $request)
+    {
+        $this->validate($request, [
+            'slot_id' => 'required',
+            'group_id' => 'required'
+        ]);
+
+        try{
+            $timetableGroupSlot = TimetableGroupSlot::firstOrCreate([
+                'slot_id' => $request->slot_id,
+                'timetable_group_id' => $request->group_id
+            ]);
+            return message_success($timetableGroupSlot);
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
     }
 }

@@ -32,7 +32,7 @@ trait TimetableSlotRelationship
      */
     public function room()
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(Room::class)->with('building');
     }
 
     /**
