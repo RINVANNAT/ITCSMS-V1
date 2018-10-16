@@ -22,31 +22,7 @@
     {!! Html::style('css/backend/schedule/timetable.css') !!}
 
     <style type="text/css">
-        .bg-primary {
-            background-color: #337ab7 !important;
-        }
 
-        .bg-danger {
-            background-color: #dd4b39 !important;
-            color: #fff;
-        }
-
-        .bg-red {
-            background-color: #dd4b39 !important;
-        }
-        .timetable_group {
-            cursor: pointer;
-            padding: 10px !important;
-            background: #fff;
-            border: 1px solid #ddd;
-            margin: 5px;
-            text-align: center;
-        }
-        .timetable_group_width {
-            height: 280px;
-            overflow-y: auto;
-            background-color: #f1f1f1;
-        }
     </style>
 
 @stop
