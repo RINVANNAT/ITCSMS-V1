@@ -329,37 +329,32 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        $result = array(
-            'code' => 200,
-            'message' => 'Successfully',
-            'timetable' => null,
-            'timetableSlots' => [],
-        );
-
         try {
-            $timetableSlots = new Collection();
-            $timetable = $this->timetableRepo->find_timetable_is_existed($request);
-            if (($request->filter_language == "true") && !($request->department == 12 || $request->department == 13)) {
-                if ($request->department < 12 && ($timetable instanceof Timetable)) {
-                    $this->timetableSlotRepo->get_timetable_slot_language_dept($timetableSlots, $timetable);
+            $result = array(
+                'code' => 200,
+                'message' => 'Successfully',
+                'timetable' => null,
+                'timetableSlots' => [],
+            );
+
+            try {
+                $timetable = $this->timetableRepo->find_timetable_is_existed($request);
+                if ($timetable instanceof Timetable) {
+                    $result['timetable'] = $timetable;
+                    $result['timetableSlots'] = TimetableSlot::with('groups', 'employee', 'room')
+                        ->where('timetable_id', $timetable->id)
+                        ->get();
                 }
-            }
 
-            if ($timetable instanceof Timetable) {
-                $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
+            } catch (\Exception $e) {
+                $result['code'] = $e->getCode();
+                $result['message'] = $e->getMessage();
+                $request['status'] = false;
             }
-
-            if (!is_null($timetable)) {
-                $result['timetable'] = $timetable;
-                $result['timetableSlots'] = $timetableSlots;
-            }
-
+            return $result;
         } catch (\Exception $e) {
-            $result['code'] = $e->getCode();
-            $result['message'] = $e->getMessage();
-            $request['status'] = false;
+            return message_error($e->getMessage());
         }
-        return $result;
     }
 
     /**

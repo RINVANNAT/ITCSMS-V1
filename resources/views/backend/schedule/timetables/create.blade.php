@@ -566,32 +566,27 @@
                         object += '</div>';
                     }
 
-                    if (typeof event.slotsForLanguage === 'undefined') {
+                    if (!event.hasOwnProperty('slotsForLanguage')) {
                         object += '<div class="side-room">' +
                             '<div class="room-name">';
 
                         // check conflict and render room
-                        if (event.room !== null && event.building !== null) {
+                        if (event.hasOwnProperty('room') && event.room !== null) {
                             if (event.conflict_room === true) {
-                                object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
+                                object += '<p class="fc-room bg-danger badge">' + event.room.building.code + '-' + event.room.name + '</p>';
                             } else {
-                                object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
+                                object += '<p class="fc-room">' + event.room.building.code + '-' + event.room.name + '</p>';
                             }
                         }
                         object += '</div>';
 
                         // render groups
-                        if (typeof event.groups !== 'undefined') {
+                        if (event.hasOwnProperty('groups') && event.groups.length > 0) {
                             if (event.groups.length > 0) {
                                 var groups = '<p>Gr: ';
-                                for (var i = 0; i < event.groups.length; i++) {
-                                    if (event.groups[i] !== null) {
-                                        groups += event.groups[i].code + ' ';
-                                    }
-                                    else {
-                                        groups = '';
-                                    }
-                                }
+                                event.groups.forEach((eachGroup) => {
+                                	groups += eachGroup.code + ' '
+                                })
                                 groups += '</p>';
                             }
                             object += groups;
