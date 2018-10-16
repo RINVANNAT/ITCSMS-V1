@@ -430,3 +430,13 @@ ul.select2-results__options li.select2-results__option:hover {
     overflow-y: auto;
     background-color: #f1f1f1;
 }
+
+.todo-list > li .text {
+    margin-left: 0px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    display: inline-block;
+}

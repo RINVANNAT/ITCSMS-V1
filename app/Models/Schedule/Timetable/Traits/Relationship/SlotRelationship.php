@@ -2,6 +2,7 @@
 
 namespace App\Models\Schedule\Timetable\Traits\Relationship;
 
+use App\Models\Schedule\Timetable\TimetableGroup;
 use App\Models\Schedule\Timetable\TimetableSlot;
 
 /**
@@ -16,5 +17,10 @@ trait SlotRelationship
     public function timetableSlots()
     {
         return $this->hasMany(TimetableSlot::class);
+    }
+
+    public function groups ()
+    {
+        return $this->belongsToMany(TimetableGroup::class, 'timetable_group_slots', 'slot_id', 'timetable_group_id');
     }
 }

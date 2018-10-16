@@ -67,4 +67,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
         Route::get('/get_rooms', 'CheckAvailableRoomController@get_rooms')->name('check-available-room.get_rooms');
         Route::post('/get-unavailable-room-info', 'CheckAvailableRoomController@get_unavailable_room_info')->name('check-available-room.get_unavailable_room_info');
     });
+
+    /** Assign groups */
+    Route::post('group/assign-group', 'TimetableController@assignGroup');
 });

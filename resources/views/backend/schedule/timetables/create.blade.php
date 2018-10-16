@@ -106,42 +106,13 @@
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
+
     <script type="text/javascript" src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
     <script type="text/javascript" src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/backend/schedule/index.js') }}"></script>
 
 
     <script type="text/javascript">
-        new Vue({
-            el: '.app',
-            data () {
-                return {
-                    message: []
-                }
-            },
-            methods: {
-                reset () {
-                    axios.post('/admin/schedule/timetables/reset', {
-                        academic_year_id: $('select[name=academicYear]').val(),
-                        department_id: $('select[name=department]').val(),
-                        department_option_id: $('select[name=option]').val(),
-                        degree_id: $('select[name=degree]').val(),
-                        grade_id: $('select[name=grade]').val(),
-                        group_id: $('select[name=group]').val(),
-                        semester_id: $('select[name=semester]').val(),
-                        week_id: $('select[name=weekly]').val()
-                    }).then((response) => {
-                        if (response.data.code == 1) {
-                            get_timetable_slots();
-                            get_timetable();
-                            drag_course_session();
-                        } {
-                            notify('error', 'Reset', 'Error')
-                        }
-                    })
-                }
-            }
-        })
-
         /*Drag course session into timetable.*/
         function drag_course_session() {
             @if(access()->allow('drag-course-session'))

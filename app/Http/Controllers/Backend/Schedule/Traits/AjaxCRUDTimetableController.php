@@ -196,6 +196,7 @@ trait AjaxCRUDTimetableController
                 ->whereIn('course_program_id', $course_program_ids)
                 ->where('slots.academic_year_id', $academic_year_id)
                 ->where('slots.time_remaining', '>', 0)
+                ->with('groups')
                 ->select(
                     'slots.id as id',
                     'slots.course_program_id as course_program_id',
