@@ -416,6 +416,11 @@ ul.select2-results__options li.select2-results__option:hover {
     background-color: #dd4b39 !important;
 }
 
+.bg-success {
+    background-color: #00a65a !important;
+    color: #ffffff;
+}
+
 .timetable_group {
     cursor: pointer;
     padding: 10px !important;

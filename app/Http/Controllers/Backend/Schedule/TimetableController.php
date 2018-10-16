@@ -23,6 +23,7 @@ use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableGroup;
+use App\Models\Schedule\Timetable\TimetableGroupSession;
 use App\Models\Schedule\Timetable\TimetableGroupSlot;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
@@ -468,6 +469,72 @@ class TimetableController extends Controller
                 'timetable_group_id' => $request->group_id
             ]);
             return message_success($timetableGroupSlot);
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
+    }
+
+    public function removeGroup (Request $request)
+    {
+        $this->validate($request, [
+            'slot_id' => 'required',
+            'timetable_group_id' => 'required'
+        ]);
+
+        try{
+            $timetableGroupSlot = TimetableGroupSlot::where([
+                'slot_id' => $request->slot_id,
+                'timetable_group_id' => $request->timetable_group_id
+            ])->first();
+
+            if ($timetableGroupSlot instanceof TimetableGroupSlot) {
+                $timetableGroupSlot->delete();
+                return message_success([]);
+            }
+            return message_error('Could not delete group!');
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
+    }
+
+
+    public function assignGroupToTimetableSlot (Request $request)
+    {
+        $this->validate($request, [
+            'timetable_slot_id' => 'required',
+            'timetable_group_id' => 'required'
+        ]);
+
+        try{
+            $timetableGroupSession = TimetableGroupSession::firstOrCreate([
+                'timetable_slot_id' => $request->timetable_slot_id,
+                'timetable_group_id' => $request->timetable_group_id
+            ]);
+            return message_success($timetableGroupSession);
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
+    }
+
+
+    public function removeGroupFromTimetableSlot (Request $request)
+    {
+        $this->validate($request, [
+            'timetable_slot_id' => 'required',
+            'timetable_group_id' => 'required'
+        ]);
+
+        try{
+            $timetableGroupSession = TimetableGroupSession::where([
+                'timetable_slot_id' => $request->timetable_slot_id,
+                'timetable_group_id' => $request->timetable_group_id
+            ])->first();
+
+            if ($timetableGroupSession instanceof TimetableGroupSession) {
+                $timetableGroupSession->delete();
+                return message_success([]);
+            }
+            return message_error('Could not delete group!');
         } catch (\Exception $exception) {
             return message_error($exception->getMessage());
         }

@@ -309,7 +309,6 @@
         }
         /** create timetable slot */
         function create_timetable_slots(copiedEventObject) {
-            console.log(copiedEventObject)
             toggleLoading(true);
             $.ajax({
                 type: 'POST',
@@ -585,7 +584,12 @@
                             if (event.groups.length > 0) {
                                 var groups = '<p>Gr: ';
                                 event.groups.forEach((eachGroup) => {
-                                	groups += eachGroup.code + ' '
+                                	groups += `
+                                	    <span class="remove-group-from-timetable-slot">
+                                	        <span class="timetable-slot-id hidden">`+event.id+`</span>
+                                	        <span class="group-id hidden">`+eachGroup.id+`</span>`+eachGroup.code+`
+                                	    </span>
+                                	`
                                 })
                                 groups += '</p>';
                             }
@@ -613,9 +617,7 @@
                             remove_timetable_slots(event);
                             $('#timetable').fullCalendar('removeEvent', event.id);
                         }
-                    } catch (e) {
-                        console.log(e);
-                    }
+                    } catch (e) {}
                 },
                 loading: function (isLoading, view) {
                     if (isLoading) {

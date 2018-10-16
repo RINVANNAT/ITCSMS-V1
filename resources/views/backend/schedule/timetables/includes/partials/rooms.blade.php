@@ -97,7 +97,7 @@
                             <div class="timetable_group_width">
                                 @foreach ($timetable_groups as $group)
                                     <div class="col-md-2 timetable_group"
-                                         @click="onCLickAddGroup('{{ $group }}')">
+                                         @click="onCLickAddGroup({{ $group }})">
                                         {{$group->code}}
                                     </div>
                                 @endforeach
