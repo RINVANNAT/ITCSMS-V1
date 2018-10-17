@@ -96,8 +96,9 @@ new Vue({
 			var data = {}
 			var slot_id = $('.course-program-selected').find('.slot-id').text()
 			var timetable_slot_id = $('.course-selected').attr('id')
+			console.log(timetable_slot_id)
 			
-			if(timetable_slot_id !== '' || timetable_slot_id !== null || timetable_slot_id !== undefined) {
+			if(timetable_slot_id !== '' && timetable_slot_id !== null && timetable_slot_id !== undefined) {
 				api = '/admin/schedule/group/assign-group-to-timetable-slot'
 				data.timetable_slot_id = parseInt(timetable_slot_id)
 				data.timetable_group_id = group.id
