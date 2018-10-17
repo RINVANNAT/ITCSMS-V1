@@ -47,7 +47,7 @@
                     <div class="col-sm-12" style="text-align: center; margin-bottom: 15px">
                         <h2>{!! $title !!}</h2>
                         <h4>ការជ្រើសរើសចូលរៀនឆ្នាំទី១​​​​​ ផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម</h4>
-                        <h3>ឆ្នាំសិក្សា: @foreach($candidatesResult as $result)  @if($check==0) {{$result->academic_year}} <?php $check++;?> @endif @endforeach </h3>
+                        <h3>ឆ្នាំសិក្សា: ២០១៨ - ២០១៩ @foreach($candidatesResult as $result)  @if($check==0) {{}} <?php $check++;?> @endif @endforeach </h3>
                     </div>
                 @endif
 
