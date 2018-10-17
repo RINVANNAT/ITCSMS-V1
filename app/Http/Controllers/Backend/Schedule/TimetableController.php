@@ -35,6 +35,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
+use Mockery\Exception;
 use Yajra\Datatables\Datatables;
 
 /**
@@ -272,7 +274,7 @@ class TimetableController extends Controller
         $groups = $this->timetableSlotRepo->sort_groups($groups);
         $weeks = Week::where('semester_id', $semester)->get();
 
-        $timetableGroups = TimetableGroup::all();
+        $timetableGroups = TimetableGroup::with('parent')->get();
 
         if (isset($createTimetablePermissionConfiguration)) {
             if (access()->allow('create-timetable') && (strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at))) {
@@ -457,19 +459,21 @@ class TimetableController extends Controller
     }
 
     public function storeTimetableGroup (Request $request) {
-        if ( $request->name != '') {
-            $newGroup = new TimetableGroup();
-            if ($request->parent_id != '') {
-                $newGroup->parent_id = $request->parent_id;
-            }
-            $newGroup->code = $request->name;
 
-            if($newGroup->save()) {
-                return message_success($newGroup);
-            }
-        } else {
-            return message_error('message error');
+        $validator = Validator::make($request->all(), [
+           'name' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return message_error($validator->errors());
         }
+
+        $newGroup = TimetableGroup::firstOrCreate([
+            'code' => $request->name,
+            'parent_id' => $request->parent_id == '' ? null : $request->parent_id
+        ]);
+
+        return message_success(TimetableGroup::where('id', $newGroup->id)->with('parent')->first());
     }
 
     public function searchTimetableGroup() {
@@ -558,5 +562,9 @@ class TimetableController extends Controller
         } catch (\Exception $exception) {
             return message_error($exception->getMessage());
         }
+    }
+
+    public function getTimetableGroup () {
+        return message_success(TimetableGroup::with('parent')->get());
     }
 }

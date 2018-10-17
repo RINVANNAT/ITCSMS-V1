@@ -103,14 +103,7 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <div class="timetable_group_width">
-                                @foreach ($timetable_groups as $group)
-                                    <div class="col-md-2 timetable_group"
-                                         @click="onCLickAddGroup({{ $group }})">
-                                        {{$group->code}}
-                                    </div>
-                                @endforeach
-                            </div>
+                            <group-wrapper :groups="groups"></group-wrapper>
                         </div>
                     </div>
                 </div>
@@ -136,9 +129,11 @@
                             <select name="timetable_group_parent_id" class="form-control">
                                 <option></option>
                                 @foreach ($timetable_groups as $group)
-                                    <option value="{{ $group->id }}">
-                                        {{$group->code}}
-                                    </option>
+                                    @if ($group->parent_id == null)
+                                        <option value="{{ $group->id }}">
+                                            {{$group->code}}
+                                        </option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
@@ -147,12 +142,13 @@
                         <label for="inputPassword3" class="col-sm-4 control-label">Group Name</label>
                         <div class="col-sm-8">
                             <input name="timetable_group_name" type="text" class="form-control" id="group_name" placeholder="Group Name">
+                            <span class="error-message"></span>
                         </div>
                     </div>
                     <hr>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
-                            <button class="btn btn-primary btn-sm btn-save-new-group">Save</button>
+                            <button class="btn btn-primary btn-sm btn-save-new-group" @click="storeTimetableGroup">Save</button>
                             <button type="button" class="btn btn-default btn-sm btn_cancel_clone_timetable"
                                     data-dismiss="modal">Close</button>
                         </div>

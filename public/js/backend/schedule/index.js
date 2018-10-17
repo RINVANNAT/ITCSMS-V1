@@ -62,11 +62,63 @@ Vue.component('course-program-wrapper', {
 	}
 })
 
+
+Vue.component('group-wrapper', {
+	template: `
+		<div class="timetable_group_width" v-if="groups !== null">
+			<div class="col-md-2 timetable_group"
+				v-for="(eachGroup, key) in groups"
+				 @click="onCLickAddGroup(eachGroup)">
+				 <span v-if="eachGroup.parent_id !== null"> {{eachGroup.parent.code}} | </span> {{ eachGroup.code }}
+			</div>
+		</div>
+	`,
+	props: {
+		groups: {
+			type: Array,
+			default: null
+		}
+	},
+	methods: {
+        onCLickAddGroup (group) {
+            toggleLoading(true)
+            var api = '/admin/schedule/group/assign-group'
+            var data = {}
+            var slot_id = $('.course-program-selected').find('.slot-id').text()
+            var timetable_slot_id = $('.course-selected').attr('id')
+            console.log(timetable_slot_id)
+
+            if(timetable_slot_id !== '' && timetable_slot_id !== null && timetable_slot_id !== undefined) {
+                api = '/admin/schedule/group/assign-group-to-timetable-slot'
+                data.timetable_slot_id = parseInt(timetable_slot_id)
+                data.timetable_group_id = group.id
+            } else {
+                data.slot_id = slot_id
+                data.group_id = group.id
+            }
+
+            axios.post(api, data).then((response) => {
+                if (response.data.code === 1) {
+                    notify('info', 'The group was added', 'Assgin Group')
+                    get_course_programs()
+                    get_timetable()
+                    get_timetable_slots()
+                }
+                toggleLoading(false)
+            }).catch((error) => {
+                console.log(error)
+                toggleLoading(false)
+            })
+        }
+	}
+})
+
 new Vue({
 	el: '.app',
 	data () {
 		return {
-			message: []
+			message: [],
+			groups: null
 		}
 	},
 	methods: {
@@ -90,36 +142,50 @@ new Vue({
 				}
 			})
 		},
-		onCLickAddGroup (group) {
-			toggleLoading(true)
-			var api = '/admin/schedule/group/assign-group'
-			var data = {}
-			var slot_id = $('.course-program-selected').find('.slot-id').text()
-			var timetable_slot_id = $('.course-selected').attr('id')
-			console.log(timetable_slot_id)
-			
-			if(timetable_slot_id !== '' && timetable_slot_id !== null && timetable_slot_id !== undefined) {
-				api = '/admin/schedule/group/assign-group-to-timetable-slot'
-				data.timetable_slot_id = parseInt(timetable_slot_id)
-				data.timetable_group_id = group.id
-			} else {
-				data.slot_id = slot_id
-				data.group_id = group.id
-			}
-			
-			axios.post(api, data).then((response) => {
-				if (response.data.code === 1) {
-					notify('info', 'The group was added', 'Assgin Group')
-					get_course_programs()
-					get_timetable()
-					get_timetable_slots()
-				}
-				toggleLoading(false)
-			}).catch((error) => {
-				console.log(error)
-				toggleLoading(false)
-			})
+		getGroups () {
+            axios.post('/admin/schedule/timetables/get_timetable_groups').then((response) => {
+                if (response.data.code === 1) {
+                	this.groups = response.data.data
+                } else {
+                    notify('error', 'Error Get Timetable Group', 'Error')
+                }
+            })
+		},
+		storeTimetableGroup () {
+			console.log(100)
+            axios.post('/admin/schedule/timetables/store_new_group', {
+                parent_id: $('select[name=timetable_group_parent_id]').val(),
+                name: $('input[name=timetable_group_name]').val()
+            }).then((response) => {
+                if (response.data.code === 1) {
+                    get_course_programs()
+                    get_timetable_slots()
+                    get_timetable()
+                    drag_course_session()
+                    $('#add-new-group').modal('hide');
+
+                    var found = ''
+					this.groups.forEach((eachGroup) => {
+                    	if (eachGroup.id === response.data.data.id) {
+                    		found = eachGroup
+						}
+					})
+
+                    if (found === '') {
+                        this.groups.push(response.data.data)
+                    }
+
+                    notify('info', 'New Group successfully created.', 'New Group')
+                } else {
+                    $('.error-message').html(response.data.message.name).css('color', 'red')
+                    $('.error-message').siblings('input').css('border-color', 'red')
+                    notify('error', 'Create New Group', response.data.message.code)
+                }
+            })
 		}
+	},
+	mounted () {
+		this.getGroups()
 	}
 })
 

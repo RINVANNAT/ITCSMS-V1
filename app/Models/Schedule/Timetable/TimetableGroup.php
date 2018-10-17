@@ -14,7 +14,8 @@ class TimetableGroup extends Model
 
     protected $fillable = [
         'code',
-        'description'
+        'description',
+        'parent_id'
     ];
 
     protected static function boot()
@@ -25,5 +26,9 @@ class TimetableGroup extends Model
     public function timetableSlots ()
     {
         return $this->belongsToMany(TimetableSlot::class, 'timetable_group_sessions', 'timetable_group_id', 'timetable_slot_id');
+    }
+
+    public function parent () {
+        return $this->belongsTo(TimetableGroup::class);
     }
 }

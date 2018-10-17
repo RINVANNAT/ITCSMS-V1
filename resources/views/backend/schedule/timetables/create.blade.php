@@ -1072,23 +1072,11 @@
                 reset_timetable()
             })
 
-            $(document).on('click', '.btn-save-new-group', function () {
-                console.log($('select[name=timetable_group_parent_id]').val())
-                axios.post('/admin/schedule/timetables/store_new_group', {
-                    parent_id: $('select[name=timetable_group_parent_id]').val(),
-                    name: $('input[name=timetable_group_name]').val()
-                }).then((response) => {
-                    if (response.data.code === 1) {
-                        get_course_programs()
-                        get_timetable_slots()
-                        get_timetable()
-                        drag_course_session()
-                        notify('info', 'Timetable successfully reset.', 'Reset Timetable')
-                    } else {
-                        notify('error', 'Reset', 'Error')
-                    }
-                    $('#reset-timetable').modal('hide');
-                })
+            $(document).on('click', '.btn_add_new_group', function () {
+                $('select[name=timetable_group_parent_id]').val('')
+                $('input[name=timetable_group_name]').val('')
+                $('.error-message').html('')
+                $('.error-message').siblings('input').css('border-color', '#d2d6de')
             })
 
             $('#t-cog').click(function () {
