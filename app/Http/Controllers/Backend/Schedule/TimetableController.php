@@ -129,7 +129,6 @@ class TimetableController extends Controller
             ->join('grades', 'grades.id', '=', 'timetables.grade_id')
             ->leftJoin('departmentOptions', 'departmentOptions.id', '=', 'timetables.option_id')
             ->join('semesters', 'semesters.id', '=', 'timetables.semester_id')
-            ->leftJoin('groups', 'groups.id', '=', 'timetables.group_id')
             ->where([
                 ['academicYears.id', $academic_year_id],
                 ['departments.id', $department_id],
@@ -141,9 +140,7 @@ class TimetableController extends Controller
         if ($option_id !== 'Option' && $option_id != null) {
             $timetables->where('departmentOptions.id', $option_id);
         }
-        if ($group_id !== 'Group' && $group_id != null) {
-            $timetables->where('groups.id', $group_id);
-        }
+
         if (request('week') != null) {
             $timetables->where('weeks.name_en', request('week'));
         }
