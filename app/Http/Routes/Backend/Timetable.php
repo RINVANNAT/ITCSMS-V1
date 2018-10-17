@@ -72,4 +72,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
 
     /** Assign groups */
     Route::post('group/assign-group', 'TimetableController@assignGroup');
+    Route::post('group/remove-group', 'TimetableController@removeGroup');
+
+    Route::post('group/assign-group-to-timetable-slot', 'TimetableController@assignGroupToTimetableSlot');
+    Route::post('group/remove-group-from-timetable-slot', 'TimetableController@removeGroupFromTimetableSlot');
 });

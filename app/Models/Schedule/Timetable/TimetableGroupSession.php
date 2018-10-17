@@ -8,6 +8,6 @@ class TimetableGroupSession extends Model
 {
     protected $fillable = [
         'timetable_slot_id',
-        'timetable_session_id'
+        'timetable_group_id'
     ];
 }

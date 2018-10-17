@@ -92,25 +92,104 @@ new Vue({
 		},
 		onCLickAddGroup (group) {
 			toggleLoading(true)
-			var slot_id = $('.course-program-selected').find('.slot-id').text();
-			group = JSON.parse(group)
-			axios.post('/admin/schedule/group/assign-group', {
-				group_id: group.id,
-				slot_id: parseInt(slot_id)
-			}).then((response) => {
+			var api = '/admin/schedule/group/assign-group'
+			var data = {}
+			var slot_id = $('.course-program-selected').find('.slot-id').text()
+			var timetable_slot_id = $('.course-selected').attr('id')
+			console.log(timetable_slot_id)
+			
+			if(timetable_slot_id !== '' && timetable_slot_id !== null && timetable_slot_id !== undefined) {
+				api = '/admin/schedule/group/assign-group-to-timetable-slot'
+				data.timetable_slot_id = parseInt(timetable_slot_id)
+				data.timetable_group_id = group.id
+			} else {
+				data.slot_id = slot_id
+				data.group_id = group.id
+			}
+			
+			axios.post(api, data).then((response) => {
 				if (response.data.code === 1) {
 					notify('info', 'The group was added', 'Assgin Group')
-					var newGroup = '<span class="bg-info badge">'+ group.code +'</span>'
-					$('.course-program-selected').find('.list-groups').append(newGroup)
+					get_course_programs()
+					get_timetable()
+					get_timetable_slots()
 				}
 				toggleLoading(false)
 			}).catch((error) => {
 				console.log(error)
 				toggleLoading(false)
 			})
-		},
-		removeGroupFromCourseProgram (group) {
-			console.log(group)
 		}
 	}
+})
+
+$(function () {
+	$(document).on('click', '.remove-group-from-course-program', function (e) {
+		var dom = $(this)
+		var timetable_group_id = parseInt(dom.find('.group-id').text())
+		var slot_id = parseInt(dom.parent().parent().find('.slot-id').text())
+		swal({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this!",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			axios.post('/admin/schedule/group/remove-group', {
+				timetable_group_id: timetable_group_id,
+				slot_id: slot_id
+			}).then((response) => {
+				if (response.data.code === 1) {
+					swal(
+						'Group Removed!',
+						'The group has been deleted.',
+						'success'
+					)
+					get_course_programs()
+				} else {
+					notify('error', response.data.message, 'Remove Group!')
+				}
+			}).catch((error) => {
+				notify('error', error, 'Remove Group!')
+			})
+			
+		})
+	})
+	
+	$(document).on('click', '.remove-group-from-timetable-slot', function (e) {
+		var dom = $(this)
+		var timetable_group_id = parseInt(dom.find('.group-id').text())
+		var timetable_slot_id = parseInt(dom.find('.timetable-slot-id').text())
+		swal({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this!",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			axios.post('/admin/schedule/group/remove-group-from-timetable-slot', {
+				timetable_group_id: timetable_group_id,
+				timetable_slot_id: timetable_slot_id
+			}).then((response) => {
+				if (response.data.code === 1) {
+					swal(
+						'Group Removed!',
+						'The group has been deleted.',
+						'success'
+					)
+					get_course_programs()
+					get_timetable_slots()
+				} else {
+					notify('error', response.data.message, 'Remove Group!')
+				}
+			}).catch((error) => {
+				notify('error', error, 'Remove Group!')
+			})
+			
+		})
+	})
 })

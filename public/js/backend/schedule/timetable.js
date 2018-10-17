@@ -11,10 +11,10 @@ $(document).on('click', '.btn_export_course_program', function (event) {
 		semester_id: $('select[name=semester]').val(),
 	}).then(function (response) {
 		if (response.data.code == 1) {
-		    get_course_programs()
-		    notify('info', 'There are ' + response.data.data + ' programs exported!', 'Export Course Programs')
+			get_course_programs()
+			notify('info', 'There are ' + response.data.data + ' programs exported!', 'Export Course Programs')
 		} else {
-		    notify('info', response.data.message, 'Export Course Programs')
+			notify('info', response.data.message, 'Export Course Programs')
 		}
 		toggleLoading(false);
 	}).catch(function (error) {
@@ -129,42 +129,55 @@ function get_course_programs() {
 					else {
 						course_session_item += '<li class="course-item">';
 					}
-					course_session_item += '<span class="text course-name">' + val.course_name + '</span><br>';
-					if (val.teacher_name === null) {
-						course_session_item += '<strong>Lecturer:</strong> <span class="teacher_name bg-danger badge">Unknown</span><br/>';
-					} else {
-						course_session_item += '<strong>Lecturer:</strong> <span class="leacher_name">' + val.teacher_name + '</span><br/>';
-					}
+					
+					course_session_item += '<span class="text course-name">' + val.course_name + '</span><br>'
+					
 					if (val.tp !== 0) {
-						course_session_item += '<span class="course-type"><strong>TP: </strong></span>' +
-							'<span class="times">' + val.remaining + '</span> H'
+						course_session_item += '<span class="course-type"><strong>TP</strong></span> : ' +
+							'<span class="times">' + val.remaining + '</span> H <br/>'
 					}
 					else if (val.td !== 0) {
-						course_session_item += '<span class="course-type"><strong>TD: </strong></span>' +
-							'<span class="times">' + val.remaining + '</span> H'
+						course_session_item += '<span class="course-type"><strong>TD</strong></span> : ' +
+							'<span class="times">' + val.remaining + '</span> H <br/>'
 					}
 					else {
-						course_session_item += '<span class="course-type"><strong>Course: </strong></span>' +
-							'<span class="times">' + val.remaining + '</span> H'
+						course_session_item += '<span class="course-type"><strong>Course</strong></span> : ' +
+							'<span class="times">' + val.remaining + '</span> H <br/>'
+					}
+					
+					if (val.teacher_name === null) {
+						course_session_item += `
+							<strong>Lecturer:</strong>
+							<span class="teacher_name bg-danger badge">Unknown</span><br/>
+						`;
+					} else {
+						course_session_item += '<strong>Lecturer:</strong> <span class="leacher_name">' + val.teacher_name + '</span><br/>';
 					}
 					
 					if (val.groups.length > 0) {
 						course_session_item += '<div class="list-groups"><span><strong>Groups: </strong></span>'
 						val.groups.forEach((eachGroup) => {
-							course_session_item += '<span class="bg-info badge" @click="removeGroupFromCourseProgram(eachGroup)">' + eachGroup.code + '</span>'
+							course_session_item += '<span class="bg-success badge remove-group-from-course-program"><span class="group-id hidden">'+ eachGroup.id +'</span>' + eachGroup.code + '</span>'
 						})
 						course_session_item += '</div>'
+					} else {
+						course_session_item += `
+							<div class="list-groups">
+								<span><strong>Groups: </strong></span>
+								<span class="teacher_name bg-danger badge">No Groups</span><br/>
+							</div>
+						`
 					}
 					
 					course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
 					course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
 				});
 				
-				$('.courses.todo-list').html(course_session_item);
+				$('.courses.todo-list').html(course_session_item)
 				drag_course_session()
 			}
 			else {
-				$('.courses.todo-list').html("<li class='course-item text-center'>No Courses!</li>");
+				$('.courses.todo-list').html("<li class='course-item text-center'>No Courses!</li>")
 			}
 		},
 		error: function () {
@@ -172,10 +185,10 @@ function get_course_programs() {
 				'Oops...',
 				'Something went wrong!',
 				'error'
-			);
+			)
 		},
 		complete: function () {
-			toggleLoading(false);
+			toggleLoading(false)
 		}
 	});
 }

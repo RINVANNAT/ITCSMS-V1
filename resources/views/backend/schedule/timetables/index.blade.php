@@ -40,21 +40,23 @@
                     @if(((strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at)) && access()->allow('create-timetable')))
                         <a class="btn btn-primary btn-sm"
                            data-toggle="tooltip"
-                           data-placement="top" title="{{ trans('tooltrips.backend.timetable.create_timetable') }}"
-                           data-original-title="{{ trans('tooltrips.backend.timetable.create_timetable') }}"
+                           data-placement="top"
+                           title="Manage Timetable"
+                           data-original-title="Manage Timetable"
                            href="{{ route('admin.schedule.timetables.create') }}">
                             <i class="fa fa-plus-circle"></i>
-                            {{ trans('buttons.backend.schedule.timetable.create') }}
+                            Manage Timetable
                         </a>
                     @endif
                 @else
                     <a class="btn btn-primary btn-sm"
                        data-toggle="tooltip"
-                       data-placement="top" title="{{ trans('tooltrips.backend.timetable.create_timetable') }}"
-                       data-original-title="{{ trans('tooltrips.backend.timetable.create_timetable') }}"
+                       data-placement="top"
+                       title="Manage Timetable"
+                       data-original-title="Manage Timetable"
                        href="{{ route('admin.schedule.timetables.create') }}">
                         <i class="fa fa-plus-circle"></i>
-                        {{ trans('buttons.backend.schedule.timetable.create') }}
+                        Manage Timetable
                     </a>
                 @endif
                 @permission('create-timetable-assignment')
@@ -64,11 +66,9 @@
                     <i class="fa fa-plus-circle"></i> {{ trans('buttons.backend.schedule.timetable.assignment_permission') }}
                 </button>
                 @endauth
-
                 <a href="/admin/schedule/timetables/check-available-room" class="btn btn-warning btn-sm">
                     <i class="fa fa-building-o"></i> Check Available Room
                 </a>
-
             </div>
         </div>
         <div class="row">
