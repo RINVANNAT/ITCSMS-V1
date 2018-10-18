@@ -441,12 +441,13 @@ class TimetableController extends Controller
 
             foreach ($timetable_slots as $timetable_slot) {
                 $slot = Slot::find($timetable_slot->slot_id);
-                if ($slot instanceof Slot) {
-                    $slot->time_used -= (float)$timetable_slot->durations;
-                    $slot->time_remaining += (float)$timetable_slot->durations;
-                    if ($slot->update()) {
-                        TimetableSlot::find($timetable_slot->id)->delete();
+                if ($slot instanceof Slot && count($slot->timetableGroupSlots) >0) {
+                    foreach ($slot->timetableGroupSlots as $groupSlot) {
+                        $timetableGroupSlot = TimetableGroupSlot::find($groupSlot->id);
+                        $timetableGroupSlot->total_hours_remain += (float)$timetable_slot->durations;
+                        $timetableGroupSlot->update();
                     }
+                    TimetableSlot::find($timetable_slot->id)->delete();
                 }
             }
 
