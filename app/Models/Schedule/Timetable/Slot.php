@@ -19,10 +19,7 @@ class Slot extends Model
         'time_course',
         'academic_year_d',
         'course_program_id',
-        'lecturer_id',
         'semester_id',
-        'time_used',
-        'time_remaining',
         'created_uid',
         'write_uid'
     ];

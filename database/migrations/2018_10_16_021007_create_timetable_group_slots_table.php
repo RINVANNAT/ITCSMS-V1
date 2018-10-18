@@ -16,6 +16,8 @@ class CreateTimetableGroupSlotsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('slot_id');
             $table->unsignedInteger('timetable_group_id');
+            $table->integer('total_hours');
+            $table->integer('total_hours_remain');
             $table->timestamps();
 
             $table->foreign('slot_id')
