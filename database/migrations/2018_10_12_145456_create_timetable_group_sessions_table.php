@@ -16,8 +16,7 @@ class CreateTimetableGroupSessionsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('timetable_slot_id');
             $table->unsignedInteger('timetable_group_id');
-            $table->integer('total_hours');
-            $table->integer('total_hours_remain');
+            $table->integer('room_id')->nullable();
             $table->timestamps();
 
             $table->foreign('timetable_slot_id')

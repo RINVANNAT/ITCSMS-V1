@@ -36,4 +36,29 @@ class Slot extends Model
             $model->write_uid = auth()->user()->id;
         });
     }
+
+    protected $appends = [
+        'total_hours'
+    ];
+
+    public function getTotalHoursAttribute ()
+    {
+        if (isset($this->tp)) {
+            if ($this->tp > 0) {
+                return $this->tp;
+            } else if ($this->td > 0) {
+                return $this->td;
+            } else {
+                return $this->tc;
+            }
+        } else {
+            if ($this->time_tp > 0) {
+                return $this->time_tp;
+            } else if ($this->time_td > 0) {
+                return $this->time_td;
+            } else {
+                return $this->time_course;
+            }
+        }
+    }
 }

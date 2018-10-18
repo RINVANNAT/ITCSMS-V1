@@ -111,24 +111,15 @@ function get_course_programs() {
 					
 					if (val.tp !== 0) {
 						course_session_item += '<span class="course-type"><strong>TP</strong></span> : ' +
-							'<span class="times">' + val.remaining + '</span> H <br/>'
+							'<span class="times">' + val.total_hours + '</span> H <br/>'
 					}
 					else if (val.td !== 0) {
 						course_session_item += '<span class="course-type"><strong>TD</strong></span> : ' +
-							'<span class="times">' + val.remaining + '</span> H <br/>'
+							'<span class="times">' + val.total_hours + '</span> H <br/>'
 					}
 					else {
 						course_session_item += '<span class="course-type"><strong>Course</strong></span> : ' +
-							'<span class="times">' + val.remaining + '</span> H <br/>'
-					}
-					
-					if (val.teacher_name === null) {
-						course_session_item += `
-							<strong>Lecturer:</strong>
-							<span class="teacher_name bg-danger badge">Unknown</span><br/>
-						`;
-					} else {
-						course_session_item += '<strong>Lecturer:</strong> <span class="leacher_name">' + val.teacher_name + '</span><br/>';
+							'<span class="times">' + val.total_hours + '</span> H <br/>'
 					}
 					
 					if (val.groups.length > 0) {

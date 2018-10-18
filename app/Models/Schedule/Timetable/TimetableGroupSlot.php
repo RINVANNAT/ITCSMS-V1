@@ -10,7 +10,8 @@ class TimetableGroupSlot extends Model
         'slot_id',
         'timetable_group_id',
         'total_hours',
-        'total_hours_remain'
+        'total_hours_remain',
+        'room_id'
     ];
 
     public function lecturers ()

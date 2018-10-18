@@ -14,6 +14,7 @@ use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableGroupSession;
+use App\Models\Schedule\Timetable\TimetableGroupSlot;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -36,51 +37,60 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function create_timetable_slot(Timetable $timetable, CreateTimetableSlotRequest $request)
     {
-        $newMergeTimetableSlot = $this->create_merge_timetable_slot($request);
-        if ($newMergeTimetableSlot instanceof MergeTimetableSlot) {
-            $slot = Slot::with('groups')->find($request->slot_id);
-            if ($slot instanceof Slot) {
-                $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
-                if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
-                    try {
-                        $newTimetableSlot = new TimetableSlot();
-                        $newTimetableSlot->timetable_id = $timetable->id;
-                        $newTimetableSlot->course_program_id = $request->course_program_id;
-                        $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
-                        $newTimetableSlot->slot_id = $request->slot_id;
-                        $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
-                        $newTimetableSlot->course_name = $request->course_name;
-                        if (isset($request->lecturer_id) && !is_null($request->lecturer_id) && $request->lecturer_id != 'null') {
-                            $newTimetableSlot->lecturer_id = $request->lecturer_id;
-                        }
-                        $newTimetableSlot->type = $request->course_type;
-                        $newTimetableSlot->start = new Carbon($request->start);
-                        $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
-                        $newTimetableSlot->durations = $duration;
-                        $newTimetableSlot->created_uid = auth()->user()->id;
-                        $newTimetableSlot->updated_uid = auth()->user()->id;
-                        if ($newTimetableSlot->save()) {
-                            $slot->time_remaining = $slot->time_remaining - $duration;
-                            $slot->updated_at = Carbon::now();
-                            $slot->update();
-                        }
+        DB::beginTransaction();
+        try {
+            $newMergeTimetableSlot = $this->create_merge_timetable_slot($request);
+            if ($newMergeTimetableSlot instanceof MergeTimetableSlot) {
+                $slot = Slot::with('groups')->find($request->slot_id);
+                if ($slot instanceof Slot) {
+                    $start = new Carbon($request->start);
+                    $end = new Carbon($request->end == null ? $request->start : $request->end);
+                    $duration = $this->durations($start, $end);
+                    $groups = $slot->groups->pluck('id');
 
-                        if (count($slot->groups) > 0) {
-                            foreach ($slot->groups as $group) {
-                                $newTimetableGroupSession = new TimetableGroupSession();
-                                $newTimetableGroupSession->timetable_slot_id = $newTimetableSlot->id;
-                                $newTimetableGroupSession->timetable_group_id = $group->id;
-                                $newTimetableGroupSession->save();
-                            }
+                    $timetableGroupSlots = TimetableGroupSlot::where('slot_id', $slot->id)
+                        ->whereIn('timetable_group_id', $groups)
+                        ->where('total_hours_remain', '>', 0)
+                        ->where('total_hours_remain', '>=', $duration)
+                        ->get();
+
+                    if (count($timetableGroupSlots) > 0) {
+                        // create a new timetable slot
+                        $newTimetableSlot = (new TimetableSlot())->create([
+                            'timetable_id' => $timetable->id,
+                            'course_program_id' => $request->course_program_id,
+                            'room_id' => null,
+                            'slot_id' => $slot->id,
+                            'group_merge_id' => $newMergeTimetableSlot->id,
+                            'course_name' => $request->course_name,
+                            'lecturer_id' => null,
+                            'type' => $request->course_type,
+                            'start' => $start,
+                            'end' => $end,
+                            'durations' => $duration
+                        ]);
+
+                        // and then create timetable group
+                        foreach ($timetableGroupSlots as $timetableGroupSlot) {
+                            $timetableGroupSlot->total_hours_remain -= $duration;
+                            $timetableGroupSlot->update();
+
+                            // add timetable slot with group on timetable_group_session
+                            (new TimetableGroupSession())->create([
+                                'timetable_slot_id' => $newTimetableSlot->id,
+                                'timetable_group_id' => $timetableGroupSlot->timetable_group_id,
+                                'room_id' => $timetableGroupSlot->room_id
+                            ]);
                         }
+                        DB::commit();
                         return $newTimetableSlot;
-                    } catch (\Exception $e) {
-                        return message_error($e->getMessage());
                     }
                 }
             }
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return message_error($exception->getMessage());
         }
-        return false;
     }
 
     /**

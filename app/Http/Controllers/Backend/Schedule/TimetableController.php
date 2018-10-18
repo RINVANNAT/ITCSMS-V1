@@ -488,11 +488,17 @@ class TimetableController extends Controller
         ]);
 
         try{
-            $timetableGroupSlot = TimetableGroupSlot::firstOrCreate([
-                'slot_id' => $request->slot_id,
-                'timetable_group_id' => $request->group_id
-            ]);
-            return message_success($timetableGroupSlot);
+            $slot = Slot::find($request->slot_id);
+            if ($slot instanceof Slot) {
+                $timetableGroupSlot = TimetableGroupSlot::firstOrCreate([
+                    'slot_id' => $request->slot_id,
+                    'timetable_group_id' => $request->group_id,
+                    'total_hours' => $slot->total_hours,
+                    'total_hours_remain' => $slot->total_hours
+                ]);
+                return message_success($timetableGroupSlot);
+            }
+            return message_error('The slot could not found!');
         } catch (\Exception $exception) {
             return message_error($exception->getMessage());
         }

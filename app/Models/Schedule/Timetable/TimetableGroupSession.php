@@ -9,8 +9,7 @@ class TimetableGroupSession extends Model
     protected $fillable = [
         'timetable_slot_id',
         'timetable_group_id',
-        'total_hours',
-        'total_hours_remain'
+        'room_id'
     ];
 
     public function lecturers ()
