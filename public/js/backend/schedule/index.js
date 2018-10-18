@@ -118,7 +118,8 @@ new Vue({
 	data () {
 		return {
 			message: [],
-			groups: null
+			groups: null,
+			groupsSelected: []
 		}
 	},
 	methods: {
@@ -152,7 +153,6 @@ new Vue({
             })
 		},
 		storeTimetableGroup () {
-			console.log(100)
             axios.post('/admin/schedule/timetables/store_new_group', {
                 parent_id: $('select[name=timetable_group_parent_id]').val(),
                 name: $('input[name=timetable_group_name]').val()
@@ -179,9 +179,39 @@ new Vue({
                 } else {
                     $('.error-message').html(response.data.message.name).css('color', 'red')
                     $('.error-message').siblings('input').css('border-color', 'red')
-                    notify('error', 'Create New Group', response.data.message.code)
+                    notify('error', 'Create New Group', response.data.message.name)
                 }
             })
+		},
+        saveGroupCourse () {
+			var selectedGroup = []
+			var group = $('.timetable-group-course input:checked')
+            $.each(group, function(){
+                selectedGroup.push($(this).val());
+            });
+            toggleLoading(true);
+            axios.post('/admin/schedule/timetables/export_course_program', {
+            	academic_year_id: $('select[name=academicYear]').val(),
+            	department_id: $('select[name=department]').val(),
+            	degree_id: $('select[name=degree]').val(),
+            	option_id: $('select[name=option]').val(),
+            	grade_id: $('select[name=grade]').val(),
+            	semester_id: $('select[name=semester]').val(),
+            	group_ids: selectedGroup,
+            }).then(function (response) {
+            	if (response.data.code === 1) {
+            		get_course_programs()
+                    $('#choose-timetable-group').modal('hide');
+                    $('.all-groups').prop('checked', false);
+                    $('.timetable-group-course input').prop('checked', false);
+            		notify('info', 'There are ' + response.data.data + ' programs exported!', 'Export Course Programs')
+            	} else {
+            		notify('info', response.data.message, 'Export Course Programs')
+            	}
+            	toggleLoading(false);
+            }).catch(function (error) {
+            	notify('error', 'Slots was not exported', 'Export Courses');
+            });
 		}
 	},
 	mounted () {
