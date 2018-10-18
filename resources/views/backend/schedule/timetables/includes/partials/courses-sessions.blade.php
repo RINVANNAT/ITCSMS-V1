@@ -9,6 +9,8 @@
                            placeholder="Search subject">
                     <span class="input-group-btn">
                         <button class="btn btn-primary btn_export_course_program"
+                              data-toggle="modal"
+                              data-target="#choose-timetable-group"
                               title="Synchronous course">
                             <i class="fa fa-refresh"></i>
                         </button>
@@ -28,4 +30,6 @@
             </div>
         </div>
     </div>
+    @include('backend.schedule.timetables.includes.modals.group-choosen')
 </div>
+

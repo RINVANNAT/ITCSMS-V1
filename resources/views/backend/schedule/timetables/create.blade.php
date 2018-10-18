@@ -108,6 +108,7 @@
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
+    {!! Html::script('js/backend/schedule/timetable-group.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript" src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
@@ -1082,6 +1083,24 @@
             $('#t-cog').click(function () {
                 $('.t-cog').toggle();
             })
+
+            // export course session into slots table.
+            $(document).on('click', '.btn_export_course_program', function (event) {
+                $('.all-groups').prop('checked', false);
+                $('.timetable-group-course input').prop('checked', false);
+            });
+
+            $(document).on('click', '.all-groups', function() {
+                if ($(this).is(':checked')) {
+                    $('.timetable-group-course input').prop('checked', true);
+                } else {
+                    $('.timetable-group-course input').prop('checked', false);
+                }
+            });
+
+            $(document).on('click', '.group', function() {
+                $('.all-groups').prop('checked', false);
+            });
         });
 
     </script>
