@@ -61,4 +61,8 @@ class Slot extends Model
             }
         }
     }
+
+    public function timetableGroupSlots() {
+        return $this->hasMany(TimetableGroupSlot::class);
+    }
 }
