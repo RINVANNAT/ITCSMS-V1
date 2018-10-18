@@ -509,7 +509,7 @@ trait AjaxCRUDTimetableController
      */
     public function get_suggest_room()
     {
-        $academic_year_id = request('academic_year_id');
+        /*$academic_year_id = request('academic_year_id');
         $week_id = request('week_id');
         $timetable_slot_id = request('timetable_slot_id');
         $query = request('room_number');
@@ -603,7 +603,7 @@ trait AjaxCRUDTimetableController
                     'roomRemain' => $rooms_remaining
                 ]);
             }
-        }
+        }*/
     }
 
     /**

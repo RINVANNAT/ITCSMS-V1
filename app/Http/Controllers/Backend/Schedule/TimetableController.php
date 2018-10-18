@@ -6,6 +6,8 @@ use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCRUDTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\ExportTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\PrintTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\TimetableSessionTrait;
+use App\Http\Controllers\Backend\Schedule\Traits\TimetableSlotTrait;
 use App\Http\Controllers\Backend\Schedule\Traits\ViewTimetableByTeacherController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
@@ -34,9 +36,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
-use Mockery\Exception;
 use Yajra\Datatables\Datatables;
 
 /**
@@ -47,6 +49,8 @@ class TimetableController extends Controller
 {
     use AjaxCRUDTimetableController,
         AjaxCloneTimetableController,
+        TimetableSlotTrait,
+        TimetableSessionTrait,
         PrintTimetableController,
         ExportTimetableController,
         ViewTimetableByTeacherController;
@@ -458,10 +462,11 @@ class TimetableController extends Controller
         }
     }
 
-    public function storeTimetableGroup (Request $request) {
+    public function storeTimetableGroup(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
-           'name' => 'required'
+            'name' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -476,26 +481,34 @@ class TimetableController extends Controller
         return message_success(TimetableGroup::where('id', $newGroup->id)->with('parent')->first());
     }
 
-    public function searchTimetableGroup() {
+    public function searchTimetableGroup()
+    {
         return message_success(TimetableGroup::where('code', 'ilike', "%" . request('query') . "%")->get());
     }
 
-    public function assignGroup (Request $request)
+    public function assignGroup(Request $request)
     {
         $this->validate($request, [
             'slot_id' => 'required',
             'group_id' => 'required'
         ]);
 
-        try{
+        try {
             $slot = Slot::find($request->slot_id);
             if ($slot instanceof Slot) {
-                $timetableGroupSlot = TimetableGroupSlot::firstOrCreate([
+                $timetableGroupSlot = TimetableGroupSlot::where([
                     'slot_id' => $request->slot_id,
-                    'timetable_group_id' => $request->group_id,
-                    'total_hours' => $slot->total_hours,
-                    'total_hours_remain' => $slot->total_hours
-                ]);
+                    'timetable_group_id' => $request->group_id
+                ])->first();
+
+                if (is_null($timetableGroupSlot)) {
+                    $timetableGroupSlot = TimetableGroupSlot::create([
+                        'slot_id' => $request->slot_id,
+                        'timetable_group_id' => $request->group_id,
+                        'total_hours' => $slot->total_hours,
+                        'total_hours_remain' => $slot->total_hours
+                    ]);
+                }
                 return message_success($timetableGroupSlot);
             }
             return message_error('The slot could not found!');
@@ -504,14 +517,14 @@ class TimetableController extends Controller
         }
     }
 
-    public function removeGroup (Request $request)
+    public function removeGroup(Request $request)
     {
         $this->validate($request, [
             'slot_id' => 'required',
             'timetable_group_id' => 'required'
         ]);
 
-        try{
+        try {
             $timetableGroupSlot = TimetableGroupSlot::where([
                 'slot_id' => $request->slot_id,
                 'timetable_group_id' => $request->timetable_group_id
@@ -528,49 +541,102 @@ class TimetableController extends Controller
     }
 
 
-    public function assignGroupToTimetableSlot (Request $request)
+    public function assignGroupToTimetableSlot(Request $request)
     {
+        DB::beginTransaction();
         $this->validate($request, [
             'timetable_slot_id' => 'required',
             'timetable_group_id' => 'required'
         ]);
 
-        try{
-            $timetableGroupSession = TimetableGroupSession::firstOrCreate([
-                'timetable_slot_id' => $request->timetable_slot_id,
-                'timetable_group_id' => $request->timetable_group_id
-            ]);
-            return message_success($timetableGroupSession);
+        try {
+            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
+
+            if ($timetableSlot instanceof TimetableSlot) {
+                $slot = Slot::find($timetableSlot->slot_id);
+
+                $timetableGroupSession = TimetableGroupSession::where([
+                    'timetable_slot_id' => $request->timetable_slot_id,
+                    'timetable_group_id' => $request->timetable_group_id
+                ])->first();
+
+                if (is_null($timetableGroupSession)) {
+                    $timetableGroupSession = TimetableGroupSession::create([
+                        'timetable_slot_id' => $request->timetable_slot_id,
+                        'timetable_group_id' => $request->timetable_group_id
+                    ]);
+                }
+
+                $timetableGroupSlot = TimetableGroupSlot::where([
+                    'slot_id' => $slot->id,
+                    'timetable_group_id' => $request->timetable_group_id
+                ])->first();
+
+                if (is_null($timetableGroupSlot)) {
+                    TimetableGroupSlot::create([
+                        'slot_id' => $slot->id,
+                        'timetable_group_id' => $request->timetable_group_id,
+                        'total_hours' => $slot->total_hours,
+                        'total_hours_remain' => ($slot->total_hours - $timetableSlot->durations)  // eliminate hours by default session durations
+                    ]);
+                }
+                DB::commit();
+                return message_success($timetableGroupSession);
+            }
+            return message_error('The timetable slot could not found!');
         } catch (\Exception $exception) {
+            DB::rollback();
             return message_error($exception->getMessage());
         }
     }
 
 
-    public function removeGroupFromTimetableSlot (Request $request)
+    public function removeGroupFromTimetableSlot(Request $request)
     {
         $this->validate($request, [
             'timetable_slot_id' => 'required',
             'timetable_group_id' => 'required'
         ]);
 
-        try{
-            $timetableGroupSession = TimetableGroupSession::where([
-                'timetable_slot_id' => $request->timetable_slot_id,
-                'timetable_group_id' => $request->timetable_group_id
-            ])->first();
+        DB::beginTransaction();
+        try {
+            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
+            $durations = $timetableSlot->durations;
+            if ($timetableSlot instanceof TimetableSlot) {
+                $slot = Slot::find($timetableSlot->slot_id);
+                if ($slot instanceof Slot) {
+                    $timetableGroupSession = TimetableGroupSession::where([
+                        'timetable_slot_id' => $request->timetable_slot_id,
+                        'timetable_group_id' => $request->timetable_group_id
+                    ])->first();
 
-            if ($timetableGroupSession instanceof TimetableGroupSession) {
-                $timetableGroupSession->delete();
-                return message_success([]);
+                    if ($timetableGroupSession instanceof TimetableGroupSession) {
+                        $timetableGroupSession->delete();
+                    }
+
+                    // update timetable group slot
+                    $timetableGroupSlot = TimetableGroupSlot::where([
+                        'slot_id' => $slot->id,
+                        'timetable_group_id' => $request->timetable_group_id
+                    ])->first();
+
+                    if ($timetableGroupSlot instanceof TimetableGroupSlot) {
+                        $timetableGroupSlot->total_hours_remain += $durations;
+                        $timetableGroupSlot->update();
+                    }
+                    DB::commit();
+                    return message_success([]);
+                }
             }
             return message_error('Could not delete group!');
         } catch (\Exception $exception) {
+            DB::rollback();
             return message_error($exception->getMessage());
         }
     }
 
-    public function getTimetableGroup () {
+    public function getTimetableGroup()
+    {
         return message_success(TimetableGroup::with('parent')->get());
     }
 }

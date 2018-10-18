@@ -498,7 +498,6 @@
                 drop: function (date) {
 
                     var originalEventObject = $(this).data('event');
-                    console.log('originalEventObject =====> ', originalEventObject)
                     var copiedEventObject = $.extend({}, originalEventObject);
 
                     var datetime = moment(date, 'YYYY-MM-DD HH:mm:ss');

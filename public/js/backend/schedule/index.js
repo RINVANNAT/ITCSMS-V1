@@ -84,11 +84,10 @@ Vue.component('group-wrapper', {
             toggleLoading(true)
             var api = '/admin/schedule/group/assign-group'
             var data = {}
-            var slot_id = $('.course-program-selected').find('.slot-id').text()
-            var timetable_slot_id = $('.course-selected').attr('id')
-            console.log(timetable_slot_id)
-
-            if(timetable_slot_id !== '' && timetable_slot_id !== null && timetable_slot_id !== undefined) {
+            var slot_id = parseInt($('.course-program-selected').find('.slot-id').text())
+            var timetable_slot_id = parseInt($('.course-selected').attr('id'))
+	        
+            if(parseInt(timetable_slot_id) > 0) {
                 api = '/admin/schedule/group/assign-group-to-timetable-slot'
                 data.timetable_slot_id = parseInt(timetable_slot_id)
                 data.timetable_group_id = group.id
