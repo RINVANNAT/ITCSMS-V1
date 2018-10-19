@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
+use App\Models\Employee;
 use App\Models\Schedule\Timetable\TimetableGroupSlotLecturer;
+use App\Models\Schedule\Timetable\TimetableSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,6 +45,43 @@ trait TimetableSlotTrait
             return message_success([]);
         } catch (\Exception $exception) {
             DB::rollback();
+            return message_error($exception->getMessage());
+        }
+    }
+
+    public function getGroupByTimetableSlot(Request $request)
+    {
+        $this->validate($request, [
+            'timetable_slot_id' => 'required'
+        ]);
+
+        try {
+            // @TODO implement your code here...
+            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
+            if ($timetableSlot instanceof TimetableSlot) {
+                return message_success($timetableSlot->groups);
+            }
+            return message_success([]);
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
+    }
+
+    public function getEmployees ()
+    {
+        try {
+            $employees = Employee::join('genders', 'genders.id', '=', 'employees.gender_id')
+                ->select([
+                    DB::raw('upper(name_latin) as name_latin'),
+                    'employees.name_kh',
+                    'employees.id as id',
+                    'genders.code as gender_code'
+                ])
+                ->orderBy('name_latin', 'asc')
+                ->get();
+
+            return message_success($employees);
+        } catch (\Exception $exception) {
             return message_error($exception->getMessage());
         }
     }

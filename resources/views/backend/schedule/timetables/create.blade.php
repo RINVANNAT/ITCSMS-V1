@@ -20,6 +20,7 @@
     {!! Html::style('plugins/iCheck/all.css') !!}
     {!! Html::style('plugins/toastr/toastr.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
+    <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.0/dist/vue-multiselect.min.css">
 
     <style type="text/css">
 
@@ -114,6 +115,7 @@
 
     <script type="text/javascript" src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
     <script type="text/javascript" src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
+    <script src="https://unpkg.com/vue-multiselect@2.1.0"></script>
     <script type="text/javascript" src="{{ asset('js/backend/schedule/index.js') }}"></script>
 
 
@@ -532,6 +534,7 @@
                     if (typeof event.slotsForLanguage !== 'undefined') {
                         object += '<div class="side-courses" id="' + event.id + '" style="width: 100% !important;padding: 2px;" ​​​>';
                         // check conflict room and render
+                        object += `<span class="hidden timetable-slot-id">${event.id}</span>`
                         object += '<div class="row"> <div class="col-md-12"><div class="fc-title">' + event.course_name + '</div></div>';
                         event.editable = false;
                         object += '<div class="lang-info">';
@@ -545,7 +548,7 @@
                         object += '</div></div></div>';
                     } else {
                         object += '<div class="side-course" id="' + event.id + '"​​​>';
-
+	                    object += `<span class="hidden timetable-slot-id">${event.id}</span>`
                         // check conflict room and render
                         object += '<div class="fc-title">' + (event.course_name).substr(0, 20) + '...';
                         if (typeof event.type !== 'undefined') {

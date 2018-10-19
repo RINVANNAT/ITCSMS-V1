@@ -238,6 +238,7 @@ class TimetableController extends Controller
         $now = Carbon::now('Asia/Phnom_Penh');
         $employee = Employee::where('user_id', auth()->user()->id)->first();
         $degrees = Degree::all();
+        $groups = TimetableGroup::select('code', 'id')->get();
         if ($employee instanceof Employee) {
             $createTimetablePermissionConfiguration = Configuration::where('key', 'timetable_' . $employee->department_id)->first();
         } else {
@@ -273,8 +274,6 @@ class TimetableController extends Controller
             $options_ = null;
         }
 
-        $groups = Group::get()->toArray();
-        $groups = $this->timetableSlotRepo->sort_groups($groups);
         $weeks = Week::where('semester_id', $semester)->get();
 
         $timetableGroups = TimetableGroup::with('parent')->get();

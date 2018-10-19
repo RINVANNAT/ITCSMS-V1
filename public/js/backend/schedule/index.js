@@ -112,13 +112,23 @@ Vue.component('group-wrapper', {
 	}
 })
 
+// register globally
+Vue.component('multiselect', window.VueMultiselect.default)
+
 new Vue({
 	el: '.app',
 	data () {
 		return {
 			message: [],
-			groups: null,
-			groupsSelected: []
+			groups: [],
+			employees: [],
+			groupsSelected: [],
+			groupRoomLecturers: [],
+			newAssignRoomAndLecturer: {
+				group: null,
+				room: null,
+				lecturer: null
+			}
 		}
 	},
 	methods: {
@@ -150,6 +160,15 @@ new Vue({
                     notify('error', 'Error Get Timetable Group', 'Error')
                 }
             })
+		},
+		getEmployees () {
+			axios.post('/admin/schedule/group/get-employees').then((response) => {
+				if (response.data.code === 1) {
+					this.employees = response.data.data
+				} else {
+					notify('error', 'Error Get Timetable Group', 'Error')
+				}
+			})
 		},
 		storeTimetableGroup () {
             axios.post('/admin/schedule/timetables/store_new_group', {
@@ -205,10 +224,22 @@ new Vue({
             }).catch(function (error) {
             	notify('error', 'Slots was not exported', 'Export Courses');
             });
+		},
+		assignRoomLecturer () {
+			var newItem = {
+				group: 'A',
+				room: 'F207',
+				lecturer: 'HENG Sothearith'
+			}
+			this.groupRoomLecturers.push(newItem)
+		},
+		removeGroupRoomLecturer (item) {
+			this.groupRoomLecturers.splice(this.groupRoomLecturers.indexOf(item), 1)
 		}
 	},
 	mounted () {
 		this.getGroups()
+		this.getEmployees()
 	}
 })
 
@@ -282,7 +313,18 @@ $(function () {
 		})
 	})
 	
-	$(document).on('click', '.btn-toggle-modal-assign-lecturer-room', () => {
+	$(document).on('click', '.btn-toggle-modal-assign-lecturer-room', function () {
+		var timetable_slot_id = parseInt($(this).parent().parent().prev().find('.timetable-slot-id').text())
+		if (timetable_slot_id > 0) {
+			axios.post('/admin/schedule/group/get-group-by-timetable-slot', {
+				timetable_slot_id: timetable_slot_id
+			}).then((response) => {
+				console.log(response)
+			})
+		} else {
+			notify('error', 'The could not found timetable slot id.', 'Get Group')
+		}
+		
 		$('#assign-lecturer-room').modal('toggle')
 	})
 })

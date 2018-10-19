@@ -24,8 +24,8 @@
                                 <h3>Groups</h3>
                             </div>
                             <div class="col-md-12">
-                                <select class="form-control">
-                                    <option v-for="item in 3">A</option>
+                                <select class="form-control" v-model="newAssignRoomAndLecturer.group">
+                                    <option value="1" v-for="item in 3">A</option>
                                 </select>
                             </div>
                         </div>
@@ -36,9 +36,14 @@
                                 <h3>Rooms</h3>
                             </div>
                             <div class="col-md-12">
-                                <select class="form-control">
-                                    <option v-for="item in 3">F207</option>
-                                </select>
+                                <multiselect v-model="newAssignRoomAndLecturer.room"
+                                             label="code"
+                                             track-by="id"
+                                             :options="groups"
+                                             :searchable="true"
+                                             :close-on-select="true"
+                                             :show-labels="false"
+                                             placeholder="Chose room"></multiselect>
                             </div>
                         </div>
                     </div>
@@ -49,16 +54,25 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="col-md-12">
-                                    <select class="form-control">
-                                        <option v-for="item in 3">HENG Sothearith</option>
-                                    </select>
+                                    <multiselect v-model="newAssignRoomAndLecturer.lecturer"
+                                                 label="name_latin"
+                                                 track-by="id"
+                                                 :options="employees"
+                                                 :searchable="true"
+                                                 :close-on-select="true"
+                                                 :show-labels="false"
+                                                 placeholder="Chose lecturer"></multiselect>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <hr/>
-                    
+                    <div class="col-md-12" style="margin-bottom: 15px; margin-top: 15px;">
+                        <button class="btn btn-primary btn-sm" @click="assignRoomLecturer">
+                            <i class="fa fa-plus-circle"></i> Add
+                        </button>
+                    </div>
+
                     <div class="col-md-12">
                         <table class="table table-bordered table-striped">
                             <thead>
@@ -71,16 +85,24 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="(item, key) in 3">
-                                <td>@{{ key+1 }}</td>
-                                <td>A</td>
-                                <td>F207</td>
-                                <td>HENG Sothearith</td>
-                                <td>
-                                    <button class="btn btn-primary btn-xs"><i class="fa fa-edit"></i> </button>
-                                    <button class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> </button>
-                                </td>
-                            </tr>
+                            <template v-if="groupRoomLecturers.length > 0">
+                                <tr v-for="(item, key) in groupRoomLecturers">
+                                    <td>@{{ key+1 }}</td>
+                                    <td>@{{ item.group }}</td>
+                                    <td>@{{ item.room }}</td>
+                                    <td>@{{ item.lecturer }}</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-xs"><i class="fa fa-edit"></i> </button>
+                                        <button class="btn btn-danger btn-xs" @click="removeGroupRoomLecturer(item)"><i class="fa fa-trash"></i> </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr>
+                                    <td colspan="5" class="text-center">No data.</td>
+                                </tr>
+                            </template>
+
                             </tbody>
                         </table>
                     </div>
