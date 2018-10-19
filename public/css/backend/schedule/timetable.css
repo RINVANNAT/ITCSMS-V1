@@ -445,3 +445,33 @@ ul.select2-results__options li.select2-results__option:hover {
     width: 100%;
     display: inline-block;
 }
+
+.modal-assign-lecturer-room-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: #EEEEEE;
+    border: 1px solid #00a7d0;
+    grid-template-rows: minmax(100px, 400px);
+    padding: 10px;
+}
+
+.arrow-group {
+    padding: 10px;
+    background: #dddddd;
+    -webkit-clip-path: polygon(0% 0%, 94% 0%, 100% 50%, 94% 100%, 0% 100%);
+    clip-path: polygon(0% 0%, 94% 0%, 100% 50%, 94% 100%, 0% 100%);
+    cursor: pointer;
+    color: #000000;
+    border-bottom: 1px solid #fff;
+    text-align: center;
+    font-weight: 600;
+}
+
+.arrow-group:hover {
+    background: #00a7d0;
+    color: #FFFFFF;
+}
+
+.modal-assign-lecturer-room-wrapper label {
+    display: block !important;
+}

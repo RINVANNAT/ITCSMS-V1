@@ -279,7 +279,6 @@ function assign_lecturer_to_course_program() {
 	})
 }
 
-
 function reset() {
 	console.log($('#options-filter').formData())
 }

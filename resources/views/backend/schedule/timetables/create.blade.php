@@ -93,6 +93,7 @@
                 <div class="panel-conflict box box-danger" id="conflict" style="display: none;"></div>
             </div>
         </div>
+        @include('backend.schedule.timetables.includes.modals.assign-lecturer-room')
     </div>
     @include('backend.schedule.timetables.includes.modals.clone')
     @include('backend.schedule.timetables.includes.modals.reset')
@@ -580,7 +581,7 @@
                                 object += '<p class="fc-room">' + event.room.building.code + '-' + event.room.name + '</p>';
                             }
                         }
-                        object += '</div>';
+                        object += '<button class="btn btn-success btn-xs btn-toggle-modal-assign-lecturer-room"><i class="fa fa-cog"></i></button></div>';
 
                         // render groups
                         if (event.hasOwnProperty('groups') && event.groups.length > 0) {
@@ -594,19 +595,19 @@
                                 	    </span>
                                 	`
                                 })
-                                groups += '</p>';
+                                groups += '</p>'
                             }
-                            object += groups;
+                            object += groups
                         }
-                        object += '</div> ';
+                        object += '</div> '
                     }
                     object += '<div class="clearfix"></div> ' +
                         '</div>' +
                         '</div>' +
                         '<div class="fc-bgd"></div>' +
                         '<div class="fc-resizer fc-end-resizer"></div>' +
-                        '</a>';
-                    return $(object);
+                        '</a>'
+                    return $(object)
                 },
                 eventResize: function (event, delta, revertFunc) {
                     var end = event.end.format();

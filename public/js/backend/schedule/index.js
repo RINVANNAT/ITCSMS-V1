@@ -281,4 +281,8 @@ $(function () {
 			
 		})
 	})
+	
+	$(document).on('click', '.btn-toggle-modal-assign-lecturer-room', () => {
+		$('#assign-lecturer-room').modal('toggle')
+	})
 })

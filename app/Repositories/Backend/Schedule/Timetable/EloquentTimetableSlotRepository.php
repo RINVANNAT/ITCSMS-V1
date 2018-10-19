@@ -19,7 +19,6 @@ use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class EloquentTimetableSlotRepository
@@ -54,22 +53,21 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                         ->where('total_hours_remain', '>=', $duration)
                         ->get();
 
-                    if (count($timetableGroupSlots) > 0) {
-                        // create a new timetable slot
-                        $newTimetableSlot = (new TimetableSlot())->create([
-                            'timetable_id' => $timetable->id,
-                            'course_program_id' => $request->course_program_id,
-                            'room_id' => null,
-                            'slot_id' => $slot->id,
-                            'group_merge_id' => $newMergeTimetableSlot->id,
-                            'course_name' => $request->course_name,
-                            'lecturer_id' => null,
-                            'type' => $request->course_type,
-                            'start' => $start,
-                            'end' => $end,
-                            'durations' => $duration
-                        ]);
+                    $newTimetableSlot = (new TimetableSlot())->create([
+                        'timetable_id' => $timetable->id,
+                        'course_program_id' => $request->course_program_id,
+                        'room_id' => null,
+                        'slot_id' => $slot->id,
+                        'group_merge_id' => $newMergeTimetableSlot->id,
+                        'course_name' => $request->course_name,
+                        'lecturer_id' => null,
+                        'type' => $request->course_type,
+                        'start' => $start,
+                        'end' => $end,
+                        'durations' => $duration
+                    ]);
 
+                    if (count($timetableGroupSlots) > 0) {
                         // and then create timetable group
                         foreach ($timetableGroupSlots as $timetableGroupSlot) {
                             $timetableGroupSlot->total_hours_remain -= $duration;
@@ -82,9 +80,9 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                                 'room_id' => $timetableGroupSlot->room_id
                             ]);
                         }
-                        DB::commit();
-                        return $newTimetableSlot;
                     }
+                    DB::commit();
+                    return $newTimetableSlot;
                 }
             }
         } catch (\Exception $exception) {
@@ -561,8 +559,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function set_permission_create_timetable()
     {
-        Log::info('Cron Set Schedule Assignment Timetable was executed.');
-
         $now = Carbon::now('Asia/Phnom_Penh');
         $departments = Configuration::where('key', 'like', 'timetable_%')->get();
         foreach ($departments as $department) {

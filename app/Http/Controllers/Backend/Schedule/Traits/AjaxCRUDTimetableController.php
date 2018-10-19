@@ -15,6 +15,7 @@ use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Group;
+use App\Models\Room;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableGroupSlot;
@@ -509,101 +510,24 @@ trait AjaxCRUDTimetableController
      */
     public function get_suggest_room()
     {
-        /*$academic_year_id = request('academic_year_id');
-        $week_id = request('week_id');
-        $timetable_slot_id = request('timetable_slot_id');
-        $query = request('room_number');
+        $rooms_remaining = Room::join('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
+            ->select([
+                'rooms.id as id',
+                'rooms.name as name',
+                'buildings.code as code',
+                'rooms.nb_desk as desk',
+                'rooms.nb_chair as chair',
+                'roomTypes.name as room_type'
+            ])
+            ->get();
+        $rooms_used = [];
 
-        if (isset($timetable_slot_id)) {
-            $timetable_slot = TimetableSlot::find($timetable_slot_id);
-            if (isset($academic_year_id) && isset($week_id)) {
-                $rooms_used = DB::table('timetables')
-                    ->join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
-                    ->join('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
-                    ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
-                    ->where([
-                        ['timetables.academic_year_id', $academic_year_id],
-                        ['timetables.week_id', $week_id],
-                        ['timetable_slots.start', $timetable_slot->start],
-                        ['timetable_slots.end', $timetable_slot->end]
-                    ])
-                    ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
-                    ->where(function ($query) {
-                        if (!access()->hasRole('Administrator')) {
-                            if (!access()->hasRole('Administrator')) {
-                                $department_id = ((auth()->user())->employees)[0]->department_id;
-                                $query->where('rooms.department_id', $department_id)
-                                    ->orWhere('rooms.is_public_room', true);
-                            }
-                        }
-                    })
-                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . $query . "%")
-                    ->whereNotNull('timetable_slots.room_id')
-                    ->select(
-                        'rooms.id as id',
-                        'rooms.name as name',
-                        'buildings.code as code',
-                        'rooms.nb_desk as desk',
-                        'rooms.nb_chair as chair',
-                        'roomTypes.name as room_type'
-                    )
-                    ->distinct('name', 'code')
-                    ->get();
-
-                $rooms_tmp = DB::table('timetables')
-                    ->join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
-                    ->join('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
-                    ->where([
-                        ['timetables.academic_year_id', $academic_year_id],
-                        ['timetables.week_id', $week_id],
-                        ['timetable_slots.start', $timetable_slot->start],
-                        ['timetable_slots.end', $timetable_slot->end]
-                    ])
-                    ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
-                    ->where(function ($query) {
-                        if (!access()->hasRole('Administrator')) {
-                            if (!access()->hasRole('Administrator')) {
-                                $department_id = ((auth()->user())->employees)[0]->department_id;
-                                $query->where('rooms.department_id', $department_id)
-                                    ->orWhere('rooms.is_public_room', true);
-                            }
-                        }
-                    })
-                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . $query . "%")
-                    ->whereNotNull('timetable_slots.room_id')
-                    ->lists('timetable_slots.room_id');
-
-                $rooms_remaining = DB::table('rooms')
-                    ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
-                    ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
-                    ->where(function ($query) {
-                        if (!access()->hasRole('Administrator')) {
-                            if (!access()->hasRole('Administrator')) {
-                                $department_id = ((auth()->user())->employees)[0]->department_id;
-                                $query->where('rooms.department_id', $department_id)
-                                    ->orWhere('rooms.is_public_room', true);
-                            }
-                        }
-                    })
-                    ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
-                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . $query . "%")
-                    ->select(
-                        'rooms.id as id',
-                        'rooms.name as name',
-                        'buildings.code as code',
-                        'rooms.nb_desk as desk',
-                        'rooms.nb_chair as chair',
-                        'roomTypes.name as room_type'
-                    )
-                    ->get();
-
-                return Response::json([
-                    'status' => true,
-                    'roomUsed' => $rooms_used,
-                    'roomRemain' => $rooms_remaining
-                ]);
-            }
-        }*/
+        return Response::json([
+            'status' => true,
+            'roomUsed' => $rooms_used,
+            'roomRemain' => $rooms_remaining
+        ]);
     }
 
     /**
