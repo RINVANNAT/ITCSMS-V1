@@ -36,7 +36,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Yajra\Datatables\Datatables;
@@ -445,7 +444,7 @@ class TimetableController extends Controller
 
             foreach ($timetable_slots as $timetable_slot) {
                 $slot = Slot::find($timetable_slot->slot_id);
-                if ($slot instanceof Slot && count($slot->timetableGroupSlots) >0) {
+                if ($slot instanceof Slot && count($slot->timetableGroupSlots) > 0) {
                     foreach ($slot->timetableGroupSlots as $groupSlot) {
                         $timetableGroupSlot = TimetableGroupSlot::find($groupSlot->id);
                         $timetableGroupSlot->total_hours_remain += (float)$timetable_slot->durations;
