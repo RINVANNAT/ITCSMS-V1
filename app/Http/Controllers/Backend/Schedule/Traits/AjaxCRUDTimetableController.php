@@ -777,16 +777,7 @@ trait AjaxCRUDTimetableController
                                 $newSlot->semester_id = $data['semester_id'];
                                 $newSlot->created_uid = auth()->user()->id;
                                 $newSlot->write_uid = auth()->user()->id;
-                                if ($newSlot->save()) {
-                                    foreach ($data['group_ids'] as $groupId) {
-                                        $newGroupSlot = new TimetableGroupSlot();
-                                        $newGroupSlot->slot_id = $newSlot->id;
-                                        $newGroupSlot->timetable_group_id = $groupId;
-                                        $newGroupSlot->total_hours = $newSlot->time_tp;
-                                        $newGroupSlot->total_hours_remain = $newSlot->time_tp;
-                                        $newGroupSlot->save();
-                                    }
-                                }
+                                $newSlot->save();
                                 $amountCourseProgramImported++;
                             });
                         }
@@ -801,16 +792,7 @@ trait AjaxCRUDTimetableController
                                 $newSlot->semester_id = $data['semester_id'];
                                 $newSlot->created_uid = auth()->user()->id;
                                 $newSlot->write_uid = auth()->user()->id;
-                                if ($newSlot->save()) {
-                                    foreach ($data['group_ids'] as $groupId) {
-                                        $newGroupSlot = new TimetableGroupSlot();
-                                        $newGroupSlot->slot_id = $newSlot->id;
-                                        $newGroupSlot->timetable_group_id = $groupId;
-                                        $newGroupSlot->total_hours = $newSlot->time_td;
-                                        $newGroupSlot->total_hours_remain = $newSlot->time_td;
-                                        $newGroupSlot->save();
-                                    }
-                                }
+                                $newSlot->save();
                                 $amountCourseProgramImported++;
                             });
                         }
@@ -825,16 +807,7 @@ trait AjaxCRUDTimetableController
                                 $newSlot->semester_id = $data['semester_id'];
                                 $newSlot->created_uid = auth()->user()->id;
                                 $newSlot->write_uid = auth()->user()->id;
-                                if ($newSlot->save()) {
-                                    foreach ($data['group_ids'] as $groupId) {
-                                        $newGroupSlot = new TimetableGroupSlot();
-                                        $newGroupSlot->slot_id = $newSlot->id;
-                                        $newGroupSlot->timetable_group_id = $groupId;
-                                        $newGroupSlot->total_hours = $newSlot->time_course;
-                                        $newGroupSlot->total_hours_remain = $newSlot->time_course;
-                                        $newGroupSlot->save();
-                                    }
-                                }
+                                $newSlot->save();
                                 $amountCourseProgramImported++;
                             });
                         }

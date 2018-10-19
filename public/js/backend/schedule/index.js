@@ -182,12 +182,7 @@ new Vue({
                 }
             })
 		},
-        saveGroupCourse () {
-			var selectedGroup = []
-			var group = $('.timetable-group-course input:checked')
-            $.each(group, function(){
-                selectedGroup.push($(this).val());
-            });
+        exportCourseProgram () {
             toggleLoading(true);
             axios.post('/admin/schedule/timetables/export_course_program', {
             	academic_year_id: $('select[name=academicYear]').val(),
@@ -195,8 +190,7 @@ new Vue({
             	degree_id: $('select[name=degree]').val(),
             	option_id: $('select[name=option]').val(),
             	grade_id: $('select[name=grade]').val(),
-            	semester_id: $('select[name=semester]').val(),
-            	group_ids: selectedGroup,
+            	semester_id: $('select[name=semester]').val()
             }).then(function (response) {
             	if (response.data.code === 1) {
             		get_course_programs()
