@@ -10,7 +10,6 @@
                 @if($front->department_id == 4 || $front->department_id == 5)
                 ដេប៉ាតឺម៉ង់ {{isset($front->department)?$front->department:""}}
                 @else
-                មហាវិទ្យាល័យ
                     @if($front->department_id == 1)
                         មហាវិទ្យាល័យគីមីឧស្សាហកម្ម
                     @elseif($front->department_id == 2)
