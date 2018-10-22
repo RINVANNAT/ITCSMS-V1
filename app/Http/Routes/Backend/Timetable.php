@@ -82,4 +82,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
        Route::post('get-group-by-timetable-slot', 'TimetableController@getGroupByTimetableSlot');
        Route::post('get-employees', 'TimetableController@getEmployees');
     });
+
+    Route::group(['prefix' => 'room'], function () {
+        Route::post('get-rooms', 'TimetableController@getRooms');
+    });
 });

@@ -22,6 +22,7 @@ use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Group;
+use App\Models\Room;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableGroup;
@@ -637,5 +638,20 @@ class TimetableController extends Controller
     public function getTimetableGroup()
     {
         return message_success(TimetableGroup::with('parent')->get());
+    }
+
+
+    public function getRooms ()
+    {
+        try {
+            $rooms = Room::join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                ->select([
+                    DB::raw("CONCAT(buildings.code, '-', rooms.name) as code"),
+                    'rooms.id as id'
+                ])->get();
+            return message_success($rooms);
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
     }
 }

@@ -584,7 +584,7 @@
                                 object += '<p class="fc-room">' + event.room.building.code + '-' + event.room.name + '</p>';
                             }
                         }
-                        object += '<button class="btn btn-success btn-xs btn-toggle-modal-assign-lecturer-room"><i class="fa fa-cog"></i></button></div>';
+                        object += `<button class="btn btn-success btn-xs btn-toggle-modal-assign-lecturer-room"><i class="fa fa-cog"></i></button></div>`
 
                         // render groups
                         if (event.hasOwnProperty('groups') && event.groups.length > 0) {

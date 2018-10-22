@@ -24,9 +24,14 @@
                                 <h3>Groups</h3>
                             </div>
                             <div class="col-md-12">
-                                <select class="form-control" v-model="newAssignRoomAndLecturer.group">
-                                    <option value="1" v-for="item in 3">A</option>
-                                </select>
+                                <multiselect v-model="newAssignRoomAndLecturer.group"
+                                             label="code"
+                                             track-by="id"
+                                             :options="groupOptions"
+                                             :searchable="true"
+                                             :close-on-select="true"
+                                             :show-labels="false"
+                                             placeholder="Chose group"></multiselect>
                             </div>
                         </div>
                     </div>
@@ -39,7 +44,7 @@
                                 <multiselect v-model="newAssignRoomAndLecturer.room"
                                              label="code"
                                              track-by="id"
-                                             :options="groups"
+                                             :options="roomOptions"
                                              :searchable="true"
                                              :close-on-select="true"
                                              :show-labels="false"
@@ -50,25 +55,24 @@
                     <div class="col-md-4">
                         <div class="row">
                             <div class="col-md-12">
-                                <h3>Lecturers</h3>
+                                <h3 class="box-title">Lecturers</h3>
                             </div>
                             <div class="col-md-12">
-                                <div class="col-md-12">
-                                    <multiselect v-model="newAssignRoomAndLecturer.lecturer"
-                                                 label="name_latin"
-                                                 track-by="id"
-                                                 :options="employees"
-                                                 :searchable="true"
-                                                 :close-on-select="true"
-                                                 :show-labels="false"
-                                                 placeholder="Chose lecturer"></multiselect>
-                                </div>
+                                <multiselect v-model="newAssignRoomAndLecturer.lecturer"
+                                             label="name_latin"
+                                             track-by="id"
+                                             :options="employees"
+                                             :searchable="true"
+                                             :close-on-select="true"
+                                             :show-labels="false"
+                                             placeholder="Chose lecturer"></multiselect>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-md-12" style="margin-bottom: 15px; margin-top: 15px;">
-                        <button class="btn btn-primary btn-sm" @click="assignRoomLecturer">
+                        <button class="btn btn-primary btn-sm"
+                                @click="assignRoomLecturer">
                             <i class="fa fa-plus-circle"></i> Add
                         </button>
                     </div>
