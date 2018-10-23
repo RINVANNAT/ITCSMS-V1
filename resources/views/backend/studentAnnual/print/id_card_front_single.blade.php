@@ -7,9 +7,25 @@
         {{--<span class="name_kh">អេង រតនា</span>--}}
         <span class="department" >
             @if($front->degree_id != 5)
-                ដេប៉ាតឺម៉ង់
+                @if($front->department_id == 4 || $front->department_id == 5)
+                ដេប៉ាតឺម៉ង់ {{isset($front->department)?$front->department:""}}
+                @else
+                    @if($front->department_id == 1)
+                        មហាវិទ្យាល័យគីមីឧស្សាហកម្ម
+                    @elseif($front->department_id == 2)
+                        មហាវិទ្យាល័យសំណង់
+                    @elseif($front->department_id == 3)
+                        មហាវិទ្យាល័យបច្ចេកទេសអគ្គិសនី
+                    @elseif($front->department_id == 6)
+                        មហាវិទ្យាល័យវារីសាស្ត្រ
+                    @elseif($front->department_id == 7)
+                        មហាវិទ្យាល័យរ៉ែនិងភូគព្ភសាស្ត្រ
+                    @endif
+                @endif
+            @else
+                {{isset($front->department)?$front->department:""}}
             @endif
-            {{isset($front->department)?$front->department:""}}
+
         </span>
         <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{isset($front->id_card)?$front->id_card:""}}</strong></span>
         <div class="avatar">
