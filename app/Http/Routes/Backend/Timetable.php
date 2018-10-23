@@ -86,4 +86,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::group(['prefix' => 'room'], function () {
         Route::post('get-rooms', 'TimetableController@getRooms');
     });
+
+    Route::group(['prefix' => 'timetable-slot'], function () {
+        Route::post('assign-room-and-lecturer-to-group', 'TimetableController@assignRoomAndLecturerToGroup');
+    });
 });

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Models\Employee;
+use App\Models\Schedule\Timetable\TimetableGroupSession;
+use App\Models\Schedule\Timetable\TimetableGroupSessionLecturer;
 use App\Models\Schedule\Timetable\TimetableGroupSlotLecturer;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 trait TimetableSlotTrait
 {
@@ -67,7 +70,7 @@ trait TimetableSlotTrait
         }
     }
 
-    public function getEmployees ()
+    public function getEmployees()
     {
         try {
             $employees = Employee::join('genders', 'genders.id', '=', 'employees.gender_id')
@@ -82,6 +85,61 @@ trait TimetableSlotTrait
 
             return message_success($employees);
         } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
+    }
+
+    public function assignRoomAndLecturerToGroup(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $this->validate($request, [
+                'timetable_slot_id' => 'required',
+                'data' => 'required|array'
+            ]);
+
+            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
+            if ($timetableSlot instanceof TimetableSlot) {
+                if (count($request->data) > 0) {
+                    foreach ($request->data as $data) {
+                        if (isset($data['group']['id']) && isset($data['room']['id'])) {
+                            $timetableGroupSession = TimetableGroupSession::where([
+                                'timetable_slot_id' => $request->timetable_slot_id,
+                                'timetable_group_id' => $data['group']['id']
+                            ])->first();
+
+                            if ($timetableGroupSession instanceof TimetableGroupSession) {
+
+                                $timetableGroupSession->room_id = $data['room']['id'];
+                                $timetableGroupSession->update();
+
+                                Log::info($timetableGroupSession);
+
+                                if (isset($data['lecturer']['id'])) {
+                                    Log::info('enter');
+                                    $timetableGroupSessionLecturer = TimetableGroupSessionLecturer::where([
+                                        'timetable_group_session_id' => $timetableGroupSession->id,
+                                        'lecturer_id' => $data['lecturer']['id']
+                                    ])->first();
+
+                                    if (!($timetableGroupSessionLecturer instanceof TimetableGroupSessionLecturer)) {
+                                        TimetableGroupSessionLecturer::create([
+                                            'timetable_group_session_id' => $timetableGroupSession->id,
+                                            'lecturer_id' => $data['lecturer']['id']
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    DB::commit();
+                    return message_success($timetableSlot);
+                }
+            } else {
+                return message_error('Could not found timetable slot.');
+            }
+        } catch (\Exception $exception) {
+            DB::rollback();
             return message_error($exception->getMessage());
         }
     }
