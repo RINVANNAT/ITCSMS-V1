@@ -1672,12 +1672,13 @@ class StudentAnnualController extends Controller
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->leftJoin('groups', 'group_student_annuals.group_id', '=', 'groups.id')
-            ->where('group_student_annuals.semester_id','=',$request->get('semester'))
-            ->whereNull('group_student_annuals.department_id');
-
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
+        if ($group = $request->get('group')) {
+            $studentAnnuals = $studentAnnuals->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+                ->leftJoin('groups', 'group_student_annuals.group_id', '=', 'groups.id')
+                ->where('group_student_annuals.semester_id','=',$request->get('semester'))
+                ->whereNull('group_student_annuals.department_id');
+        }
         if ($academic_year = $request->get('academic_year')) {
             $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year);
         }
