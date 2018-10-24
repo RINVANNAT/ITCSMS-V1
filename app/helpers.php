@@ -456,7 +456,7 @@ if (!function_exists('to_khmer_month')) {
             case "10":
                 return "តុលា";
             case "11":
-                return "វិច្ឆកា";
+                return "វិច្ឆិកា";
             case "12":
                 return "ធ្នូ";
             default:

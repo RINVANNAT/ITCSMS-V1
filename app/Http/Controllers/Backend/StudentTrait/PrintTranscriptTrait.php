@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Backend\StudentTrait;
+
 use App\Http\Requests\Backend\Student\PrintTranscriptRequest;
 use App\Models\AcademicYear;
 use App\Models\Configuration;
@@ -22,17 +23,20 @@ use Illuminate\Support\Str;
  */
 trait PrintTranscriptTrait
 {
-    public function request_print_transcript(PrintTranscriptRequest $request){
-        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
-        $genders = Gender::lists('code','id');
+    public function request_print_transcript(PrintTranscriptRequest $request)
+    {
+        $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_kh', 'id');
+        $genders = Gender::lists('code', 'id');
         $current_date = Carbon::now()->format('d/m/Y');
         $academicYearSelected = $request->academic_year;
         return view(
             'backend.studentAnnual.print.request_print_transcript',
-            compact('academicYears','genders','student_class','current_date', 'academicYearSelected')
+            compact('academicYears', 'genders', 'student_class', 'current_date', 'academicYearSelected')
         );
     }
-    public function request_print_transcript_data(PrintTranscriptRequest $request){
+
+    public function request_print_transcript_data(PrintTranscriptRequest $request)
+    {
         $academic_year = $request->get('academic_year');
         $group = $request->get('group');
         $gender = $request->get('gender');
@@ -42,18 +46,18 @@ trait PrintTranscriptTrait
         $grade = [];
         $semester = 1;
         $student_class = json_decode($request->get('student_class'));
-        if(!empty($student_class)){
-            foreach($student_class as $element){
-                if($element->department_option_id!=null){
+        if (!empty($student_class)) {
+            foreach ($student_class as $element) {
+                if ($element->department_option_id != null) {
                     $department_option[] = $element->department_option_id;
                 }
-                if($element->department_id!=null){
+                if ($element->department_id != null) {
                     $department[] = $element->department_id;
                 }
-                if($element->degree_id != null){
+                if ($element->degree_id != null) {
                     $degree[] = $element->degree_id;
                 }
-                if($element->grade_id != null){
+                if ($element->grade_id != null) {
                     $grade[] = $element->grade_id;
                 }
             }
@@ -61,65 +65,65 @@ trait PrintTranscriptTrait
 
         // This will return all passed students in the given academic year/semester 1 as a collection
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id','groups.code as group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
+            'studentAnnuals.id', 'groups.code as group', 'students.id_card', 'students.name_kh', 'students.dob as dob', 'students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code,\"departmentOptions\".code) as class")
         ])
-            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('students', 'students.id', '=', 'studentAnnuals.student_id')
             ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
             ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
-            ->leftJoin('redouble_student', 'redouble_student.student_id','=','students.id')
-            ->where('studentAnnuals.academic_year_id',$academic_year)
+            ->leftJoin('groups', 'groups.id', '=', 'group_student_annuals.group_id')
+            ->leftJoin('redouble_student', 'redouble_student.student_id', '=', 'students.id')
+            ->where('studentAnnuals.academic_year_id', $academic_year)
             ->whereNull('group_student_annuals.department_id')
-            ->where(function($query) use($semester){
-                $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+            ->where(function ($query) use ($semester) {
+                $query->where("group_student_annuals.semester_id", $semester)->orWhereNull("group_student_annuals.semester_id");
             })
-            ->where(function($query){
-                $query->where('students.radie','=', false)->orWhereNull('students.radie');
+            ->where(function ($query) {
+                $query->where('students.radie', '=', false)->orWhereNull('students.radie');
             })
-            ->whereNotIn('students.id',function($query) use ($academic_year){
-                $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
+            ->whereNotIn('students.id', function ($query) use ($academic_year) {
+                $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id', '=', $academic_year);
             });
 
-        if(!empty($department_option)){
-            $studentAnnuals = $studentAnnuals->whereIN('departmentOptions.id',$department_option);
+        if (!empty($department_option)) {
+            $studentAnnuals = $studentAnnuals->whereIN('departmentOptions.id', $department_option);
         }
-        if(!empty($department)){
-            $studentAnnuals = $studentAnnuals->whereIN('departments.id',$department);
+        if (!empty($department)) {
+            $studentAnnuals = $studentAnnuals->whereIN('departments.id', $department);
         }
-        if(!empty($degree)){
-            $studentAnnuals = $studentAnnuals->whereIN('degrees.id',$degree);
+        if (!empty($degree)) {
+            $studentAnnuals = $studentAnnuals->whereIN('degrees.id', $degree);
         }
-        if(!empty($grade)){
-            $studentAnnuals = $studentAnnuals->whereIN('grades.id',$grade);
+        if (!empty($grade)) {
+            $studentAnnuals = $studentAnnuals->whereIN('grades.id', $grade);
         }
-        if($group != null){
-            $studentAnnuals = $studentAnnuals->where('groups.code',$group);
+        if ($group != null) {
+            $studentAnnuals = $studentAnnuals->where('groups.code', $group);
         }
-        if($gender != null){
-            $studentAnnuals = $studentAnnuals->where('students.gender_id',$gender);
+        if ($gender != null) {
+            $studentAnnuals = $studentAnnuals->where('students.gender_id', $gender);
         }
 
         $studentAnnuals = $studentAnnuals->get()->toArray();
 
         // Get printed transcript date
         $printed_transcripts = DB::table("printed_transcripts")
-            ->where("academic_year_id",$academic_year)
+            ->where("academic_year_id", $academic_year)
             ->get();
         $printed_transcripts = collect($printed_transcripts)->groupBy("student_annual_id")->toArray();
-        foreach ($studentAnnuals as &$student){
+        foreach ($studentAnnuals as &$student) {
             $student['printed_transcript'] = "";
-            if(isset($printed_transcripts[$student['id']])){
-                foreach($printed_transcripts[$student['id']] as $transcript){
-                    $transcript_date = Carbon::createFromFormat("Y-m-d H:i:s",$transcript->created_at)->toDayDateTimeString();
-                    if($transcript->type == "year"){
-                        $student['printed_transcript'] = $student['printed_transcript']."<span class='label label-primary'>".$transcript->type." | ".$transcript_date."</span><br/>";
+            if (isset($printed_transcripts[$student['id']])) {
+                foreach ($printed_transcripts[$student['id']] as $transcript) {
+                    $transcript_date = Carbon::createFromFormat("Y-m-d H:i:s", $transcript->created_at)->toDayDateTimeString();
+                    if ($transcript->type == "year") {
+                        $student['printed_transcript'] = $student['printed_transcript'] . "<span class='label label-primary'>" . $transcript->type . " | " . $transcript_date . "</span><br/>";
                     } else {
-                        $student['printed_transcript'] = $student['printed_transcript']."<span class='label label-success'>".$transcript->type." | ".$transcript_date."</span><br/>";
+                        $student['printed_transcript'] = $student['printed_transcript'] . "<span class='label label-success'>" . $transcript->type . " | " . $transcript_date . "</span><br/>";
                     }
 
 
@@ -127,18 +131,18 @@ trait PrintTranscriptTrait
             }
         }
         // Sort by multiple columns
-        $studentAnnuals = collect($studentAnnuals)->sortBy(function($student){
+        $studentAnnuals = collect($studentAnnuals)->sortBy(function ($student) {
             return sprintf('%-12s%s', $student['class'], $student['name_latin']);
         });
-        $datatables =  app('datatables')->of($studentAnnuals)
+        $datatables = app('datatables')->of($studentAnnuals)
             ->filter(function ($instance) use ($request) {
                 $keyword = $request->get('search');
                 if ($keyword != null and $keyword['value'] != "") {
                     $instance->collection = $instance->collection->filter(function ($row) use ($request, $keyword) {
-                        if(
+                        if (
                             Str::contains(strtolower($row['name_latin']), strtolower($keyword['value'])) ||
                             Str::contains(strtolower($row['id_card']), strtolower($keyword['value']))
-                        ){
+                        ) {
                             return true;
                         } else {
                             return false;
@@ -146,34 +150,36 @@ trait PrintTranscriptTrait
                     });
                 }
             })
-            ->addColumn('checkbox', function($student) {
-                return '<input type="checkbox" checked class="checkbox" data-id='.$student["id"].'>';
+            ->addColumn('checkbox', function ($student) {
+                return '<input type="checkbox" checked class="checkbox" data-id=' . $student["id"] . '>';
             })
-            ->addColumn('name', function($student) {
-                return  $student["name_kh"]."<br/>".
-                strtoupper($student["name_latin"]);
+            ->addColumn('name', function ($student) {
+                return $student["name_kh"] . "<br/>" .
+                    strtoupper($student["name_latin"]);
             })
-            ->editColumn('dob', function($student) {
-                $dob = Carbon::createFromFormat('Y-m-d H:i:s',$student["dob"])->format('d/m/Y');
+            ->editColumn('dob', function ($student) {
+                $dob = Carbon::createFromFormat('Y-m-d H:i:s', $student["dob"])->format('d/m/Y');
                 return $dob;
             });
-            /*->addColumn('action', function ($student) {
-                $actions = '<button data-id='.$student["id"].' style="float: right" class="btn btn-block btn-default btn-sm btn-single-print"><i class="fa fa-print"></i> Print</button>';
-                return  $actions;
+        /*->addColumn('action', function ($student) {
+            $actions = '<button data-id='.$student["id"].' style="float: right" class="btn btn-block btn-default btn-sm btn-single-print"><i class="fa fa-print"></i> Print</button>';
+            return  $actions;
 
-            });*/
+        });*/
         return $datatables->make(true);
     }
-    public function print_transcript(PrintTranscriptRequest $request){
+
+    public function print_transcript(PrintTranscriptRequest $request)
+    {
         $academic_year_id = null;
         $department_id = null;
         $paramSemester = $request->transcript_type;
         $semester_id = 1;
-        if($paramSemester == 'year') {
+        if ($paramSemester == 'year') {
             $semester_id = 0;
         }
 
-        $smis_server = Configuration::where("key","smis_server")->first();
+        $smis_server = Configuration::where("key", "smis_server")->first();
         $semester = 1;
         $studentAnnualIds = json_decode($request->ids);
         $photo = $request->photo;
@@ -182,7 +188,7 @@ trait PrintTranscriptTrait
         $is_certificate = $request->is_certificate;
 
         ($is_back == 'true' || $is_front == 'true' ? $is_certificate = 'true' : $is_certificate);
-        $students  = StudentAnnual::select([
+        $students = StudentAnnual::select([
             'students.id_card',
             'students.name_kh',
             'students.name_latin',
@@ -214,7 +220,7 @@ trait PrintTranscriptTrait
             'groups.code as group',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code,\"departmentOptions\".code) as class")
         ])
-            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('students', 'students.id', '=', 'studentAnnuals.student_id')
             ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
             ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
@@ -222,17 +228,17 @@ trait PrintTranscriptTrait
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
             ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
+            ->leftJoin('groups', 'groups.id', '=', 'group_student_annuals.group_id')
             ->whereNull('group_student_annuals.department_id')
-            ->where(function($query) use($semester){
-                $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+            ->where(function ($query) use ($semester) {
+                $query->where("group_student_annuals.semester_id", $semester)->orWhereNull("group_student_annuals.semester_id");
             })
             ->whereIn('studentAnnuals.id', $studentAnnualIds)
-            ->orderBy('students.id_card','ASC')
+            ->orderBy('students.id_card', 'ASC')
             ->get()
             ->toArray();
 
-        if (count($studentAnnualIds) >0){
+        if (count($studentAnnualIds) > 0) {
             $studentAnnual = StudentAnnual::find($studentAnnualIds[0]);
             $academic_year_id = $studentAnnual->academic_year_id;
             $department_id = $studentAnnual->department_id;
@@ -280,7 +286,7 @@ trait PrintTranscriptTrait
         }
 
         $students = collect($students);
-        $students = collect($students)->sortBy(function($student){
+        $students = collect($students)->sortBy(function ($student) {
             return sprintf('%-12s%s',
                 $student['class'],
                 $student['name_latin']
@@ -293,16 +299,16 @@ trait PrintTranscriptTrait
         $issued_date = $request->get("issued_date");
         $scores = [];
 
-        foreach($studentAnnualIds as $id){
+        foreach ($studentAnnualIds as $id) {
 
-            if($transcript_type == "semester1"){
-                $scores[$id] = $this->getStudentScoreBySemester($id,1);
+            if ($transcript_type == "semester1") {
+                $scores[$id] = $this->getStudentScoreBySemester($id, 1);
             } else {
-                $scores[$id] = $this->getStudentScoreBySemester($id,null); // Full year
+                $scores[$id] = $this->getStudentScoreBySemester($id, null); // Full year
             }
         }
         $ranking_data = [];
-        if(isset($students[0]) && $students[0]['degree_id'] == 1 && $students[0]['grade_id'] == 1 && $is_certificate == 'true') {
+        if (isset($students[0]) && $students[0]['degree_id'] == 1 && $students[0]['grade_id'] == 1 && $is_certificate == 'true') {
             $params = array(
                 "department_id" => $students[0]['department_id'],
                 "degree_id" => $students[0]['degree_id'],
@@ -313,7 +319,7 @@ trait PrintTranscriptTrait
             );
             $ranking_data = collect(json_decode($this->get_total_score_summary($params))->data)->keyBy("student_id_card");
             $view = 'backend.studentAnnual.print.foundation_certificate';
-            return view($view,
+            /*return view($view,
                 compact(
                     'ranking_data',
                     'scores',
@@ -332,7 +338,35 @@ trait PrintTranscriptTrait
                     'passedScoreII',
                     'passedScoreFinal'
                 )
-            );
+            );*/
+            return SnappyPdf::loadView($view,
+                compact(
+                    'ranking_data',
+                    'scores',
+                    'students',
+                    'semester',
+                    'transcript_type',
+                    'issued_by',
+                    'issued_date',
+                    'issued_number',
+                    'smis_server',
+                    'photo',
+                    'is_front',
+                    'is_back',
+                    'is_certificate',
+                    'passedScoreI',
+                    'passedScoreII',
+                    'passedScoreFinal'
+                )
+            )
+                ->setOption('margin-bottom', 0)
+                ->setOption('margin-left', 0)
+                ->setOption('margin-right', 0)
+                ->setOption('margin-top', 0)
+                ->setOption('encoding', 'utf-8')
+                ->setPaper('a4')
+                ->setOrientation('landscape')
+                ->stream();
         } else {
             $view = 'backend.studentAnnual.print.transcript';
         }
@@ -357,15 +391,16 @@ trait PrintTranscriptTrait
                 'passedScoreFinal'
             )
         )
-        ->setOption('margin-bottom', 0)
-        ->setOption('margin-left', 0)
-        ->setOption('margin-right', 0)
-        ->setOption('margin-top', 0)
-        ->setOption('encoding', 'utf-8')
-        ->stream();
+            ->setOption('margin-bottom', 0)
+            ->setOption('margin-left', 0)
+            ->setOption('margin-right', 0)
+            ->setOption('margin-top', 0)
+            ->setOption('encoding', 'utf-8')
+            ->stream();
     }
 
-    public function mark_printed_transcript(PrintTranscriptRequest $request){
+    public function mark_printed_transcript(PrintTranscriptRequest $request)
+    {
 
         $studentAnnualIds = json_decode($request->ids);
         $type = $request->transcript_type;
@@ -375,19 +410,19 @@ trait PrintTranscriptTrait
         $academic_year_id = $student->academic_year_id;
 
         $success = true;
-        foreach($studentAnnualIds as $student_id) {
-            if(!PrintedTranscript::create([
-                "student_annual_id"=> $student_id,
+        foreach ($studentAnnualIds as $student_id) {
+            if (!PrintedTranscript::create([
+                "student_annual_id" => $student_id,
                 "type" => $type,
                 "academic_year_id" => $academic_year_id,
                 "create_uid" => auth()->user()->id,
                 "created_at" => $date
-            ])){
+            ])) {
                 $success = false;
             };
         }
 
-        if($success){
+        if ($success) {
             return response()->json(['status' => 'success', 'message' => 'All printed transcripts are marked']);
         } else {
             return response()->json(['status' => 'fail', 'state' => 'Something went wrong! please try again or contact administrator']);
