@@ -133,7 +133,7 @@
                 <div class="col-md-6 col-xs-6">
                     <div class="border margin-left-5">
 
-                        <div class="row" style="margin-top: 90mm">
+                        <div class="row" style="margin-top: 85mm">
                             <div class="col-md-12 margin-top-40">
                                 <h3 class="text-center text-bold">{{$student['academic_year_latin']}}</h3>
                             </div>
