@@ -113,10 +113,7 @@ trait TimetableSlotTrait
                                 $timetableGroupSession->room_id = $data['room']['id'];
                                 $timetableGroupSession->update();
 
-                                Log::info($timetableGroupSession);
-
                                 if (isset($data['lecturer']['id'])) {
-                                    Log::info('enter');
                                     $timetableGroupSessionLecturer = TimetableGroupSessionLecturer::where([
                                         'timetable_group_session_id' => $timetableGroupSession->id,
                                         'lecturer_id' => $data['lecturer']['id']
