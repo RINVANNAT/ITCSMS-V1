@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Models\Employee;
+use App\Models\Room;
+use App\Models\Schedule\Timetable\TimetableGroup;
 use App\Models\Schedule\Timetable\TimetableGroupSession;
 use App\Models\Schedule\Timetable\TimetableGroupSessionLecturer;
 use App\Models\Schedule\Timetable\TimetableGroupSlotLecturer;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 trait TimetableSlotTrait
 {
@@ -59,12 +60,36 @@ trait TimetableSlotTrait
         ]);
 
         try {
-            // @TODO implement your code here...
-            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
-            if ($timetableSlot instanceof TimetableSlot) {
-                return message_success($timetableSlot->groups);
+            $timetable_group_sessions = TimetableGroupSession::where('timetable_slot_id', $request->timetable_slot_id)->get();
+            $results = [];
+            if (count($timetable_group_sessions)) {
+                foreach ($timetable_group_sessions as $timetable_group_session) {
+                    $newItem = [];
+                    $newItem['group'] = TimetableGroup::find($timetable_group_session->timetable_group_id);
+                    $newItem['room'] = Room::join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                        ->where('rooms.id', $timetable_group_session->room_id)
+                        ->select([
+                            DB::raw("CONCAT(buildings.code, '-', rooms.name) as code"),
+                            'rooms.id as id'
+                        ])->first();
+
+                    $timetable_group_session_lecturer = TimetableGroupSessionLecturer::where([
+                        'timetable_group_session_id' => $timetable_group_session->id
+                    ])->first();
+                    $newItem['lecturer'] = Employee::join('genders', 'genders.id', '=', 'employees.gender_id')
+                        ->where('employees.id', $timetable_group_session_lecturer->lecturer_id)
+                        ->select([
+                            DB::raw('upper(name_latin) as name_latin'),
+                            'employees.name_kh',
+                            'employees.id as id',
+                            'genders.code as gender_code'
+                        ])
+                        ->orderBy('name_latin', 'asc')
+                        ->first();
+                    array_push($results, $newItem);
+                }
             }
-            return message_success([]);
+            return message_success($results);
         } catch (\Exception $exception) {
             return message_error($exception->getMessage());
         }
@@ -100,13 +125,14 @@ trait TimetableSlotTrait
 
             $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
             if ($timetableSlot instanceof TimetableSlot) {
+                TimetableGroupSession::where('timetable_slot_id', $timetableSlot->id)->delete();
                 if (count($request->data) > 0) {
                     foreach ($request->data as $data) {
                         if (isset($data['group']['id']) && isset($data['room']['id'])) {
-                            $timetableGroupSession = TimetableGroupSession::where([
+                            $timetableGroupSession = TimetableGroupSession::firstOrCreate([
                                 'timetable_slot_id' => $request->timetable_slot_id,
                                 'timetable_group_id' => $data['group']['id']
-                            ])->first();
+                            ]);
 
                             if ($timetableGroupSession instanceof TimetableGroupSession) {
 

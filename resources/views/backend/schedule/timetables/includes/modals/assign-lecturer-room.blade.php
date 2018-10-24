@@ -20,6 +20,50 @@
             </div>
             <div class="modal-body">
                 <div class="row">
+                    <div class="col-md-4">
+                        <multiselect v-model="newGroupRoomLecturer.groups"
+                                     :multiple="true"
+                                     label="code"
+                                     track-by="id"
+                                     :options="groups"
+                                     :searchable="true"
+                                     :close-on-select="true"
+                                     :show-labels="false"
+                                     placeholder="Chose groups"></multiselect>
+                    </div>
+
+                    <div class="col-md-4">
+                        <multiselect v-model="newGroupRoomLecturer.room"
+                                     label="code"
+                                     track-by="id"
+                                     :options="roomOptions"
+                                     :searchable="true"
+                                     :close-on-select="true"
+                                     :show-labels="false"
+                                     placeholder="Chose room"></multiselect>
+                    </div>
+
+                    <div class="col-md-4">
+                        <multiselect v-model="newGroupRoomLecturer.lecturer"
+                                     label="name_latin"
+                                     track-by="id"
+                                     :options="employees"
+                                     :searchable="true"
+                                     :close-on-select="true"
+                                     :show-labels="false"
+                                     placeholder="Chose lecturer"></multiselect>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" @click="addItem">
+                            <i class="fa fa-plus-circle"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-12">
                         <table class="table table-bordered table-striped">
                             <thead>
@@ -27,31 +71,20 @@
                                 <th>Group</th>
                                 <th width="40%">Room</th>
                                 <th width="40%">Lecturer</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <template v-if="groupOptions.length > 0">
-                                <tr v-for="(item, key) in groupOptions" :key="key">
-                                    <td>@{{ item.code }}</td>
+                            <template v-if="groupRoomLecturers.length > 0">
+                                <tr v-for="(item, key) in groupRoomLecturers"
+                                    :key="key">
+                                    <td>@{{ item.group.code }}</td>
+                                    <td>@{{ item.room.code }}</td>
+                                    <td>@{{ item.lecturer.name_latin }}</td>
                                     <td>
-                                        <multiselect v-model="groupRoomLecturers[key].room"
-                                                     label="code"
-                                                     track-by="id"
-                                                     :options="roomOptions"
-                                                     :searchable="true"
-                                                     :close-on-select="true"
-                                                     :show-labels="false"
-                                                     placeholder="Chose room"></multiselect>
-                                    </td>
-                                    <td>
-                                        <multiselect v-model="groupRoomLecturers[key].lecturer"
-                                                     label="name_latin"
-                                                     track-by="id"
-                                                     :options="employees"
-                                                     :searchable="true"
-                                                     :close-on-select="true"
-                                                     :show-labels="false"
-                                                     placeholder="Chose lecturer"></multiselect>
+                                        <button class="btn btn-danger btn-xs" @click="removeItem(item)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </template>
@@ -65,7 +98,7 @@
                         </table>
                     </div>
 
-                    <div class="col-md-12" v-if="groupOptions.length > 0">
+                    <div class="col-md-12" v-if="groupRoomLecturers.length > 0">
                         <button class="btn btn-primary" @click="onClickAssignRoomAndLecturerToTimetableSlot">Save</button>
                     </div>
                 </div>
