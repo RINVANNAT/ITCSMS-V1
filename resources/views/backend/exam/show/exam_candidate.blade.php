@@ -26,6 +26,10 @@
         <button class="btn btn-default btn-sm pull-right" id="btn-candidate-generate-room"><i class="fa fa-map-signs"></i> {!! trans('buttons.exam.candidate.generate_room') !!}</button>
         @endauth
 
+        <a href="{{route('admin.candidate.register_candidate_department')}}?exam_id={{$exam->id}}">
+            <button  class="btn btn-primary btn-sm pull-right" id="btn_input_department_choice" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> Choose Department </button>
+        </a>
+
         @permission('create-entrance-exam-score')
         <button  class="btn btn-primary btn-sm pull-right" id="btn_input_score_course" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> {!! trans('buttons.exam.course.input_score') !!} </button>
         @endauth
