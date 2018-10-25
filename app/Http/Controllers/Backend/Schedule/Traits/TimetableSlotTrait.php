@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Models\Employee;
 use App\Models\Room;
+use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\TimetableGroup;
 use App\Models\Schedule\Timetable\TimetableGroupSession;
 use App\Models\Schedule\Timetable\TimetableGroupSessionLecturer;
+use App\Models\Schedule\Timetable\TimetableGroupSlot;
 use App\Models\Schedule\Timetable\TimetableGroupSlotLecturer;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Illuminate\Http\Request;
@@ -127,8 +129,27 @@ trait TimetableSlotTrait
             if ($timetableSlot instanceof TimetableSlot) {
                 TimetableGroupSession::where('timetable_slot_id', $timetableSlot->id)->delete();
                 if (count($request->data) > 0) {
+
+                    // assign group to timetable slot group
+                    $slot = Slot::find($timetableSlot->slot_id);
+
                     foreach ($request->data as $data) {
                         if (isset($data['group']['id']) && isset($data['room']['id'])) {
+
+                            $timetableGroupSlot = TimetableGroupSlot::where([
+                                'slot_id' => $slot->id,
+                                'timetable_group_id' => $data['group']['id']
+                            ])->first();
+
+                            if (!($timetableGroupSlot instanceof TimetableGroupSlot)) {
+                                TimetableGroupSlot::create([
+                                    'slot_id' => $slot->id,
+                                    'timetable_group_id' => $data['group']['id'],
+                                    'total_hours' => $slot->total_hours,
+                                    'total_hours_remain' => $slot->total_hours - $timetableSlot->durations
+                                ]);
+                            }
+
                             $timetableGroupSession = TimetableGroupSession::firstOrCreate([
                                 'timetable_slot_id' => $request->timetable_slot_id,
                                 'timetable_group_id' => $data['group']['id']

@@ -18,6 +18,7 @@ use App\Models\Group;
 use App\Models\Room;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableGroupSession;
 use App\Models\Schedule\Timetable\TimetableGroupSlot;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
@@ -754,21 +755,26 @@ trait AjaxCRUDTimetableController
      */
     public function remove_timetable_slot(RemoveTimetableSlotRequest $removeTimetableSlotRequest)
     {
-        $timetable_slot_id = $removeTimetableSlotRequest->timetable_slot_id;
-
-        if (isset($timetable_slot_id)) {
+        try {
+            $timetable_slot_id = $removeTimetableSlotRequest->timetable_slot_id;
             $timetableSlot = TimetableSlot::find($timetable_slot_id);
-            // take duration and slot_id field
-            $slot = Slot::find($timetableSlot->slot_id);
-            // update time_remaining field
-            $slot->time_remaining = $slot->time_remaining + $timetableSlot->durations;
-            $slot->updated_at = Carbon::now();
-            $slot->write_uid = auth()->user()->id;
-            if ($slot->update() && $timetableSlot->delete()) {
-                return Response::json(['status' => true]);
+            if ($timetableSlot instanceof TimetableSlot) {
+                $groups = $timetableSlot->groups->pluck('id');
+                $timetableGroupSlots = TimetableGroupSlot::where('slot_id', $timetableSlot->slot_id)
+                    ->whereIn('timetable_group_id', $groups)
+                    ->get();
+
+                foreach ($timetableGroupSlots as $groupSlot) {
+                    $groupSlot->total_hours_remain += $timetableSlot->durations;
+                    $groupSlot->update();
+                }
+                TimetableGroupSession::where('timetable_slot_id', $timetableSlot->id)->delete();
+                $timetableSlot->delete();
+                return message_success([]);
             }
+        } catch (\Exception $e) {
+            return message_error($e->getMessage());
         }
-        return Response::json(['status' => false]);
     }
 
     /**
