@@ -512,7 +512,7 @@ class CandidateController extends Controller
         } else {
             $choices = $request->get("choice_department");
             DB::beginTransaction();
-            foreach($choices as $department_id => $priority) {
+            foreach($choices as $priority => $department_id) {
                 if($priority == "" || $priority <1 || $priority == null) {
                     DB::rollback();
                     return json_encode(array('success'=>false, "message" => "Candidate priority is invalid"));
@@ -540,7 +540,8 @@ class CandidateController extends Controller
                 'candidate_department.*', 'departments.code as department_code',
                 'candidates.register_id','candidates.name_kh','candidates.name_latin',
                 'dob','result'
-            ])->get();
+            ])
+            ->orderBy('candidate_department.created_at','DESC')->get();
 
         $candidates_by_register_id = collect($candidates)->groupBy('register_id');
         $datatable = [];

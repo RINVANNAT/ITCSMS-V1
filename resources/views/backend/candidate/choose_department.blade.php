@@ -41,47 +41,47 @@
                                     <tr>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[1]', null, array('class'=>'form-control department_choice input','id'=>'GCA_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[1]', null, array('class'=>'form-control department_choice input','id'=>'1_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[2]', null, array('class'=>'form-control department_choice input','id'=>'GCI_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[2]', null, array('class'=>'form-control department_choice input','id'=>'2_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[17]', null, array('class'=>'form-control department_choice input','id'=>'OAC_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[3]', null, array('class'=>'form-control department_choice input','id'=>'3_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[3]', null, array('class'=>'form-control department_choice input','id'=>'GEE_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[4]', null, array('class'=>'form-control department_choice input','id'=>'4_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[16]', null, array('class'=>'form-control department_choice input','id'=>'GTR_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[5]', null, array('class'=>'form-control department_choice input','id'=>'5_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[4]', null, array('class'=>'form-control department_choice input','id'=>'GIC_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[6]', null, array('class'=>'form-control department_choice input','id'=>'6_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[5]', null, array('class'=>'form-control department_choice input','id'=>'GIM_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[7]', null, array('class'=>'form-control department_choice input','id'=>'7_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[7]', null, array('class'=>'form-control department_choice input','id'=>'GGG_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[8]', null, array('class'=>'form-control department_choice input','id'=>'8_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                         <td class="choose_department_cell">
                                             <div class="col-md-12 col-sm-12">
-                                                {!! Form::text('choice_department[6]', null, array('class'=>'form-control department_choice input','id'=>'GRU_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                                {!! Form::text('choice_department[9]', null, array('class'=>'form-control department_choice input','id'=>'9_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                             </div>
                                         </td>
                                     </tr>
@@ -175,14 +175,11 @@
                     url: baseUrl,
                     data: data,
                     success: function(response) {
-                        if(typeof response.status !== 'undefined'){
-                            if(response.status == true){
-                                return_back();
-                            } else {
-                                notify("error","Candidate Error",response.toString());
-                            }
+                        response = JSON.parse(response);
+                        if(response.success == true){
+                            notify("info","Success",response.message);
                         } else {
-                            notify("error","Candidate Error",response.toString());
+                            notify("error","Error",response.message);
                         }
                     },
                     error:function(response){
