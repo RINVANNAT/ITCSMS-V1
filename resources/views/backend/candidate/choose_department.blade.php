@@ -28,28 +28,62 @@
                             <div class="col-sm-10">
                                 <table id="choose_department_table">
                                     <tr>
-                                        @foreach($departments as $department)
-                                            <td class="choose_department_cell"><center><b>{!! $department->code !!}</b></center></td>
-                                        @endforeach
+                                        <td class="choose_department_cell"><center><b>Choice 1</b></center></td>
+                                        <td class="choose_department_cell"><center><b>Choice 2</b></center></td>
+                                        <td class="choose_department_cell"><center><b>Choice 3</b></center></td>
+                                        <td class="choose_department_cell"><center><b>Choice 4</b></center></td>
+                                        <td class="choose_department_cell"><center><b>Choice 5</b></center></td>
+                                        <td class="choose_department_cell"><center><b>Choice 6</b></center></td>
+                                        <td class="choose_department_cell"><center><b>Choice 7</b></center></td>
+                                        <td class="choose_department_cell"><center><b>Choice 8</b></center></td>
+                                        <td class="choose_department_cell"><center><b>Choice 9</b></center></td>
                                     </tr>
                                     <tr>
-                                        @if(isset($candidate) && $candidate != null)
-                                            @foreach($departments as $department)
-                                                <td class="choose_department_cell">
-                                                    <div class="col-md-12 col-sm-12">
-                                                        {!! Form::text('choice_department['.$department->id.']', $candidate_departments[$department->id], array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
-                                                    </div>
-                                                </td>
-                                            @endforeach
-                                        @else
-                                            @foreach($departments as $department)
-                                                <td class="choose_department_cell">
-                                                    <div class="col-md-12 col-sm-12">
-                                                        {!! Form::text('choice_department['.$department->id.']', null, array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
-                                                    </div>
-                                                </td>
-                                            @endforeach
-                                        @endif
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[1]', null, array('class'=>'form-control department_choice input','id'=>'GCA_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[2]', null, array('class'=>'form-control department_choice input','id'=>'GCI_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[17]', null, array('class'=>'form-control department_choice input','id'=>'OAC_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[3]', null, array('class'=>'form-control department_choice input','id'=>'GEE_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[16]', null, array('class'=>'form-control department_choice input','id'=>'GTR_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[4]', null, array('class'=>'form-control department_choice input','id'=>'GIC_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[5]', null, array('class'=>'form-control department_choice input','id'=>'GIM_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[7]', null, array('class'=>'form-control department_choice input','id'=>'GGG_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
+                                        <td class="choose_department_cell">
+                                            <div class="col-md-12 col-sm-12">
+                                                {!! Form::text('choice_department[6]', null, array('class'=>'form-control department_choice input','id'=>'GRU_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                            </div>
+                                        </td>
                                     </tr>
                                 </table>
 
