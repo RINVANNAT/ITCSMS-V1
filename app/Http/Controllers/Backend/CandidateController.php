@@ -4,7 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Candidate\CreateCandidateRequest;
 use App\Http\Requests\Backend\Candidate\DeleteCandidateRequest;
 use App\Http\Requests\Backend\Candidate\EditCandidateRequest;
-use App\Http\Requests\Backend\Candidate\RegisterCandidateDepartmentRequest;
+use App\Http\Requests\Backend\Candidate\Request;
 use App\Http\Requests\Backend\Candidate\RegisterCandidateRequest;
 use App\Http\Requests\Backend\Candidate\StoreCandidateRequest;
 use App\Http\Requests\Backend\Candidate\UpdateCandidateRequest;
@@ -29,7 +29,6 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Yajra\Datatables\Datatables;
-use Symfony\Component\HttpFoundation\Request;
 
 class CandidateController extends Controller
 {
@@ -485,7 +484,7 @@ class CandidateController extends Controller
         return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id', 'studentWithRegisteredStudetn','register_url','candidate'));
     }
 
-    public function register_candidate_department(RegisterCandidateDepartmentRequest $request) {
+    public function register_candidate_department(\Illuminate\Http\Request $request) {
         $exam_id = $request->get('exam_id');
         $exam = Exam::where('id', $exam_id)->first();
         $departments = Department::where('parent_id' , 11)->where('is_specialist',true)->orderBy('order')->get();
@@ -493,11 +492,11 @@ class CandidateController extends Controller
         return view('backend.candidate.choose_department', compact('exam','departments'));
     }
 
-    public function search_candidate(RegisterCandidateDepartmentRequest $request) {
+    public function search_candidate(Request $request) {
 
     }
 
-    public function store_candidate_department(RegisterCandidateDepartmentRequest $request) {
+    public function store_candidate_department(\Illuminate\Http\Request $request) {
         $candidate = Candidate::where('register_id', '=', $request->get("candidate_register_id"))->where("candidates.exam_id", "=", $request->get('exam_id'))->first();
         // Validate candidate
         if(!$candidate) {
@@ -530,7 +529,7 @@ class CandidateController extends Controller
         }
     }
 
-    public function list_candidate_department(RegisterCandidateDepartmentRequest $request) {
+    public function list_candidate_department(\Illuminate\Http\Request $request) {
         $exam_id = $request->get('exam_id');
         $candidates = DB::table('candidate_department')
             ->leftJoin('candidates','candidate_department.candidate_id','=','candidates.id')
@@ -603,7 +602,7 @@ class CandidateController extends Controller
             ->make(true);
     }
 
-    public function clear_department(RegisterCandidateDepartmentRequest $request, $id) {
+    public function clear_department(\Illuminate\Http\Request $request, $id) {
 
         $candidate_departments = CandidateDepartment::where('candidate_id', $id)->delete();
         if($request->ajax()){
