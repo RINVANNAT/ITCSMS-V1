@@ -574,27 +574,7 @@ class CandidateController extends Controller
                 "candidate_id" => $candidate->first()->candidate_id
             );
             foreach($candidate as $choice) {
-                $code = null;
-                if($choice->department_code == 'GCA') {
-                    $code = "No1";
-                } else if($choice->department_code == 'GCI') {
-                    $code = "No2";
-                } else if($choice->department_code == 'OAC') {
-                    $code = "No3";
-                } else if($choice->department_code == 'GEE') {
-                    $code = "No4";
-                } else if($choice->department_code == 'GTR') {
-                    $code = "No5";
-                } else if($choice->department_code == 'GIC') {
-                    $code = "No6";
-                } else if($choice->department_code == 'GIM') {
-                    $code = "No7";
-                } else if($choice->department_code == 'GGG') {
-                    $code = "No8";
-                } else if($choice->department_code == 'GRU') {
-                    $code = "No9";
-                }
-                $data[$code] = $choice->rank;
+                $data[$choice->department_code] = $choice->rank;
             }
             array_push(
                 $datatable, $data

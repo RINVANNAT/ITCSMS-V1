@@ -111,15 +111,15 @@
                         <th>{{ trans('labels.backend.candidates.fields.name_latin') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.dob') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.result') }}</th>
-                        <th>No 1</th>
-                        <th>No 2</th>
-                        <th>No 3</th>
-                        <th>No 4</th>
-                        <th>No 5</th>
-                        <th>No 6</th>
-                        <th>No 7</th>
-                        <th>No 8</th>
-                        <th>No 9</th>
+                        <th>GCA</th>
+                        <th>GCI</th>
+                        <th>OAC</th>
+                        <th>GEE</th>
+                        <th>GTR </th>
+                        <th>GIC</th>
+                        <th>GIM</th>
+                        <th>GGG</th>
+                        <th>GRU</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -150,19 +150,19 @@
                 },
                 columns: [
                     { data: 'register_id', name: 'candidates.register_id'},
-                    { data: 'name_kh', name: 'candidates.name_kh',orderable: false, searchable: false},
-                    { data: 'name_latin', name: 'candidates.name_latin',orderable: false, searchable: false},
-                    { data: 'dob', name: 'candidates.dob',orderable: false, searchable: false},
-                    { data: 'result', name: 'candidates.result',orderable: false, searchable: false},
-                    { data: 'No1', name: 'candidates.No1',orderable: false, searchable: false},
-                    { data: 'No2', name: 'candidates.No2',orderable: false, searchable: false},
-                    { data: 'No3', name: 'candidates.No3',orderable: false, searchable: false},
-                    { data: 'No4', name: 'candidates.No4',orderable: false, searchable: false},
-                    { data: 'No5', name: 'candidates.No5',orderable: false, searchable: false},
-                    { data: 'No6', name: 'candidates.No6',orderable: false, searchable: false},
-                    { data: 'No7', name: 'candidates.No7',orderable: false, searchable: false},
-                    { data: 'No8', name: 'candidates.No8',orderable: false, searchable: false},
-                    { data: 'No9', name: 'candidates.No9',orderable: false, searchable: false},
+                    { data: 'name_kh', name: 'candidates.name_kh'},
+                    { data: 'name_latin', name: 'candidates.name_latin'},
+                    { data: 'dob', name: 'candidates.dob'},
+                    { data: 'result', name: 'candidates.result'},
+                    { data: 'GCA', name: 'candidates.GCA'},
+                    { data: 'GCI', name: 'candidates.GCI'},
+                    { data: 'OAC', name: 'candidates.OAC'},
+                    { data: 'GEE', name: 'candidates.GEE'},
+                    { data: 'GTR', name: 'candidates.GTR'},
+                    { data: 'GIC', name: 'candidates.GIC'},
+                    { data: 'GIM', name: 'candidates.GIM'},
+                    { data: 'GGG', name: 'candidates.GGG'},
+                    { data: 'GRU', name: 'candidates.GRU'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
