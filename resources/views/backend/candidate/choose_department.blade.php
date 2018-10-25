@@ -178,6 +178,7 @@
                         response = JSON.parse(response);
                         if(response.success == true){
                             notify("info","Success",response.message);
+                            candidate_datatable.draw();
                         } else {
                             notify("error","Error",response.message);
                         }
@@ -221,7 +222,6 @@
                 save_department_choice();
                 $("#candidate_register_id").focus();
                 clear_input();
-                candidate_datatable.draw();
             })
             $(".department_choice").keydown(function (e) {
                 allowNumberOnlyAndNotDuplicate(e,$(this));
