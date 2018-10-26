@@ -74,20 +74,22 @@ trait TimetableSlotTrait
                             DB::raw("CONCAT(buildings.code, '-', rooms.name) as code"),
                             'rooms.id as id'
                         ])->first();
-
                     $timetable_group_session_lecturer = TimetableGroupSessionLecturer::where([
                         'timetable_group_session_id' => $timetable_group_session->id
                     ])->first();
-                    $newItem['lecturer'] = Employee::join('genders', 'genders.id', '=', 'employees.gender_id')
-                        ->where('employees.id', $timetable_group_session_lecturer->lecturer_id)
-                        ->select([
-                            DB::raw('upper(name_latin) as name_latin'),
-                            'employees.name_kh',
-                            'employees.id as id',
-                            'genders.code as gender_code'
-                        ])
-                        ->orderBy('name_latin', 'asc')
-                        ->first();
+                    if ($timetable_group_session_lecturer instanceof TimetableGroupSessionLecturer) {
+                        $newItem['lecturer'] = Employee::join('genders', 'genders.id', '=', 'employees.gender_id')
+                            ->where('employees.id', $timetable_group_session_lecturer->lecturer_id)
+                            ->select([
+                                DB::raw('upper(name_latin) as name_latin'),
+                                'employees.name_kh',
+                                'employees.id as id',
+                                'genders.code as gender_code'
+                            ])
+                            ->orderBy('name_latin', 'asc')
+                            ->first();
+                    }
+
                     array_push($results, $newItem);
                 }
             }

@@ -19,6 +19,7 @@ use App\Models\Room;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableGroupSession;
+use App\Models\Schedule\Timetable\TimetableGroupSessionLecturer;
 use App\Models\Schedule\Timetable\TimetableGroupSlot;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
@@ -388,47 +389,51 @@ trait AjaxCRUDTimetableController
      */
     public function resize_timetable_slot(ResizeTimetableSlotRequest $request)
     {
-        $result = array(
-            'code' => 200,
-            'message' => 'The operation was executed successfully',
-            'data' => [],
-            'status' => true,
-            'timetable_slot' => []
-        );
-
+        DB::beginTransaction();
         try {
-            $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
-            if ($timetable_slot instanceof TimetableSlot) {
-                $old_durations = $timetable_slot->durations;
-                $new_durations = $this->timetableSlotRepo->durations(new Carbon($timetable_slot->start), new Carbon($request->end));
-                $timetable_slot->durations = $new_durations;
-                $timetable_slot->end = new Carbon($request->end);
-                $timetable_slot->updated_at = Carbon::now();
+            try {
+                $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
 
-                $slot = Slot::find($timetable_slot->slot_id);
+                if ($timetable_slot instanceof TimetableSlot) {
+                    $groups = $timetable_slot->groups->pluck('id');
 
-                if (($slot->time_remaining >= ($new_durations - $old_durations)) && $slot->time_remaining >= 0) {
-                    if ($new_durations > $old_durations) {
-                        $interval = $new_durations - $old_durations;
-                        $slot->time_remaining = $slot->time_remaining - $interval;
+                    $old_durations = $timetable_slot->durations;
+                    $new_durations = $this->timetableSlotRepo->durations(new Carbon($timetable_slot->start), new Carbon($request->end));
+                    $interval = $new_durations - $old_durations;
+
+                    $timetable_slot->durations = $new_durations;
+                    $timetable_slot->end = new Carbon($request->end);
+
+                    $timetableGroupSlots = TimetableGroupSlot::where('slot_id', $timetable_slot->slot_id)
+                        ->whereIn('timetable_group_id', $groups)
+                        ->get();
+
+                    $groupUnableResize = [];
+                    foreach ($timetableGroupSlots as $timetableGroupSlot) {
+                        if (!(($timetableGroupSlot->total_hours_remain > 0) && ($timetableGroupSlot->total_hours_remain >= $interval))) {
+                            array_push($groupUnableResize, $timetableGroupSlot->timetable_group_id);
+                        }
+                    }
+
+                    if (count($groupUnableResize) > 0) {
+                        return message_error(Group::whereIn('id', $groupUnableResize)->get());
                     } else {
-                        $interval = $old_durations - $new_durations;
-                        $slot->time_remaining = $slot->time_remaining + $interval;
-                    }
-                    if ($slot->update()) {
+                        foreach ($timetableGroupSlots as $timetableGroupSlot) {
+                            $timetableGroupSlot->total_hours_remain = (float)$timetableGroupSlot->total_hours_remain - (float)$interval;
+                            $timetableGroupSlot->update();
+                        }
                         $timetable_slot->update();
-                        $this->timetableSlotRepo->update_merge_timetable_slot($timetable_slot);
+                        DB::commit();
+                        return message_success($timetable_slot);
                     }
-                    $result['timetable_slot'] = $timetable_slot;
                 }
+            } catch (\Exception $e) {
+                return message_error($e->getMessage());
             }
         } catch (\Exception $e) {
-            $result['message'] = $e->getMessage();
-            $result['code'] = $e->getCode();
-            $result['status'] = false;
+            DB::rollback();
+            return message_error($e->getMessage());
         }
-
-        return $result;
     }
 
     /**
@@ -439,32 +444,27 @@ trait AjaxCRUDTimetableController
      */
     public function insert_room_into_timetable_slot(AddRoomIntoTimetableSlotRequest $request)
     {
-        $result = array(
-            'code' => 200,
-            'status' => true,
-            'data' => []
-        );
-
+        DB::beginTransaction();
         try {
             $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
+            $room_id = $request->room_id;
             if ($timetableSlot instanceof TimetableSlot) {
-                $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
-                if (count($timetableSlots) > 1) {
-                    foreach ($timetableSlots as $item) {
-                        $item->room_id = request('room_id');
-                        $item->update();
+                $timetableGroupSessions = TimetableGroupSession::where('timetable_slot_id', $timetableSlot->id)->get();
+                if (count($timetableGroupSessions) > 0) {
+                    foreach ($timetableGroupSessions as $timetableGroupSession) {
+                        $timetableGroupSession->room_id = $room_id;
+                        $timetableGroupSession->update();
                     }
-                } else {
-                    $timetableSlot->room_id = request('room_id');
-                    $timetableSlot->update();
-
+                    DB::commit();
+                    return message_success([]);
                 }
+                return message_error('There are 0 records updated');
             }
-        } catch (\Exception $e) {
-            $result['code'] = $e->getCode();
-            $result['status'] = false;
+            return message_error('Could not found timetable slot.');
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return message_error($exception->getMessage());
         }
-        return $result;
     }
 
     /**
@@ -755,6 +755,7 @@ trait AjaxCRUDTimetableController
      */
     public function remove_timetable_slot(RemoveTimetableSlotRequest $removeTimetableSlotRequest)
     {
+        DB::beginTransaction();
         try {
             $timetable_slot_id = $removeTimetableSlotRequest->timetable_slot_id;
             $timetableSlot = TimetableSlot::find($timetable_slot_id);
@@ -770,9 +771,11 @@ trait AjaxCRUDTimetableController
                 }
                 TimetableGroupSession::where('timetable_slot_id', $timetableSlot->id)->delete();
                 $timetableSlot->delete();
+                DB::commit();
                 return message_success([]);
             }
         } catch (\Exception $e) {
+            DB::rollback();
             return message_error($e->getMessage());
         }
     }
@@ -953,29 +956,24 @@ trait AjaxCRUDTimetableController
             ['semester_id', $semester_id],
         ])->pluck('id');
 
-
         $slots = Slot::join('courses', 'courses.id', '=', 'slots.course_program_id')
-            ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
             ->whereIn('course_program_id', $course_program_ids)
             ->where('slots.academic_year_id', $academic_year_id)
-            ->where('slots.time_remaining', '>', 0)
             ->where(function ($query) {
                 $query->whereRaw('LOWER(courses.name_en) LIKE ?', array('%' . strtolower(request('query')) . '%'))
-                    ->orWhereRaw('LOWER(courses.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'))
-                    ->orWhereRaw('LOWER(employees.name_latin) LIKE ?', array('%' . strtolower(request('query')) . '%'))
-                    ->orWhereRaw('LOWER(employees.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'));
+                    ->orWhereRaw('LOWER(courses.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'));
             })
+            ->with('groups')
             ->select(
                 'slots.id as id',
                 'slots.course_program_id as course_program_id',
                 'slots.time_tp as tp',
                 'slots.time_td as td',
                 'slots.time_course as tc',
-                'slots.time_remaining as remaining',
-                'courses.name_en as course_name',
-                'slots.lecturer_id as lecturer_id',
-                'employees.name_latin as teacher_name'
-            )->get();
+                'courses.name_en as course_name'
+            )
+            ->orderBy('courses.name_en', 'asc')
+            ->get();
         return array('status' => true, 'course_sessions' => $slots, 'code' => 200);
     }
 
@@ -1037,30 +1035,37 @@ trait AjaxCRUDTimetableController
         return $result;
     }
 
-    public function assign_lecturer_to_timetable_slot()
+    public function assign_lecturer_to_timetable_slot(Request $request)
     {
-        $result = [
-            'code' => 200,
-            'data' => [],
-            'message' => "The operation was executed successfully"
-        ];
-
-        $timetable_slot_id = request('timetable_slot_id');
-        $lecturer_id = request('lecturer_id');
-        if (isset($timetable_slot_id) && !is_null($timetable_slot_id)) {
-            try {
-                DB::transaction(function () use ($timetable_slot_id, $lecturer_id) {
-                    $timetable_slot = TimetableSlot::find($timetable_slot_id);
-                    $timetable_slot->lecturer_id = $lecturer_id;
-                    $timetable_slot->updated_at = Carbon::now();
-                    $timetable_slot->update();
-                });
-            } catch (\Exception $e) {
-                $result['code'] = $e->getCode();
-                $result['message'] = $e->getMessage();
+        DB::beginTransaction();
+        $this->validate($request, [
+            'timetable_slot_id' => 'required',
+            'lecturer_id' => 'required'
+        ]);
+        try {
+            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
+            if ($timetableSlot instanceof TimetableSlot) {
+                $employee = Employee::find($request->lecturer_id);
+                if ($employee instanceof Employee) {
+                    $timetableGroupSessionIds = TimetableGroupSession::where('timetable_slot_id', $timetableSlot->id)->pluck('id');
+                    if (count($timetableGroupSessionIds) > 0) {
+                        foreach ($timetableGroupSessionIds as $timetableGroupSessionId) {
+                            TimetableGroupSessionLecturer::firstOrCreate([
+                                'timetable_group_session_id' => $timetableGroupSessionId,
+                                'lecturer_id' => $employee->id
+                            ]);
+                        }
+                        DB::commit();
+                        return message_success([]);
+                    }
+                    return message_error('There are no one lecturers set');
+                }
+                return message_error('Could not found lecturer');
             }
+            return message_error('Could not found timetable slot.');
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return message_error($exception->getMessage());
         }
-
-        return $result;
     }
 }

@@ -407,37 +407,24 @@
 
 		/** resize timetable slot */
 		function resize_timetable_slot(timetable_slot_id, end_date, revertFunc) {
-			$.ajax({
-				type: 'POST',
-				url: '{!! route('resize_timetable_slot') !!}',
-				data: {
-					timetable_slot_id: timetable_slot_id,
-					end: end_date
-				},
-				success: function (response) {
-					if (response.status === true) {
-						notify('info', 'Timetable slot have been changed.', 'Resize Timetable Slot');
-					} else {
-						notify('error', 'Something went wrong.', 'Resize Timetable Slot');
-						revertFunc();
-					}
-				},
-				error: function (response) {
-					if (response.status === 403) {
-						notify('error', 'You are not allowed to resize timetable slot.', 'Unauthorized');
-					} else {
-						notify('error', response.message, "Resize timetable Slot");
-					}
-					get_timetable_slots();
-					get_course_programs();
-				},
-				complete: function () {
-					get_timetable_slots();
-					get_course_programs();
-					$('#timetable').fullCalendar({
-						eventDurationEditable: true
-					});
+			axios.post('{!! route('resize_timetable_slot') !!}', {
+				timetable_slot_id: timetable_slot_id,
+				end: end_date
+			}).then((response) => {
+				console.log(response)
+				if (response.data.code === 1) {
+					notify('info', 'Timetable slot have been changed.', 'Resize Timetable Slot');
+				} else {
+					notify('error', 'Something went wrong.', 'Resize Timetable Slot');
+					revertFunc();
 				}
+				get_timetable_slots();
+				get_course_programs();
+				$('#timetable').fullCalendar({
+					eventDurationEditable: true
+				});
+			}).catch((error) => {
+				notify('error', error, "Resize timetable Slot");
 			})
 		}
 
@@ -821,10 +808,10 @@
 					},
 					error: function (response) {
 						if (response.status === 403) {
-							notify('error', 'You are not allow to remove room.', 'Unauthorized');
+							notify('error', 'You are not allow to remove room.', 'Unauthorized')
 						}
 						else {
-							notify('error', 'Something went wrong.', 'Remove Room');
+							notify('error', 'Something went wrong.', 'Remove Room')
 						}
 					},
 					complete: function () {
@@ -835,35 +822,29 @@
 
 			// add room to timetable slot.
 			$(document).on('click', '.rooms > .info-box', function (e) {
-				var dom_room = $(this);
-				$.ajax({
-					type: 'POST',
-					url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
-					data: {
-						timetable_slot_id: $('.side-course.course-selected').attr('id'),
-						room_id: $(this).find('.room_id').text()
-					},
-					success: function (response) {
-						if (response.status === true) {
-							$('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.find('.room_name').text() + '</p>');
-							dom_room.find('.info-box-icon').removeClass('bg-aqua').addClass('bg-red');
-							dom_room.css('cursor', 'not-allowed');
-							notify('success', 'Room was added', 'Add Room');
-							get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), $('.side-course.course-selected').attr('id'));
-						} else {
-							notify('warning', 'Please select which course.', 'Add Room');
-						}
-						get_rooms();
-					},
-					error: function (response) {
-						if (response.status === 403) {
-							notify('error', 'You can not add room.', 'Unauthorized');
-						} else {
-							notify('error', 'Something went wrong.', 'Add Room');
-						}
+				var dom_room = $(this)
+				if ($('.side-course.course-selected').attr('id') === undefined) {
+					notify('info', 'Please select course session', 'Add Room')
+					return 0
+				}
+				axios.post('/admin/schedule/timetables/insert_room_into_timetable_slot', {
+					timetable_slot_id: $('.side-course.course-selected').attr('id'),
+					room_id: $(this).find('.room_id').text()
+				}).then((response) => {
+					if (response.data.code === 1) {
+						// $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.find('.room_name').text() + '</p>')
+						dom_room.find('.info-box-icon').removeClass('bg-aqua').addClass('bg-red')
+						dom_room.css('cursor', 'not-allowed')
+						get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), $('.side-course.course-selected').attr('id'))
+						notify('success', 'Room was added', 'Add Room')
+					} else {
+						notify('info', response.data.message, 'Add Room')
 					}
-				});
-			});
+					get_rooms()
+				}).catch((error) => {
+					notify('error', error, 'Add Room')
+				})
+			})
 
 			// get timetable slot by on change semester option.
 			$(document).on('change', 'select[name="semester"]', function () {
@@ -1009,30 +990,39 @@
 									else {
 										course_session_item += '<li class="course-item">';
 									}
-									course_session_item += '<span class="handle ui-sortable-handle">' +
-										'<i class="fa fa-ellipsis-v"></i> ' +
-										'<i class="fa fa-ellipsis-v"></i>' +
-										'</span>' +
-										'<span class="text course-name">' + val.course_name + '</span><br>';
-									if (val.teacher_name === null) {
-										course_session_item += '<span style="margin-left: 28px;" class="teacher_name bg-danger badge">Unsigned</span><br/>';
-									} else {
-										course_session_item += '<span style="margin-left: 28px;" class="leacher_name">' + val.teacher_name + '</span><br/>';
-									}
+
+									course_session_item += '<span class="text course-name">' + val.course_name + '</span><br>'
+
 									if (val.tp !== 0) {
-										course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
-											'<span class="times">' + val.remaining + '</span> H'
+										course_session_item += '<span class="course-type"><strong>TP</strong></span> : ' +
+											'<span class="times">' + val.total_hours + '</span> H <br/>'
 									}
 									else if (val.td !== 0) {
-										course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
-											'<span class="times">' + val.remaining + '</span> H'
+										course_session_item += '<span class="course-type"><strong>TD</strong></span> : ' +
+											'<span class="times">' + val.total_hours + '</span> H <br/>'
 									}
 									else {
-										course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
-											'<span class="times">' + val.remaining + '</span> H'
+										course_session_item += '<span class="course-type"><strong>Course</strong></span> : ' +
+											'<span class="times">' + val.total_hours + '</span> H <br/>'
 									}
+
+									if (val.groups.length > 0) {
+										course_session_item += '<div class="list-groups"><span><strong>Groups: </strong></span>'
+										val.groups.forEach((eachGroup) => {
+											course_session_item += '<span class="bg-success badge remove-group-from-course-program"><span class="group-id hidden">' + eachGroup.id + '</span>' + eachGroup.code + '</span>'
+										})
+										course_session_item += '</div>'
+									} else {
+										course_session_item += `
+                                            <div class="list-groups">
+                                                <span><strong>Groups: </strong></span>
+                                                <span class="teacher_name bg-danger badge">No Groups</span><br/>
+                                            </div>
+                                        `
+									}
+
 									course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
-									course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>'
+									course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
 								})
 
 								$('.courses.todo-list').html(course_session_item);

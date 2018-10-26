@@ -20,48 +20,50 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-4">
-                        <multiselect v-model="newGroupRoomLecturer.groups"
-                                     :multiple="true"
-                                     label="code"
-                                     track-by="id"
-                                     :options="groups"
-                                     :searchable="true"
-                                     :close-on-select="true"
-                                     :show-labels="false"
-                                     placeholder="Chose groups"></multiselect>
-                    </div>
+                    <div class="col-md-11">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <multiselect v-model="newGroupRoomLecturer.groups"
+                                             :multiple="true"
+                                             label="code"
+                                             track-by="id"
+                                             :options="groups"
+                                             :searchable="true"
+                                             :close-on-select="true"
+                                             :show-labels="false"
+                                             placeholder="Chose groups"></multiselect>
+                            </div>
+                            <div class="col-md-4">
+                                <multiselect v-model="newGroupRoomLecturer.room"
+                                             label="code"
+                                             track-by="id"
+                                             :options="roomOptions"
+                                             :searchable="true"
+                                             :close-on-select="true"
+                                             :show-labels="false"
+                                             placeholder="Chose room"></multiselect>
+                            </div>
 
-                    <div class="col-md-4">
-                        <multiselect v-model="newGroupRoomLecturer.room"
-                                     label="code"
-                                     track-by="id"
-                                     :options="roomOptions"
-                                     :searchable="true"
-                                     :close-on-select="true"
-                                     :show-labels="false"
-                                     placeholder="Chose room"></multiselect>
+                            <div class="col-md-4">
+                                <multiselect v-model="newGroupRoomLecturer.lecturer"
+                                             label="name_latin"
+                                             track-by="id"
+                                             :options="employees"
+                                             :searchable="true"
+                                             :close-on-select="true"
+                                             :show-labels="false"
+                                             placeholder="Chose lecturer"></multiselect>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="col-md-4">
-                        <multiselect v-model="newGroupRoomLecturer.lecturer"
-                                     label="name_latin"
-                                     track-by="id"
-                                     :options="employees"
-                                     :searchable="true"
-                                     :close-on-select="true"
-                                     :show-labels="false"
-                                     placeholder="Chose lecturer"></multiselect>
-                    </div>
-                </div>
-
-                <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
-                    <div class="col-md-12">
-                        <button class="btn btn-info" @click="addItem">
+                    <div class="col-md-1">
+                        <button class="btn btn-info pull-right" @click="addItem">
                             <i class="fa fa-plus-circle"></i> Add
                         </button>
                     </div>
                 </div>
+
+                <div class="row" style="margin-top: 15px; margin-bottom: 15px;"></div>
 
                 <div class="row">
                     <div class="col-md-12">
@@ -100,6 +102,7 @@
 
                     <div class="col-md-12" v-if="groupRoomLecturers.length > 0">
                         <button class="btn btn-primary" @click="onClickAssignRoomAndLecturerToTimetableSlot">Save</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>
