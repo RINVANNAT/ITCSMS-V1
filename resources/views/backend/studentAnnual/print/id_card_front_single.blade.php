@@ -20,6 +20,8 @@
                         មហាវិទ្យាល័យវារីសាស្ត្រ
                     @elseif($front->department_id == 7)
                         មហាវិទ្យាល័យរ៉ែនិងភូគព្ភសាស្ត្រ
+                    @elseif($front->department_id == 16)
+                        ដេប៉ាតឺម៉ង់ទូរគមនាគមន៍ និងបណ្តាញ
                     @endif
                 @endif
             @else
