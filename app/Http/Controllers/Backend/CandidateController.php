@@ -512,11 +512,30 @@ class CandidateController extends Controller
         } else {
             $choices = $request->get("choice_department");
             DB::beginTransaction();
-            foreach($choices as $department_id => $priority) {
+            foreach($choices as $priority => $department_id) {
                 if($priority == "" || $priority <1 || $priority == null) {
                     DB::rollback();
                     return json_encode(array('success'=>false, "message" => "Candidate priority is invalid"));
                 } else {
+                    if($department_id == 1) {
+                        $department_id = 1;
+                    } else if($department_id == 2) {
+                        $department_id = 2;
+                    } else if($department_id == 3) {
+                        $department_id = 17;
+                    } else if($department_id == 4) {
+                        $department_id = 3;
+                    } else if($department_id == 5) {
+                        $department_id = 16;
+                    } else if($department_id == 6) {
+                        $department_id = 4;
+                    } else if($department_id == 7) {
+                        $department_id = 5;
+                    } else if($department_id == 8) {
+                        $department_id = 7;
+                    } else if($department_id == 9) {
+                        $department_id = 6;
+                    }
                     CandidateDepartment::create([
                         "candidate_id" => $candidate->id,
                         "department_id" => $department_id,
@@ -540,7 +559,8 @@ class CandidateController extends Controller
                 'candidate_department.*', 'departments.code as department_code',
                 'candidates.register_id','candidates.name_kh','candidates.name_latin',
                 'dob','result'
-            ])->get();
+            ])
+            ->orderBy('candidate_department.created_at','DESC')->get();
 
         $candidates_by_register_id = collect($candidates)->groupBy('register_id');
         $datatable = [];
