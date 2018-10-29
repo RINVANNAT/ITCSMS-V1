@@ -4,7 +4,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Candidate\CreateCandidateRequest;
 use App\Http\Requests\Backend\Candidate\DeleteCandidateRequest;
 use App\Http\Requests\Backend\Candidate\EditCandidateRequest;
-use App\Http\Requests\Backend\Candidate\Request;
 use App\Http\Requests\Backend\Candidate\RegisterCandidateRequest;
 use App\Http\Requests\Backend\Candidate\StoreCandidateRequest;
 use App\Http\Requests\Backend\Candidate\UpdateCandidateRequest;
@@ -29,6 +28,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Yajra\Datatables\Datatables;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CandidateController extends Controller
 {
@@ -559,10 +559,9 @@ class CandidateController extends Controller
                 'candidate_department.*', 'departments.code as department_code',
                 'candidates.register_id','candidates.name_kh','candidates.name_latin',
                 'dob','result'
-            ])
-            ->orderBy('candidate_department.created_at','DESC')->get();
+            ])->get();
 
-        $candidates_by_register_id = collect($candidates)->groupBy('register_id');
+        $candidates_by_register_id = collect($candidates)->sortByDesc('created_at')->groupBy('register_id');
         $datatable = [];
         foreach($candidates_by_register_id as $candidate) {
             $data = array(
@@ -574,7 +573,25 @@ class CandidateController extends Controller
                 "candidate_id" => $candidate->first()->candidate_id
             );
             foreach($candidate as $choice) {
-                $data[$choice->department_code] = $choice->rank;
+                if($choice->rank == 1) {
+                    $data["No1"] = $choice->department_code;
+                } else if($choice->rank == 2) {
+                    $data["No2"] = $choice->department_code;
+                } else if($choice->rank == 3) {
+                    $data["No3"] = $choice->department_code;
+                } else if($choice->rank == 4) {
+                    $data["No4"] = $choice->department_code;
+                } else if($choice->rank == 5) {
+                    $data["No5"] = $choice->department_code;
+                } else if($choice->rank == 6) {
+                    $data["No6"] = $choice->department_code;
+                } else if($choice->rank == 7) {
+                    $data["No7"] = $choice->department_code;
+                } else if($choice->rank == 8) {
+                    $data["No8"] = $choice->department_code;
+                } else if($choice->rank == 9) {
+                    $data["No9"] = $choice->department_code;
+                }
             }
             array_push(
                 $datatable, $data
@@ -631,4 +648,144 @@ class CandidateController extends Controller
             return redirect()->route('admin.candidates.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
         }
     }
+
+    public function export_chosen_departments(\Illuminate\Http\Request $request) {
+        $exam = Exam::where('id',$request->get('exam_id'))->first();
+        if(!$exam) {
+            return redirect()->back()->withFlashDanger("Exam ID is required");
+        }
+        $academicYear = $exam->academicYear;
+        // Get list departments so that we don't need to do query join
+        $departments = Department::where('is_specialist',true)
+                                ->where('parent_id',11)
+                                ->select(['id','code'])
+                                ->get()
+                                ->toArray();
+        $departments = collect($departments)->keyBy('id'); // The result format is ['key' => 'code']
+        // Get all candidates that have chosen departments in raw format
+        $raw_candidates = CandidateDepartment::join('candidates','candidate_department.candidate_id','=','candidates.id')
+                        ->join('genders','candidates.gender_id','=','genders.id')
+                        ->where('candidates.exam_id', $exam->id)
+                        ->select(
+                            'candidates.register_id','candidates.name_kh',
+                            'genders.code as gender','candidates.dob',
+                            'candidates.name_latin','candidate_department.*',
+                            'candidates.result','candidates.total_score'
+                        )
+                        ->get()
+                        ->toArray();
+
+        $raw_candidates = collect($raw_candidates)->groupBy('register_id');
+
+        // Prepare well structure candidates with the departments above
+        $candidates = [];
+        foreach($raw_candidates as $rawCandidate) {
+            $tmpData = array(
+                'name_kh' => $rawCandidate->first()['name_kh'],
+                'name_latin' => $rawCandidate->first()['name_latin'],
+                'register_id' => $rawCandidate->first()['register_id'],
+                'dob' => Carbon::createFromFormat('Y-m-d H:i:s', $rawCandidate->first()['dob'])->format('d/M/Y'),
+                'gender' => $rawCandidate->first()['gender'],
+                'result' => $rawCandidate->first()['result'],
+                'score' => $rawCandidate->first()['total_score']
+            );
+            foreach ($rawCandidate as $chosenDepartment) {
+                $tmpData[$chosenDepartment['rank']] = $departments[$chosenDepartment['department_id']]['code'];
+                $tmpData['pass'] = '';
+                $tmpData['reserve'] = '';
+                if($chosenDepartment['is_success'] == 'Pass'){
+                    $tmpData['pass'] = $departments[$chosenDepartment['department_id']]['code'];
+                } else if($chosenDepartment['is_success'] == 'Reserve') {
+                    $tmpData['reserve'] = $departments[$chosenDepartment['department_id']]['code'];
+                }
+            }
+            array_push(
+                $candidates,
+                $tmpData
+            );
+        }
+
+        return Excel::create('Candidate Priority Department ' . $academicYear->id, function ($excel) use ($academicYear, $candidates) {
+            $excel->setTitle('Candidate Priority Department ' . $academicYear->id);
+            $excel->sheet('Candidate Priority Department ', function ($sheet) use ($candidates) {
+                // header
+                $sheet->mergeCells('A1:E1');
+                $sheet->cell('A1', function ($cell) {
+                    $cell->setValue('វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា');
+                    $cell->setFont(array(
+                        'bold' => true,
+                        'size' => 14
+                    ));
+                });
+
+                $sheet->mergeCells('A3:R3');
+                $sheet->cell('A3', function ($cell) {
+                    $cell->setValue('បញ្ចើសម្រង់ជម្រើសនិសិ្សត');
+                    $cell->setAlignment('center');
+                    $cell->setFont(array(
+                        'bold' => true,
+                        'size' => 16
+                    ));
+                });
+
+                $sheet->setAutoSize(true);
+
+                $sheet->cell('A6', 'No.');
+                $sheet->cell('B6', 'Register ID');
+                $sheet->cell('C6', 'Name');
+                $sheet->cell('D6', 'Sex');
+                $sheet->cell('E6', 'DOB');
+                $sheet->cell('F6', 'Result');
+                $sheet->cell('G6', 'Score');
+                $sheet->cell('H6', '1st choice');
+                $sheet->cell('I6', '2nd choice');
+                $sheet->cell('J6', '3rd choice');
+                $sheet->cell('K6', '4th choice');
+                $sheet->cell('L6', '5th choice');
+                $sheet->cell('M6', '6th choice');
+                $sheet->cell('N6', '7th choice');
+                $sheet->cell('O6', '8th choice');
+                $sheet->cell('P6', '9th choice');
+                $sheet->cell('Q6', 'Pass');
+                $sheet->cell('R6', 'Reserve');
+
+                $row = 7;
+                $number = 1;
+                foreach ($candidates as $candidate) {
+                    $sheet->cell('A' . $row, $number);
+                    $sheet->cell('B' . $row, $candidate['register_id']);
+                    $sheet->cell('C' . $row, strtoupper($candidate['name_latin']));
+                    $sheet->cell('D' . $row, $candidate['gender']);
+                    $sheet->cell('E' . $row, $candidate['dob']);
+                    $sheet->cell('F' . $row, $candidate['result']);
+                    $sheet->cell('G' . $row, $candidate['score']);
+                    $sheet->cell('H' . $row, $candidate['1']);
+                    $sheet->cell('I' . $row, $candidate['2']);
+                    $sheet->cell('J' . $row, $candidate['3']);
+                    $sheet->cell('K' . $row, $candidate['4']);
+                    $sheet->cell('L' . $row, $candidate['5']);
+                    $sheet->cell('M' . $row, $candidate['6']);
+                    $sheet->cell('N' . $row, $candidate['7']);
+                    $sheet->cell('O' . $row, $candidate['8']);
+                    $sheet->cell('P' . $row, $candidate['9']);
+                    $sheet->cell('Q' . $row, $candidate['pass']);
+                    $sheet->cell('R' . $row, $candidate['reserve']);
+                    $number += 1;
+                    $row += 1;
+                }
+
+                $sheet->setBorder('A6:R' . ($row - 1), 'thin');
+                $sheet->cells('A6:R' . '6', function ($cells) {
+                    $cells->setValignment('center');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'family' => 'Calibri',
+                        'size' => '12',
+                        'bold' => true
+                    ));
+                });
+            });
+        })->export('xlsx');
+    }
+
 }

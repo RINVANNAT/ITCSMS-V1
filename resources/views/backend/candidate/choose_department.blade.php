@@ -92,7 +92,9 @@
                         <div class="row">
                             <hr/>
                             <div class="col-sm-12">
-                                <center><button type="button" id="btn-save-candidate" class="btn btn-primary">Save</button></center>
+                                <center>
+                                    <button type="button" id="btn-save-candidate" class="btn btn-primary">Save</button>
+                                </center>
                             </div>
                         </div>
                     </div>
@@ -111,15 +113,15 @@
                         <th>{{ trans('labels.backend.candidates.fields.name_latin') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.dob') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.result') }}</th>
-                        <th>GCA</th>
-                        <th>GCI</th>
-                        <th>OAC</th>
-                        <th>GEE</th>
-                        <th>GTR </th>
-                        <th>GIC</th>
-                        <th>GIM</th>
-                        <th>GGG</th>
-                        <th>GRU</th>
+                        <th>No1</th>
+                        <th>No2</th>
+                        <th>No3</th>
+                        <th>No4</th>
+                        <th>No5</th>
+                        <th>No6</th>
+                        <th>No7</th>
+                        <th>No8</th>
+                        <th>No9</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -127,6 +129,8 @@
             </div>
 
             <div class="clearfix"></div>
+            <a href="{{route('admin.candidate.export_chosen_departments')}}?exam_id={{$exam->id}}"><button type="button" id="btn-export-candidate" class="btn btn-primary"><i class="fa fa-file-excel-o"></i> Export</button></a>
+            <a href="{{route('admin.exam.request_form_generate_score', $exam->id)}}"><button type="button" id="btn-generate-candidate" class="btn btn-primary"><i class="fa fa-gears"></i> Generate Result</button></a>
         </div><!-- /.box-body -->
     </div><!--box-->
 @stop
@@ -141,7 +145,6 @@
             var candidate_datatable = $('#candidates-table').DataTable({
                 processing: true,
                 serverSide: true,
-                dom: 'l<"candidate_filter">frtip',
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url: '{!! route('admin.candidate.list_candidate_department')."?exam_id=".$exam->id !!}',
@@ -150,19 +153,19 @@
                 },
                 columns: [
                     { data: 'register_id', name: 'candidates.register_id'},
-                    { data: 'name_kh', name: 'candidates.name_kh'},
-                    { data: 'name_latin', name: 'candidates.name_latin'},
-                    { data: 'dob', name: 'candidates.dob'},
-                    { data: 'result', name: 'candidates.result'},
-                    { data: 'GCA', name: 'candidates.GCA'},
-                    { data: 'GCI', name: 'candidates.GCI'},
-                    { data: 'OAC', name: 'candidates.OAC'},
-                    { data: 'GEE', name: 'candidates.GEE'},
-                    { data: 'GTR', name: 'candidates.GTR'},
-                    { data: 'GIC', name: 'candidates.GIC'},
-                    { data: 'GIM', name: 'candidates.GIM'},
-                    { data: 'GGG', name: 'candidates.GGG'},
-                    { data: 'GRU', name: 'candidates.GRU'},
+                    { data: 'name_kh', name: 'candidates.name_kh',orderable: false, searchable: false},
+                    { data: 'name_latin', name: 'candidates.name_latin',orderable: false, searchable: false},
+                    { data: 'dob', name: 'candidates.dob',orderable: false, searchable: false},
+                    { data: 'result', name: 'candidates.result',orderable: false, searchable: false},
+                    { data: 'No1', name: 'candidates.No1',orderable: false, searchable: false},
+                    { data: 'No2', name: 'candidates.No2',orderable: false, searchable: false},
+                    { data: 'No3', name: 'candidates.No3',orderable: false, searchable: false},
+                    { data: 'No4', name: 'candidates.No4',orderable: false, searchable: false},
+                    { data: 'No5', name: 'candidates.No5',orderable: false, searchable: false},
+                    { data: 'No6', name: 'candidates.No6',orderable: false, searchable: false},
+                    { data: 'No7', name: 'candidates.No7',orderable: false, searchable: false},
+                    { data: 'No8', name: 'candidates.No8',orderable: false, searchable: false},
+                    { data: 'No9', name: 'candidates.No9',orderable: false, searchable: false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
