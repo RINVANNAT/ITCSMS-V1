@@ -25,10 +25,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
-use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
+use Yajra\Datatables\Datatables;
 
 class CandidateController extends Controller
 {
@@ -71,45 +70,44 @@ class CandidateController extends Controller
     {
         $studentBac2_id = Input::get('studentBac2_id');
         $exam_id = Input::get('exam_id');
-        $exam = Exam::where('id',$exam_id)->first();
+        $exam = Exam::where('id', $exam_id)->first();
 
-        if($exam->accept_registration){
+        if ($exam->accept_registration) {
             // This exam accept new candidate registration
             $highschool = null;
 
-            if($studentBac2_id==0){ // This allow to create candidate manually
+            if ($studentBac2_id == 0) { // This allow to create candidate manually
                 $studentBac2 = null;
                 $highschool = null;
             } else {
                 $studentBac2 = StudentBac2::find($studentBac2_id);
-                $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
+                $highschool = HighSchool::where('id', $studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
             }
-
 
 
             $dif = $exam->academic_year_id - 2016;
-            if($exam->type_id == 1){ // Engineer
-                $promotion_id = config('app.promotions.I.2016')+$dif;
-                $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
-            } else if($exam->type_id == 2){
-                $promotion_id = config('app.promotions.T.2016')+$dif;
-                $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+            if ($exam->type_id == 1) { // Engineer
+                $promotion_id = config('app.promotions.I.2016') + $dif;
+                $promotions = Promotion::where('id', $promotion_id)->orderBy('id', 'desc')->lists('name', 'id')->toArray();
+            } else if ($exam->type_id == 2) {
+                $promotion_id = config('app.promotions.T.2016') + $dif;
+                $promotions = Promotion::where('id', $promotion_id)->orderBy('id', 'desc')->lists('name', 'id')->toArray();
             } else {
-                $promotions = Promotion::orderBy('id','desc')->lists('name','id')->toArray();
+                $promotions = Promotion::orderBy('id', 'desc')->lists('name', 'id')->toArray();
             }
 
-            $degrees = Degree::lists('name_kh','id');
-            $genders = Gender::lists('name_kh','id');
+            $degrees = Degree::lists('name_kh', 'id');
+            $genders = Gender::lists('name_kh', 'id');
 
-            $provinces = Origin::lists('name_kh','id');
-            $gdeGrades = GdeGrade::lists('name_en','id');
-            $departments = Department::where('is_specialist',true)->where('parent_id',11)->where('code', '!=', 'GTR')->orderBy('code','asc')->get();
-            $academicYears = AcademicYear::orderBy('id','desc')->lists('id','id');
+            $provinces = Origin::lists('name_kh', 'id');
+            $gdeGrades = GdeGrade::lists('name_en', 'id');
+            $departments = Department::where('is_specialist', true)->where('parent_id', 11)->where('code', '!=', 'GTR')->orderBy('code', 'asc')->get();
+            $academicYears = AcademicYear::orderBy('id', 'desc')->lists('id', 'id');
 
-            return view('backend.candidate.create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
+            return view('backend.candidate.create', compact('departments', 'degrees', 'genders', 'promotions', 'provinces', 'gdeGrades', 'academicYears', 'exam', 'studentBac2', 'highschool'));
         } else {
             // This exam no longer accept new candidate registration
-            return Response::json(array("message"=>"You can not add new candidate to this exam"),422);
+            return Response::json(array("message" => "You can not add new candidate to this exam"), 422);
         }
 
     }
@@ -117,72 +115,72 @@ class CandidateController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  StoreCandidateRequest  $request
+     * @param  StoreCandidateRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreCandidateRequest $request)
     {
 
-        $exam = Exam::where('id',$request->get('exam_id'))->first();
+        $exam = Exam::where('id', $request->get('exam_id'))->first();
         $data = $request->all();
 
-        if($exam->accept_registration) { // If this exam doesn't allow new registration, we can't accept it
-            if($request->pass_dept != null && $request->reserve_dept != null) {
+        if ($exam->accept_registration) { // If this exam doesn't allow new registration, we can't accept it
+            if ($request->pass_dept != null && $request->reserve_dept != null) {
 
                 $data['result'] = "Pass";
                 $result = $this->candidates->create($data);
 
-                if($result['status']==true){
-                    $this->updateCandidateDept($result['candidate_id'],$request->pass_dept,"Pass");
-                    $this->updateCandidateDept($result['candidate_id'],$request->reserve_dept,"Reserve");
+                if ($result['status'] == true) {
+                    $this->updateCandidateDept($result['candidate_id'], $request->pass_dept, "Pass");
+                    $this->updateCandidateDept($result['candidate_id'], $request->reserve_dept, "Reserve");
                     return Response::json($result);
                 } else {
-                    return Response::json($result,422);
+                    return Response::json($result, 422);
                 }
 
-            } elseif($request->pass_dept != null && $request->reserve_dept == null) {
+            } elseif ($request->pass_dept != null && $request->reserve_dept == null) {
 
                 $data['result'] = "Pass";
                 $result = $this->candidates->create($data);
 
-                if($result['status']==true){
-                    $this->updateCandidateDept($result['candidate_id'],$request->pass_dept,"Pass");
+                if ($result['status'] == true) {
+                    $this->updateCandidateDept($result['candidate_id'], $request->pass_dept, "Pass");
                     return Response::json($result);
                 } else {
-                    return Response::json($result,422);
+                    return Response::json($result, 422);
                 }
 
 
-            } elseif($request->pass_dept == null && $request->reserve_dept != null) {
+            } elseif ($request->pass_dept == null && $request->reserve_dept != null) {
 
                 $data['result'] = "Reserve";
                 $result = $this->candidates->create($data);
 
-                if($result['status']==true){
-                    $this->updateCandidateDept($result['candidate_id'],$request->reserve_dept,"Reserve");
+                if ($result['status'] == true) {
+                    $this->updateCandidateDept($result['candidate_id'], $request->reserve_dept, "Reserve");
                     return Response::json($result);
                 } else {
-                    return Response::json($result,422);
+                    return Response::json($result, 422);
                 }
 
-            }
-            else {
+            } else {
 
                 $result = $this->candidates->create($request->all());
 
-                if($result['status']==true){
+                if ($result['status'] == true) {
                     return Response::json($result);
                 } else {
-                    return Response::json($result,422);
+                    return Response::json($result, 422);
                 }
             }
         } else {
-            return Response::json(array("message"=>"You cannot register new candidate with this examination"),422);
+            return Response::json(array("message" => "You cannot register new candidate with this examination"), 422);
         }
 
     }
 
-    private function updateCandidateDept($candidate_id, $department_id, $result) {
+    private function updateCandidateDept($candidate_id, $department_id, $result)
+    {
 
         $res = DB::table('candidate_department')
             ->where([
@@ -199,7 +197,7 @@ class CandidateController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -211,74 +209,74 @@ class CandidateController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param EditCandidateRequest $request
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit(EditCandidateRequest $request, $id)
     {
-        $candidate = Candidate::where('id',$id)->with('departments')->first();
+        $candidate = Candidate::where('id', $id)->with('departments')->first();
 
         //dd($candidate->departments->toArray());
         $candidate_departments = [];
-        foreach($candidate->departments as $candidate_department){
+        foreach ($candidate->departments as $candidate_department) {
             $candidate_departments[$candidate_department->id] = $candidate_department->pivot->rank;
         }
         //dd($candidate_departments);
 
-        $exam = Exam::where('id',$candidate->exam_id)->first();
+        $exam = Exam::where('id', $candidate->exam_id)->first();
         $studentBac2 = StudentBac2::find($candidate->studentBac2_id);
 
-        $degrees = Degree::lists('name_kh','id');
-        $genders = Gender::lists('name_kh','id');
+        $degrees = Degree::lists('name_kh', 'id');
+        $genders = Gender::lists('name_kh', 'id');
 
         $dif = $exam->academic_year_id - 2015;
-        if($exam->type_id == 1){ // Engineer
-            $promotion_id = config('app.promotions.I.2015')+$dif;
-            $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
-        } else if($exam->type_id == 2){
-            $promotion_id = config('app.promotions.T.2015')+$dif;
-            $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+        if ($exam->type_id == 1) { // Engineer
+            $promotion_id = config('app.promotions.I.2015') + $dif;
+            $promotions = Promotion::where('id', $promotion_id)->orderBy('id', 'desc')->lists('name', 'id')->toArray();
+        } else if ($exam->type_id == 2) {
+            $promotion_id = config('app.promotions.T.2015') + $dif;
+            $promotions = Promotion::where('id', $promotion_id)->orderBy('id', 'desc')->lists('name', 'id')->toArray();
         } else {
-            $promotions = Promotion::orderBy('id','desc')->lists('name','id')->toArray();
+            $promotions = Promotion::orderBy('id', 'desc')->lists('name', 'id')->toArray();
         }
 
-        $provinces = Origin::lists('name_kh','id');
-        $gdeGrades = GdeGrade::lists('name_en','id');
-        $departments = Department::where('is_specialist',true)->where('parent_id',11)->where('code','!=','GTR')->orderBy('code','asc')->get();
-        $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
+        $provinces = Origin::lists('name_kh', 'id');
+        $gdeGrades = GdeGrade::lists('name_en', 'id');
+        $departments = Department::where('is_specialist', true)->where('parent_id', 11)->where('code', '!=', 'GTR')->orderBy('code', 'asc')->get();
+        $academicYears = AcademicYear::orderBy('name_latin', 'desc')->lists('name_latin', 'id');
 
-        if($studentBac2!=null){
-            $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
+        if ($studentBac2 != null) {
+            $highschool = HighSchool::where('id', $studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
         } else {
-            $highschool = HighSchool::where('id',$candidate->highschool_id)->lists('id', 'name_kh as name')->toArray();
+            $highschool = HighSchool::where('id', $candidate->highschool_id)->lists('id', 'name_kh as name')->toArray();
         }
 
 
-        return view('backend.candidate.edit',compact('highschool','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2','candidate_departments'));
+        return view('backend.candidate.edit', compact('highschool', 'departments', 'exam', 'degrees', 'genders', 'promotions', 'provinces', 'gdeGrades', 'academicYears', 'candidate', 'studentBac2', 'candidate_departments'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  UpdateCandidateRequest $request
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateCandidateRequest $request, $id)
     {
-        $exam = Exam::where('id',$request->get('exam_id'))->first();
-        $candidate = Candidate::where('id',$id)->first();
+        $exam = Exam::where('id', $request->get('exam_id'))->first();
+        $candidate = Candidate::where('id', $id)->first();
 
-        if($exam->accept_registration && $candidate->result == "Pending"){ // If this result is still pending, they can update their info
+        if ($exam->accept_registration && $candidate->result == "Pending") { // If this result is still pending, they can update their info
             $result = $this->candidates->update($id, $request->all());
 
-            if($result['status']==true){
+            if ($result['status'] == true) {
                 return Response::json($result);
             } else {
-                return Response::json($result,422);
+                return Response::json($result, 422);
             }
         } else {
-            return Response::json(array("message"=>"You cannot modify information of this candidate"),422);
+            return Response::json(array("message" => "You cannot modify information of this candidate"), 422);
         }
 
     }
@@ -287,14 +285,14 @@ class CandidateController extends Controller
      * Remove the specified resource from storage.
      *
      * @param DeleteCandidateRequest $request
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeleteCandidateRequest $request, $id)
     {
         $this->candidates->destroy($id);
-        if($request->ajax()){
-            return json_encode(array("success"=>true));
+        if ($request->ajax()) {
+            return json_encode(array("success" => true));
         } else {
             return redirect()->route('admin.candidates.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
         }
@@ -310,95 +308,95 @@ class CandidateController extends Controller
         //$exam = Exam::where('id',Input::get('exam_id'))->first();
 
         $candidates = DB::table('candidates')
-            ->leftJoin('origins','candidates.province_id','=','origins.id')
-            ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
-            ->leftJoin('genders','candidates.gender_id','=','genders.id')
-            ->leftJoin('examRooms','candidates.room_id','=','examRooms.id')
-            ->leftJoin('buildings','examRooms.building_id','=','buildings.id')
-            ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
-            ->where('candidates.active',true)
+            ->leftJoin('origins', 'candidates.province_id', '=', 'origins.id')
+            ->leftJoin('gdeGrades', 'candidates.bac_total_grade', '=', 'gdeGrades.id')
+            ->leftJoin('genders', 'candidates.gender_id', '=', 'genders.id')
+            ->leftJoin('examRooms', 'candidates.room_id', '=', 'examRooms.id')
+            ->leftJoin('buildings', 'examRooms.building_id', '=', 'buildings.id')
+            ->leftJoin('highSchools', 'candidates.highschool_id', '=', 'highSchools.id')
+            ->where('candidates.active', true)
             ->select([
-                'candidates.id',DB::raw("CONCAT(buildings.code,\"examRooms\".name) as room"),
-                'candidates.register_id','candidates.name_kh','candidates.name_latin',
-                'candidates.highschool_id','highSchools.name_kh as high_school',
+                'candidates.id', DB::raw("CONCAT(buildings.code,\"examRooms\".name) as room"),
+                'candidates.register_id', 'candidates.name_kh', 'candidates.name_latin',
+                'candidates.highschool_id', 'highSchools.name_kh as high_school',
                 'candidates.exam_id', 'candidates.total_score',
-                'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
-                'origins.name_kh as province', 'dob','result','is_paid','is_register'
+                'genders.name_kh as gender_name_kh', 'gdeGrades.name_en as bac_total_grade',
+                'origins.name_kh as province', 'dob', 'result', 'is_paid', 'is_register'
             ]);
 
-        if($exam_id = Input::get('exam_id')){
-            $candidates = $candidates->where('candidates.exam_id',$exam_id);
+        if ($exam_id = Input::get('exam_id')) {
+            $candidates = $candidates->where('candidates.exam_id', $exam_id);
         }
-        if($academic_year_id = Input::get('academic_year_id')){
-            $candidates = $candidates->where('academic_year_id',$exam_id);
+        if ($academic_year_id = Input::get('academic_year_id')) {
+            $candidates = $candidates->where('academic_year_id', $exam_id);
         }
-        if($degree_id = Input::get('degree_id')){
-            $candidates = $candidates->where('degree_id',$degree_id);
+        if ($degree_id = Input::get('degree_id')) {
+            $candidates = $candidates->where('degree_id', $degree_id);
         }
-        if($origin_id = Input::get('origin_id')){
-            $candidates = $candidates->where('candidates.province_id',$origin_id);
+        if ($origin_id = Input::get('origin_id')) {
+            $candidates = $candidates->where('candidates.province_id', $origin_id);
         }
-        if($room_id = Input::get('room_id')){
-            $candidates = $candidates->where('candidates.room_id',$room_id);
+        if ($room_id = Input::get('room_id')) {
+            $candidates = $candidates->where('candidates.room_id', $room_id);
         }
-        if($result = Input::get('result')){
-            $candidates = $candidates->where('candidates.result',$result);
+        if ($result = Input::get('result')) {
+            $candidates = $candidates->where('candidates.result', $result);
         }
 
-        $datatables =  app('datatables')->of($candidates);
+        $datatables = app('datatables')->of($candidates);
 
 
         return $datatables
-            ->addColumn('number',function($candidate){
+            ->addColumn('number', function ($candidate) {
                 return "";
             })
-            ->editColumn('name_latin',function($candidate){
+            ->editColumn('name_latin', function ($candidate) {
                 return strtoupper($candidate->name_latin);
             })
-            ->editColumn('register_id',function($candidate){
+            ->editColumn('register_id', function ($candidate) {
                 return str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT);
             })
-            ->editColumn('room',function($candidate){
-                if($candidate->room == "" || $candidate->room == null){
+            ->editColumn('room', function ($candidate) {
+                if ($candidate->room == "" || $candidate->room == null) {
                     return " - ";
                 } else {
                     return $candidate->room;
                 }
             })
-            ->editColumn('result',function($candidate){
-                if($candidate->result == "Pending"){
-                    return '<span class="label label-warning">'.$candidate->result.'</span>';
-                } else if($candidate->result == "Pass"){
-                    return '<span class="label label-success">'.$candidate->result.'</span>';
-                } else if($candidate->result == "Reserve"){
-                    return '<span class="label label-info">'.$candidate->result.'</span>';
-                } else if($candidate->result == "Fail"){
-                    return '<span class="label label-danger">'.$candidate->result.'</span>';
+            ->editColumn('result', function ($candidate) {
+                if ($candidate->result == "Pending") {
+                    return '<span class="label label-warning">' . $candidate->result . '</span>';
+                } else if ($candidate->result == "Pass") {
+                    return '<span class="label label-success">' . $candidate->result . '</span>';
+                } else if ($candidate->result == "Reserve") {
+                    return '<span class="label label-info">' . $candidate->result . '</span>';
+                } else if ($candidate->result == "Fail") {
+                    return '<span class="label label-danger">' . $candidate->result . '</span>';
                 } else { // Rejected
-                    return '<span class="label label-danger">'.$candidate->result.'</span>';
+                    return '<span class="label label-danger">' . $candidate->result . '</span>';
                 }
             })
-            ->editColumn('dob',function($candidate){
-                $date = Carbon::createFromFormat('Y-m-d h:i:s',$candidate->dob);
+            ->editColumn('dob', function ($candidate) {
+                $date = Carbon::createFromFormat('Y-m-d h:i:s', $candidate->dob);
                 return $date->toFormattedDateString();
             })
             ->addColumn('action', function ($candidate) {
                 $action = "";
 
-                if($candidate->result == "Pending"){
+                if ($candidate->result == "Pending") {
                     $action = '';
-                    if(Auth::user()->allow('edit-exam-candidate')){
-                       $action = $action .'<a href="'.route('admin.candidates.edit',$candidate->id).'" class="btn_candidate_edit btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                    if (Auth::user()->allow('edit-exam-candidate')) {
+                        $action = $action . '<a href="' . route('admin.candidates.edit', $candidate->id) . '" class="btn_candidate_edit btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.crud.edit') . '"></i> </a>';
                     }
-                    if(Auth::user()->allow('delete-exam-candidate')) {
-                        $action = $action. ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.candidates.destroy', $candidate->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                    if (Auth::user()->allow('delete-exam-candidate')) {
+                        $action = $action . ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.candidates.destroy', $candidate->id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
                     }
                 } else {
-                    if($candidate->is_register){
+                    if ($candidate->is_register) {
                         $action = '<span style="color:green"><i class="fa fa-check"></i></span>';
                     } else {//if($candidate->is_paid){
-                        if(Auth::user()->allow('register-exam-candidate')) {
-                            $action = ' <button class="btn btn-xs btn-register" data-exam="'.$candidate->exam_id.'" data-candidate="'.$candidate->id.'" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
+                        if (Auth::user()->allow('register-exam-candidate')) {
+                            $action = ' <button class="btn btn-xs btn-register" data-exam="' . $candidate->exam_id . '" data-candidate="' . $candidate->id . '" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
                         }
                     }
                 }
@@ -415,34 +413,36 @@ class CandidateController extends Controller
      * Register candidate, to become first year student
      *
      * @param RegisterCandidateRequest $request
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function register(RegisterCandidateRequest $request, $id){
+    public function register(RegisterCandidateRequest $request, $id)
+    {
 
         //$examId = $request->exam_id;
         //$exam = Exam::where('id',$examId)->first();
-        $candidate = Candidate::where('id',$id)->first();
+        $candidate = Candidate::where('id', $id)->first();
         $dept_id = config('access.departments.department_tc'); // By default, it is foundation department
 
-        if(isset($request->department_id) && $request->department_id != null) {
+        if (isset($request->department_id) && $request->department_id != null) {
             $dept_id = $request->department_id;
         }
 
         $result = $this->studentRepo->register($candidate, $dept_id);
-        if($request->ajax()){
-            return json_encode(array('success'=>$result));
+        if ($request->ajax()) {
+            return json_encode(array('success' => $result));
         }
     }
 
 
-    public function requestRegisterStudentDUT(RegisterCandidateRequest $request){
+    public function requestRegisterStudentDUT(RegisterCandidateRequest $request)
+    {
         $examId = $request->exam_id;
-        $exam = Exam::where('id',$examId)->first();
+        $exam = Exam::where('id', $examId)->first();
         $candidate_id = $request->candidate_id;
-        $register_url = route('admin.candidate.register',$candidate_id);
+        $register_url = route('admin.candidate.register', $candidate_id);
 
-        $candidate = Candidate::where('id',$candidate_id)->first();
+        $candidate = Candidate::where('id', $candidate_id)->first();
 
         $candidateDepartments = DB::table('candidates')
             ->join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
@@ -470,7 +470,7 @@ class CandidateController extends Controller
             ->get();
 
 
-        foreach($getAllDepts as $Dept) {
+        foreach ($getAllDepts as $Dept) {
 
             $countRegisteredStudents = DB::table('studentAnnuals')
                 ->where([
@@ -481,59 +481,62 @@ class CandidateController extends Controller
             $studentWithRegisteredStudetn[$Dept->dept_name] = $countRegisteredStudents;
         }
 
-        return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id', 'studentWithRegisteredStudetn','register_url','candidate'));
+        return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id', 'studentWithRegisteredStudetn', 'register_url', 'candidate'));
     }
 
-    public function register_candidate_department(\Illuminate\Http\Request $request) {
+    public function register_candidate_department(\Illuminate\Http\Request $request)
+    {
         $exam_id = $request->get('exam_id');
         $exam = Exam::where('id', $exam_id)->first();
-        $departments = Department::where('parent_id' , 11)->where('is_specialist',true)->orderBy('order')->get();
+        $departments = Department::where('parent_id', 11)->where('is_specialist', true)->orderBy('order')->get();
 
-        return view('backend.candidate.choose_department', compact('exam','departments'));
+        return view('backend.candidate.choose_department', compact('exam', 'departments'));
     }
 
-    public function search_candidate(Request $request) {
+    public function search_candidate(Request $request)
+    {
 
     }
 
-    public function store_candidate_department(\Illuminate\Http\Request $request) {
+    public function store_candidate_department(\Illuminate\Http\Request $request)
+    {
         $candidate = Candidate::where('register_id', '=', $request->get("candidate_register_id"))->where("candidates.exam_id", "=", $request->get('exam_id'))->first();
         // Validate candidate
-        if(!$candidate) {
-            return json_encode(array('success'=>false, "message" => "This candidate register id is  invalid"));
+        if (!$candidate) {
+            return json_encode(array('success' => false, "message" => "This candidate register id is  invalid"));
         }
         // then find if this candidate already register
         $candidate_departments = DB::table('candidate_department')
             ->where("candidate_department.candidate_id", "=", $candidate->id)
             ->first();
-        if($candidate_departments) {
+        if ($candidate_departments) {
             // this one already register, send error back
-            return json_encode(array('success'=>false, "message" => "This candidate is already registered"));
+            return json_encode(array('success' => false, "message" => "This candidate is already registered"));
         } else {
             $choices = $request->get("choice_department");
             DB::beginTransaction();
-            foreach($choices as $priority => $department_id) {
-                if($priority == "" || $priority <1 || $priority == null) {
+            foreach ($choices as $priority => $department_id) {
+                if ($priority == "" || $priority < 1 || $priority == null) {
                     DB::rollback();
-                    return json_encode(array('success'=>false, "message" => "Candidate priority is invalid"));
+                    return json_encode(array('success' => false, "message" => "Candidate priority is invalid"));
                 } else {
-                    if($department_id == 1) {
+                    if ($department_id == 1) {
                         $department_id = 1;
-                    } else if($department_id == 2) {
+                    } else if ($department_id == 2) {
                         $department_id = 2;
-                    } else if($department_id == 3) {
+                    } else if ($department_id == 3) {
                         $department_id = 17;
-                    } else if($department_id == 4) {
+                    } else if ($department_id == 4) {
                         $department_id = 3;
-                    } else if($department_id == 5) {
+                    } else if ($department_id == 5) {
                         $department_id = 16;
-                    } else if($department_id == 6) {
+                    } else if ($department_id == 6) {
                         $department_id = 4;
-                    } else if($department_id == 7) {
+                    } else if ($department_id == 7) {
                         $department_id = 5;
-                    } else if($department_id == 8) {
+                    } else if ($department_id == 8) {
                         $department_id = 7;
-                    } else if($department_id == 9) {
+                    } else if ($department_id == 9) {
                         $department_id = 6;
                     }
                     CandidateDepartment::create([
@@ -544,26 +547,27 @@ class CandidateController extends Controller
                 }
             }
             DB::commit();
-            return json_encode(array('success'=>true, "message" => "Candidate's department is registered"));
+            return json_encode(array('success' => true, "message" => "Candidate's department is registered"));
         }
     }
 
-    public function list_candidate_department(\Illuminate\Http\Request $request) {
+    public function list_candidate_department(\Illuminate\Http\Request $request)
+    {
         $exam_id = $request->get('exam_id');
         $candidates = DB::table('candidate_department')
-            ->leftJoin('candidates','candidate_department.candidate_id','=','candidates.id')
-            ->leftJoin('departments','candidate_department.department_id','=','departments.id')
-            ->where('candidates.active',true)
-            ->where('candidates.exam_id',$exam_id)
+            ->leftJoin('candidates', 'candidate_department.candidate_id', '=', 'candidates.id')
+            ->leftJoin('departments', 'candidate_department.department_id', '=', 'departments.id')
+            ->where('candidates.active', true)
+            ->where('candidates.exam_id', $exam_id)
             ->select([
                 'candidate_department.*', 'departments.code as department_code',
-                'candidates.register_id','candidates.name_kh','candidates.name_latin',
-                'dob','result'
+                'candidates.register_id', 'candidates.name_kh', 'candidates.name_latin',
+                'dob', 'result'
             ])->get();
 
         $candidates_by_register_id = collect($candidates)->sortByDesc('created_at')->groupBy('register_id');
         $datatable = [];
-        foreach($candidates_by_register_id as $candidate) {
+        foreach ($candidates_by_register_id as $candidate) {
             $data = array(
                 "name_kh" => $candidate->first()->name_kh,
                 "name_latin" => $candidate->first()->name_latin,
@@ -572,24 +576,24 @@ class CandidateController extends Controller
                 "result" => $candidate->first()->result,
                 "candidate_id" => $candidate->first()->candidate_id
             );
-            foreach($candidate as $choice) {
-                if($choice->rank == 1) {
+            foreach ($candidate as $choice) {
+                if ($choice->rank == 1) {
                     $data["No1"] = $choice->department_code;
-                } else if($choice->rank == 2) {
+                } else if ($choice->rank == 2) {
                     $data["No2"] = $choice->department_code;
-                } else if($choice->rank == 3) {
+                } else if ($choice->rank == 3) {
                     $data["No3"] = $choice->department_code;
-                } else if($choice->rank == 4) {
+                } else if ($choice->rank == 4) {
                     $data["No4"] = $choice->department_code;
-                } else if($choice->rank == 5) {
+                } else if ($choice->rank == 5) {
                     $data["No5"] = $choice->department_code;
-                } else if($choice->rank == 6) {
+                } else if ($choice->rank == 6) {
                     $data["No6"] = $choice->department_code;
-                } else if($choice->rank == 7) {
+                } else if ($choice->rank == 7) {
                     $data["No7"] = $choice->department_code;
-                } else if($choice->rank == 8) {
+                } else if ($choice->rank == 8) {
                     $data["No8"] = $choice->department_code;
-                } else if($choice->rank == 9) {
+                } else if ($choice->rank == 9) {
                     $data["No9"] = $choice->department_code;
                 }
             }
@@ -599,37 +603,37 @@ class CandidateController extends Controller
         }
 
 
-        $datatables =  app('datatables')->of(collect($datatable));
+        $datatables = app('datatables')->of(collect($datatable));
         return $datatables
-            ->addColumn('number',function($candidate){
+            ->addColumn('number', function ($candidate) {
                 return "";
             })
-            ->editColumn('name_latin',function($candidate){
+            ->editColumn('name_latin', function ($candidate) {
                 return strtoupper($candidate['name_latin']);
             })
-            ->editColumn('register_id',function($candidate){
+            ->editColumn('register_id', function ($candidate) {
                 return str_pad($candidate['register_id'], 4, '0', STR_PAD_LEFT);
             })
-            ->editColumn('result',function($candidate){
-                if($candidate['result'] == "Pending"){
-                    return '<span class="label label-warning">'.$candidate['result'].'</span>';
-                } else if($candidate['result'] == "Pass"){
-                    return '<span class="label label-success">'.$candidate['result'].'</span>';
-                } else if($candidate['result'] == "Reserve"){
-                    return '<span class="label label-info">'.$candidate['result'].'</span>';
-                } else if($candidate['result'] == "Fail"){
-                    return '<span class="label label-danger">'.$candidate['result'].'</span>';
+            ->editColumn('result', function ($candidate) {
+                if ($candidate['result'] == "Pending") {
+                    return '<span class="label label-warning">' . $candidate['result'] . '</span>';
+                } else if ($candidate['result'] == "Pass") {
+                    return '<span class="label label-success">' . $candidate['result'] . '</span>';
+                } else if ($candidate['result'] == "Reserve") {
+                    return '<span class="label label-info">' . $candidate['result'] . '</span>';
+                } else if ($candidate['result'] == "Fail") {
+                    return '<span class="label label-danger">' . $candidate['result'] . '</span>';
                 } else { // Rejected
-                    return '<span class="label label-danger">'.$candidate['result'].'</span>';
+                    return '<span class="label label-danger">' . $candidate['result'] . '</span>';
                 }
             })
-            ->editColumn('dob',function($candidate){
-                $date = Carbon::createFromFormat('Y-m-d h:i:s',$candidate['dob']);
+            ->editColumn('dob', function ($candidate) {
+                $date = Carbon::createFromFormat('Y-m-d h:i:s', $candidate['dob']);
                 return $date->toFormattedDateString();
             })
             ->addColumn('action', function ($candidate) {
                 $action = "";
-                $action = $action.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.candidate.clear_department', $candidate['candidate_id']) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                $action = $action . ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.candidate.clear_department', $candidate['candidate_id']) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
                 return $action;
             })
             ->setRowClass(function ($candidate) {
@@ -639,47 +643,49 @@ class CandidateController extends Controller
             ->make(true);
     }
 
-    public function clear_department(\Illuminate\Http\Request $request, $id) {
+    public function clear_department(\Illuminate\Http\Request $request, $id)
+    {
 
         $candidate_departments = CandidateDepartment::where('candidate_id', $id)->delete();
-        if($request->ajax()){
-            return json_encode(array("success"=>true));
+        if ($request->ajax()) {
+            return json_encode(array("success" => true));
         } else {
             return redirect()->route('admin.candidates.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
         }
     }
 
-    public function export_chosen_departments(\Illuminate\Http\Request $request) {
-        $exam = Exam::where('id',$request->get('exam_id'))->first();
-        if(!$exam) {
+    public function export_chosen_departments(\Illuminate\Http\Request $request)
+    {
+        $exam = Exam::where('id', $request->get('exam_id'))->first();
+        if (!$exam) {
             return redirect()->back()->withFlashDanger("Exam ID is required");
         }
         $academicYear = $exam->academicYear;
         // Get list departments so that we don't need to do query join
-        $departments = Department::where('is_specialist',true)
-                                ->where('parent_id',11)
-                                ->select(['id','code'])
-                                ->get()
-                                ->toArray();
+        $departments = Department::where('is_specialist', true)
+            ->where('parent_id', 11)
+            ->select(['id', 'code'])
+            ->get()
+            ->toArray();
         $departments = collect($departments)->keyBy('id'); // The result format is ['key' => 'code']
         // Get all candidates that have chosen departments in raw format
-        $raw_candidates = CandidateDepartment::join('candidates','candidate_department.candidate_id','=','candidates.id')
-                        ->join('genders','candidates.gender_id','=','genders.id')
-                        ->where('candidates.exam_id', $exam->id)
-                        ->select(
-                            'candidates.register_id','candidates.name_kh',
-                            'genders.code as gender','candidates.dob',
-                            'candidates.name_latin','candidate_department.*',
-                            'candidates.result','candidates.total_score'
-                        )
-                        ->get()
-                        ->toArray();
+        $raw_candidates = CandidateDepartment::join('candidates', 'candidate_department.candidate_id', '=', 'candidates.id')
+            ->join('genders', 'candidates.gender_id', '=', 'genders.id')
+            ->where('candidates.exam_id', $exam->id)
+            ->select(
+                'candidates.register_id', 'candidates.name_kh',
+                'genders.code as gender', 'candidates.dob',
+                'candidates.name_latin', 'candidate_department.*',
+                'candidates.result', 'candidates.total_score'
+            )
+            ->get()
+            ->toArray();
 
         $raw_candidates = collect($raw_candidates)->groupBy('register_id');
 
         // Prepare well structure candidates with the departments above
         $candidates = [];
-        foreach($raw_candidates as $rawCandidate) {
+        foreach ($raw_candidates as $key => $rawCandidate) {
             $tmpData = array(
                 'name_kh' => $rawCandidate->first()['name_kh'],
                 'name_latin' => $rawCandidate->first()['name_latin'],
@@ -689,20 +695,17 @@ class CandidateController extends Controller
                 'result' => $rawCandidate->first()['result'],
                 'score' => $rawCandidate->first()['total_score']
             );
+            $tmpData['pass'] = '';
+            $tmpData['reserve'] = '';
             foreach ($rawCandidate as $chosenDepartment) {
                 $tmpData[$chosenDepartment['rank']] = $departments[$chosenDepartment['department_id']]['code'];
-                $tmpData['pass'] = '';
-                $tmpData['reserve'] = '';
-                if($chosenDepartment['is_success'] == 'Pass'){
+                if ($chosenDepartment['is_success'] == 'Pass') {
                     $tmpData['pass'] = $departments[$chosenDepartment['department_id']]['code'];
-                } else if($chosenDepartment['is_success'] == 'Reserve') {
+                } else if ($chosenDepartment['is_success'] == 'Reserve') {
                     $tmpData['reserve'] = $departments[$chosenDepartment['department_id']]['code'];
                 }
             }
-            array_push(
-                $candidates,
-                $tmpData
-            );
+            array_push($candidates, $tmpData);
         }
 
         return Excel::create('Candidate Priority Department ' . $academicYear->id, function ($excel) use ($academicYear, $candidates) {
