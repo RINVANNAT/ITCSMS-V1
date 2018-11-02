@@ -15,6 +15,7 @@ use App\Http\Requests\Backend\Exam\GenerateExamScoreDUTRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
 use App\Models\Candidate;
+use App\Models\CandidateDepartment;
 use App\Models\Department;
 use App\Models\EntranceExamCourse;
 use App\Models\Exam;
@@ -1989,8 +1990,6 @@ class ExamController extends Controller
         } else {
             return Response::json(['status'=>false]);
         }
-
-
     }
 
     public function reportErrorCandidateScores($exam_id, Request $request) {
@@ -3108,71 +3107,59 @@ class ExamController extends Controller
 
     }
 
-    public function generateCandidateDUTResult($examId, GenerateExamScoreDUTRequest $request) {
-
-        $DeptSelectedForStu =[];
+    public function generateCandidateDUTResult($examId, GenerateExamScoreDUTRequest &$request) {
 
         $arrayCandidateInEachDept = $request->department; // Array from form department
 
-        //$totalCands = $this->isAvalaibleDept($arrayCandidateInEachDept, null, null, $findsum = 'true');
+        $candidateIds = CandidateDepartment::join('candidates', 'candidates.id', '=', 'candidate_department.candidate_id')
+            ->where('candidates.exam_id', $examId)
+            ->distinct('candidate_department.candidate_id')
+            ->pluck('candidates.id');
 
-        $dUTCandidates = $this->getAllDUTCandidates($examId); // List of all canidate order by bac percentile
+        $dUTCandidates = Candidate::whereIn('id', $candidateIds)
+            ->select('id', 'total_score')
+            ->orderBy('total_score', 'desc')
+            ->get();
 
         if($dUTCandidates) {
+            $candidateDepartments = CandidateDepartment::whereIn('candidate_id', $candidateIds)->get();
+            foreach ($candidateDepartments as $candidateDepartment) {
+                $candidateDepartment->is_success = null;
+                $candidateDepartment->update();
+            }
 
-            $this->resetCandidateDUTResult();// reset all first then make an update
+            $prevStudent = null;
+            $prevStudentDeptId = null;
 
-            foreach($dUTCandidates as $dUTCandidate) { // loop by each candidate order by percentile
+            foreach($dUTCandidates as $key => $dUTCandidate) { // loop by each candidate order by percentile
+                $candidateDepts = $this->getCandidateDept($dUTCandidate->id); // List of all chosen department order by rank
 
-                //$statusRank =1;
-                $candidateDepts = $this->getCandidateDept($dUTCandidate->candidate_id); // List of all chosen department order by rank
-
-                $index = 1;
-                $reserve_ready = false;
-                foreach($candidateDepts as $candidateDept) {// loop candidate department option from the 1 choice to the end 1->8
+                foreach($candidateDepts as $candidateDept) { // loop candidate department option from the 1 choice to the end 1->8
 
                     // Candidate ID : $dutCandidate->candidate_id
                     // Sequence of department chosen by current candidate : $candidateDepts
-                    $index++;
 
-                    if($arrayCandidateInEachDept[$candidateDept->department_id]['success'] > 0){
+                    if(($arrayCandidateInEachDept[$candidateDept->department_id]['success'] > 0) || ($dUTCandidate->total_score == $prevStudent->total_score && $prevStudentDeptId !== null && $candidateDept->department_id == $prevStudentDeptId)){ // total number choose department is bigger than 0 or not
                         // update candidate_department.status = true
+                        $arrayCandidateInEachDept[$candidateDept->department_id]['success']--;
 
-                        $DeptSelectedForStu[] =$candidateDept->department_id;
-                        $arrayCandidateInEachDept[$candidateDept->department_id]['success'] --;
-
-                        $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank, $result='Pass');
-
-                        if($update) {
-                            $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Pass');
-                            break;
-                        }
-                    } else if(!$reserve_ready) {
-
-                        if($arrayCandidateInEachDept[$candidateDept->department_id]['reserve'] > 0){
-                            $arrayCandidateInEachDept[$candidateDept->department_id]['reserve'] --;
-                            // sdfsfasfdsdfafd
-                            $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank, $result='Reserve');
-
-                            $reserve_ready = true;
-                        }
-                    }
-
-                    if($index == count($candidateDepts)){
-                        if($reserve_ready){
-                            $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Reserve');
-                        } else {
-                            $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Fail');
-                        }
+                        DB::table('candidate_department')
+                            ->where([
+                                ['candidate_id', '=', $dUTCandidate->id],
+                                ['department_id', '=', $candidateDept->department_id],
+                                ['rank', '=', $candidateDept->rank]
+                            ])
+                            ->update([
+                                'is_success' => 'Pass'
+                            ]);
+                        $prevStudentDeptId = $candidateDept->department_id;
+                        $prevStudent = $dUTCandidate;
+                        break;
                     }
                 }
             }
-
-            //return view list of candidate who pass with selected department and student whow reserve with selected department options
-
             return Response::json(['status'=>true]);
         }
-
         return Response::json(['status'=>false]);
     }
 
