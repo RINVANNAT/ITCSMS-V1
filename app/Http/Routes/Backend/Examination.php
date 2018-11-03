@@ -113,5 +113,6 @@ Route::group([], function() {
     Route::get('exams/{id}/export-data', 'ExamController@exportData')->name('admin.exam.export_data');// link to get data for teacher Seng
 
 
-
+    Route::get('exams/{id}/get-form-distribution-engineer-first-year', 'ExamController@getFormDistributionEngineerFirstYear')->name('admin.exam.get-form-distribution-engineer-first-year');
+    Route::post('exams/generate-distribution-engineer-first-year', 'ExamController@generateDistributionEngineerFirstYear')->name('admin.exam.generate-distribution-engineer-first-year');
 });
