@@ -130,7 +130,7 @@
 
             <div class="clearfix"></div>
             <a href="{{route('admin.candidate.export_chosen_departments')}}?exam_id={{$exam->id}}"><button type="button" id="btn-export-candidate" class="btn btn-primary"><i class="fa fa-file-excel-o"></i> Export</button></a>
-            <a href="{{route('admin.exam.get-form-distribution-engineer-first-year', $exam->id)}}"><button type="button" id="btn-generate-candidate" class="btn btn-primary"><i class="fa fa-gears"></i> Generate Result</button></a>
+            <a href="{{route('admin.exam.request_form_generate_score', $exam->id)}}"><button type="button" id="btn-generate-candidate" class="btn btn-primary"><i class="fa fa-gears"></i> Generate Result</button></a>
         </div><!-- /.box-body -->
     </div><!--box-->
 @stop

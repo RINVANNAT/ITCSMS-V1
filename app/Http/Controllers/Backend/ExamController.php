@@ -3162,71 +3162,9 @@ class ExamController extends Controller
 
     }
 
-    private function getAllDUTCandidates($examId)
-    {
+    public function generateCandidateDUTResult($examId, GenerateExamScoreDUTRequest $request) {
 
-        $dUTCandidates = DB::table('candidates')
-            ->select('candidates.id as candidate_id', 'candidates.bac_percentile', 'candidates.name_latin')
-            ->where('candidates.exam_id', '=', $examId)
-            ->orderBy('bac_percentile', 'DESC')
-            ->get();
-
-        return $dUTCandidates;
-    }
-
-    private function resetCandidateDUTResult()
-    { // set the field is_success to false
-
-        $res = DB::table('candidate_department')
-            ->update(array(
-                'is_success' => null
-            ));
-    }
-
-    private function getCandidateDept($candidateId)
-    {
-
-        $candidateDept = DB::table('candidate_department')
-            ->where('candidate_department.candidate_id', '=', $candidateId)
-            ->select('candidate_department.department_id', 'candidate_department.rank')
-            ->orderBy('rank', 'ASC')
-            ->get();
-
-        return $candidateDept;
-    }
-
-    private function updateCandiateDepartment($candidate_id, $department_id, $rank, $result)
-    {
-
-        $res = DB::table('candidate_department')
-            ->where([
-                ['candidate_id', '=', $candidate_id],
-                ['department_id', '=', $department_id],
-                ['rank', '=', $rank]
-            ])
-            ->update(array(
-                'is_success' => $result
-            ));
-        return $res;
-    }
-
-    private function updateDutCandResult($examId, $candidateId, $canResult)
-    {
-        $res = DB::table('candidates')
-            ->where([
-                ['id', '=', $candidateId],
-                ['exam_id', '=', $examId]
-            ])
-            ->update(array(
-                'result' => $canResult
-            ));
-        return $res;
-    }
-
-    public function generateCandidateDUTResult($examId, GenerateExamScoreDUTRequest $request)
-    {
-
-        $DeptSelectedForStu = [];
+        $DeptSelectedForStu =[];
 
         $arrayCandidateInEachDept = $request->department; // Array from form department
 
@@ -3234,48 +3172,48 @@ class ExamController extends Controller
 
         $dUTCandidates = $this->getAllDUTCandidates($examId); // List of all canidate order by bac percentile
 
-        if ($dUTCandidates) {
+        if($dUTCandidates) {
 
             $this->resetCandidateDUTResult();// reset all first then make an update
 
-            foreach ($dUTCandidates as $dUTCandidate) { // loop by each candidate order by percentile
+            foreach($dUTCandidates as $dUTCandidate) { // loop by each candidate order by percentile
 
                 //$statusRank =1;
                 $candidateDepts = $this->getCandidateDept($dUTCandidate->candidate_id); // List of all chosen department order by rank
 
                 $index = 1;
                 $reserve_ready = false;
-                foreach ($candidateDepts as $candidateDept) {// loop candidate department option from the 1 choice to the end 1->8
+                foreach($candidateDepts as $candidateDept) {// loop candidate department option from the 1 choice to the end 1->8
 
                     // Candidate ID : $dutCandidate->candidate_id
                     // Sequence of department chosen by current candidate : $candidateDepts
                     $index++;
 
-                    if ($arrayCandidateInEachDept[$candidateDept->department_id]['success'] > 0) {
+                    if($arrayCandidateInEachDept[$candidateDept->department_id]['success'] > 0){
                         // update candidate_department.status = true
 
-                        $DeptSelectedForStu[] = $candidateDept->department_id;
-                        $arrayCandidateInEachDept[$candidateDept->department_id]['success']--;
+                        $DeptSelectedForStu[] =$candidateDept->department_id;
+                        $arrayCandidateInEachDept[$candidateDept->department_id]['success'] --;
 
-                        $update = $this->updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id, $candidateDept->rank, $result = 'Pass');
+                        $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank, $result='Pass');
 
-                        if ($update) {
+                        if($update) {
                             $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Pass');
                             break;
                         }
-                    } else if (!$reserve_ready) {
+                    } else if(!$reserve_ready) {
 
-                        if ($arrayCandidateInEachDept[$candidateDept->department_id]['reserve'] > 0) {
-                            $arrayCandidateInEachDept[$candidateDept->department_id]['reserve']--;
+                        if($arrayCandidateInEachDept[$candidateDept->department_id]['reserve'] > 0){
+                            $arrayCandidateInEachDept[$candidateDept->department_id]['reserve'] --;
                             // sdfsfasfdsdfafd
-                            $update = $this->updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id, $candidateDept->rank, $result = 'Reserve');
+                            $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank, $result='Reserve');
 
                             $reserve_ready = true;
                         }
                     }
 
-                    if ($index == count($candidateDepts)) {
-                        if ($reserve_ready) {
+                    if($index == count($candidateDepts)){
+                        if($reserve_ready){
                             $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Reserve');
                         } else {
                             $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Fail');
@@ -3286,10 +3224,10 @@ class ExamController extends Controller
 
             //return view list of candidate who pass with selected department and student whow reserve with selected department options
 
-            return Response::json(['status' => true]);
+            return Response::json(['status'=>true]);
         }
 
-        return Response::json(['status' => false]);
+        return Response::json(['status'=>false]);
     }
 
     public function getDUTCandidateResultLists($examId)
