@@ -19,6 +19,7 @@ use App\Http\Requests\Backend\Exam\ViewSecretCodeRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
 use App\Models\Candidate;
+use App\Models\CandidateDepartment;
 use App\Models\Department;
 use App\Models\EntranceExamCourse;
 use App\Models\Exam;
@@ -3424,12 +3425,62 @@ class ExamController extends Controller
     {
         $this->validate($request, [
             'exam_id' => 'required',
-            'departments' => 'required|array'
+            'department' => 'required|array'
         ]);
-
         try {
-            $candidateIds = Candidate::join('candidate_department', '');
-            Candidate::create($request->all());
+            $nbDeptNeed = $request->department;
+            $candidateIds = Candidate::join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
+                ->where('candidates.exam_id', $request->exam_id)
+                ->distinct('candidates.id')
+                ->pluck('candidate_department.candidate_id');
+
+            $candidates = Candidate::whereIn('id', $candidateIds)
+                ->orderBy('total_score', 'desc')
+                ->select('id', 'total_score')
+                ->get()->toArray();
+
+            CandidateDepartment::whereIn('candidate_id', $candidateIds)
+                ->update(['is_success' => null]);
+
+            if (count($candidates) > 0) {
+                $prevCandidate = null;
+                $prevCandidateDeptIdPass = null;
+                foreach ($candidates as $candidate) {
+                    $deptChooses = CandidateDepartment::where('candidate_id', $candidate['id'])
+                        ->orderBy('rank', 'asc')
+                        ->get();
+                    $deptChooses = $deptChooses->groupBy('department_id')->toArray();
+
+                    foreach ($deptChooses as $deptChoose) {
+
+                        if($nbDeptNeed[$deptChoose[0]['department_id']]['success'] > 0) {
+                            $candidateDepartment = CandidateDepartment::find($deptChoose[0]['id']);
+                            if ($candidateDepartment instanceof CandidateDepartment) {
+                                $candidateDepartment->is_success = 'Pass';
+                                $candidateDepartment->update();
+                                $prevCandidate = $candidate;
+                                $prevCandidateDeptIdPass = $deptChoose[0]['department_id'];
+                                $nbDeptNeed[$deptChoose[0]['department_id']]['success']--;
+                                break;
+                            }
+                        }else {
+                            if ($prevCandidate !== null) {
+                                if (($prevCandidate['total_score'] == $candidate['total_score']) && ($prevCandidateDeptIdPass == $deptChoose[0]['department_id'])) {
+                                    $candidateDepartment = CandidateDepartment::find($deptChoose[0]['id']);
+                                    if ($candidateDepartment instanceof CandidateDepartment) {
+                                        $candidateDepartment->is_success = 'Pass';
+                                        $candidateDepartment->update();
+                                        $prevCandidate = $candidate;
+                                        $prevCandidateDeptIdPass = $deptChoose[0]['department_id'];
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return redirect()->back();
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
