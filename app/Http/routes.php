@@ -121,4 +121,8 @@ Route::group(['prefix' => 'api', 'namespace' => 'API'], function () {
     Route::group(['prefix' => 'timetable'], function () {
         require(__DIR__ . '/Routes/Backend/API/timetable.php');
     });
+
+    Route::group(['prefix', 'system-vote'], function (){
+        require(__DIR__ . '/Routes/Backend/API/SystemVote.php');
+    });
 });
