@@ -29,7 +29,7 @@
                                              track-by="id"
                                              :options="groups"
                                              :searchable="true"
-                                             :close-on-select="true"
+                                             :close-on-select="false"
                                              :show-labels="false"
                                              placeholder="Chose groups"></multiselect>
                             </div>

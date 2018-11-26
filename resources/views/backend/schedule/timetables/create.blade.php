@@ -411,7 +411,6 @@
 				timetable_slot_id: timetable_slot_id,
 				end: end_date
 			}).then((response) => {
-				console.log(response)
 				if (response.data.code === 1) {
 					notify('info', 'Timetable slot have been changed.', 'Resize Timetable Slot');
 				} else {
@@ -568,7 +567,7 @@
 								var groups = '<p>Gr: ';
 								event.groups.forEach((eachGroup) => {
 									groups += `
-                                	    <span class="remove-group-from-timetable-slot">
+                                	    <span class="group-timetable-slot">
                                 	        <span class="timetable-slot-id hidden">` + event.id + `</span>
                                 	        <span class="group-id hidden">` + eachGroup.id + `</span>` + eachGroup.code + `
                                 	    </span>
