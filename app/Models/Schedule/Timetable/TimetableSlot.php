@@ -41,7 +41,7 @@ class TimetableSlot extends Model
         });
 
         self::updating(function ($model) {
-           $model->updated_uid = auth()->user()->id;
+            $model->updated_uid = auth()->user()->id;
         });
     }
 }

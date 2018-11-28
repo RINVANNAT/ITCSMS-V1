@@ -336,19 +336,35 @@ trait AjaxCRUDTimetableController
                 'timetableSlots' => [],
             );
 
-            try {
-                $timetable = $this->timetableRepo->find_timetable_is_existed($request);
-                if ($timetable instanceof Timetable) {
-                    $result['timetable'] = $timetable;
-                    $result['timetableSlots'] = TimetableSlot::with('groups', 'employee', 'room')
-                        ->where('timetable_id', $timetable->id)
-                        ->get();
-                }
+            $timetable = Timetable::where([
+                ['academic_year_id', $request->academicYear],
+                ['department_id', $request->department],
+                ['degree_id', $request->degree],
+                ['grade_id', $request->grade],
+                ['option_id', $request->option == null ? null : $request->option],
+                ['semester_id', $request->semester],
+                ['week_id', $request->weekly]
+            ])->first();
 
-            } catch (\Exception $e) {
-                $result['code'] = $e->getCode();
-                $result['message'] = $e->getMessage();
-                $request['status'] = false;
+            /*$timetableSlots = TimetableSlot::with('groups', 'employee', 'room')
+                ->where('timetable_id', $timetable->id)
+                ->get();*/
+
+            $timetableSlotIds = TimetableSlot::where('timetable_id', $timetable->id)
+                ->pluck('id');
+
+            $findOtherTimetable = Timetable::where([
+                'academic_year_id' => $request->academicYear,
+                'semester_id' => $request->semester,
+                'week_id' => $request->weekly
+            ])
+            ->whereNotIn('timetable_id', [$timetable->id])
+            ->pluck('id');
+
+            $timetableSlots = [];
+            if ($timetable instanceof Timetable) {
+                $result['timetable'] = $timetable;
+                $result['timetableSlots'] = $timetableSlots;
             }
             return $result;
         } catch (\Exception $e) {
