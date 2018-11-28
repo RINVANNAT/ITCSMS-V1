@@ -424,37 +424,51 @@ class TimetableController extends Controller
     {
         DB::beginTransaction();
         try {
-            $timetable_slots = Timetable::join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
-                ->where([
-                    'timetables.academic_year_id' => $request->academic_year_id,
-                    'timetables.department_id' => $request->department_id,
-                    'timetables.option_id' => $request->department_option_id,
-                    'timetables.degree_id' => $request->degree_id,
-                    'timetables.grade_id' => $request->grade_id,
-                    'timetables.semester_id' => $request->semester_id
-                ]);
-
-            if ($request->selected_week != 'all') {
-                $timetable_slots = $timetable_slots->whereIn('timetables.week_id', $request->selected_week);
-            }
-
-            $timetable_slots = $timetable_slots->select('timetable_slots.*')
+            $weekIds = array_unique($request->selected_week);
+            $timetables = Timetable::where([
+                'timetables.academic_year_id' => $request->academic_year_id,
+                'timetables.department_id' => $request->department_id,
+                'timetables.option_id' => $request->department_option_id,
+                'timetables.degree_id' => $request->degree_id,
+                'timetables.grade_id' => $request->grade_id,
+                'timetables.semester_id' => $request->semester_id
+            ])
+                ->whereIn('week_id', $weekIds)
                 ->get();
+            if (count($timetables) > 0) {
+                foreach ($timetables as $timetable) {
+                    if ($timetable instanceof Timetable) {
+                        $timetableSlots = $timetable->timetableSlots;
+                        if (count($timetableSlots) > 0) {
+                            foreach ($timetableSlots as $timetableSlot) {
+                                if ($timetableSlot instanceof TimetableSlot) {
+                                    $groupIds = TimetableGroupSession::where([
+                                        'timetable_slot_id' => $timetableSlot->id
+                                    ])->pluck('timetable_group_id');
 
-            foreach ($timetable_slots as $timetable_slot) {
-                $slot = Slot::find($timetable_slot->slot_id);
-                if ($slot instanceof Slot && count($slot->timetableGroupSlots) > 0) {
-                    foreach ($slot->timetableGroupSlots as $groupSlot) {
-                        $timetableGroupSlot = TimetableGroupSlot::find($groupSlot->id);
-                        $timetableGroupSlot->total_hours_remain += (float)$timetable_slot->durations;
-                        $timetableGroupSlot->update();
+                                    foreach ($groupIds as $groupId) {
+                                        $timetableGroupSlot = TimetableGroupSlot::where([
+                                            'slot_id' => $timetableSlot->slot_id,
+                                            'timetable_group_id' => $groupId
+                                        ])->first();
+                                        if ($timetableGroupSlot instanceof TimetableGroupSlot) {
+                                            $timetableGroupSlot->total_hours_remain += $timetableSlot->durations;
+                                            $timetableGroupSlot->update();
+                                            TimetableGroupSession::where([
+                                                'timetable_slot_id' => $timetableSlot->id,
+                                                'timetable_group_id' => $groupId
+                                            ])->delete();
+                                        }
+                                    }
+                                    $timetableSlot->delete();
+                                }
+                            }
+                        }
                     }
-                    TimetableSlot::find($timetable_slot->id)->delete();
                 }
             }
-
             DB::commit();
-            return message_success($timetable_slots);
+            return message_success($timetables);
         } catch (\Exception $exception) {
             DB::rollback();
             return message_error($exception->getMessage());
