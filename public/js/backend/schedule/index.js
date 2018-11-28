@@ -255,7 +255,7 @@ var app = new Vue({
 				toggleLoading(false);
 			}).catch(function (error) {
 				notify('error', 'Slots was not exported', 'Export Courses');
-			});
+			})
 		},
 		getGroupsByTimetableSlot(timetable_slot_id) {
 			this.timetable_slot_id = timetable_slot_id
@@ -321,6 +321,7 @@ $(function () {
 						'success'
 					)
 					get_course_programs()
+					get_timetable_slots()
 				} else {
 					notify('error', response.data.message, 'Remove Group!')
 				}

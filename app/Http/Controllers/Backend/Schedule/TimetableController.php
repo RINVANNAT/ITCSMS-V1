@@ -21,7 +21,6 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
-use App\Models\Group;
 use App\Models\Room;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
@@ -523,7 +522,7 @@ class TimetableController extends Controller
             'slot_id' => 'required',
             'timetable_group_id' => 'required'
         ]);
-
+        DB::beginTransaction();
         try {
             $timetableGroupSlot = TimetableGroupSlot::where([
                 'slot_id' => $request->slot_id,
@@ -531,11 +530,21 @@ class TimetableController extends Controller
             ])->first();
 
             if ($timetableGroupSlot instanceof TimetableGroupSlot) {
+
+                $timetableSlotIds = TimetableSlot::where([
+                    'slot_id' => $request->slot_id
+                ])->pluck('id');
+
+                TimetableGroupSession::whereIn('timetable_slot_id', $timetableSlotIds)
+                    ->where('timetable_group_id', $request->timetable_group_id)
+                    ->delete();
                 $timetableGroupSlot->delete();
+                DB::commit();
                 return message_success([]);
             }
             return message_error('Could not delete group!');
         } catch (\Exception $exception) {
+            DB::rollback();
             return message_error($exception->getMessage());
         }
     }
@@ -641,7 +650,7 @@ class TimetableController extends Controller
     }
 
 
-    public function getRooms ()
+    public function getRooms()
     {
         try {
             $rooms = Room::join('buildings', 'buildings.id', '=', 'rooms.building_id')
