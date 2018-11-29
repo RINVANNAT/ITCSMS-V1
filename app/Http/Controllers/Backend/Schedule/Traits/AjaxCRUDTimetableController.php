@@ -350,21 +350,22 @@ trait AjaxCRUDTimetableController
                 ->where('timetable_id', $timetable->id)
                 ->get();*/
 
-            $timetableSlotIds = TimetableSlot::where('timetable_id', $timetable->id)
-                ->pluck('id');
-
-            $findOtherTimetable = Timetable::where([
-                'academic_year_id' => $request->academicYear,
-                'semester_id' => $request->semester,
-                'week_id' => $request->weekly
-            ])
-            ->whereNotIn('timetable_id', [$timetable->id])
-            ->pluck('id');
+            $otherTimetableSlots = TimetableSlot::join('timetables', 'timetables.id', '=', 'timetable_slots.timetable_id')
+                ->where([
+                    'timetables.academic_year_id' => $request->academicYear,
+                    'timetables.semester_id' => $request->semester,
+                    'timetables.week_id' => $request->weekly
+                ])
+                // ->whereNotIn('timetables.id', [$timetable->id])
+                ->with('timetables.groups', 'timetables.employee', 'timetables.room')
+                ->select('timetable_slots.*')
+                ->get();
 
             $timetableSlots = [];
+
             if ($timetable instanceof Timetable) {
                 $result['timetable'] = $timetable;
-                $result['timetableSlots'] = $timetableSlots;
+                $result['timetableSlots'] = $otherTimetableSlots;
             }
             return $result;
         } catch (\Exception $e) {
