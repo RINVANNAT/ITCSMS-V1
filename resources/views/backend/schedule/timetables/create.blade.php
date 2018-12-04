@@ -86,7 +86,7 @@
                         </div>
                         <div class="col-md-3">
                             @include('backend.schedule.timetables.includes.partials.courses-sessions')
-                            @include('backend.schedule.timetables.includes.partials.rooms')
+                            {{--@include('backend.schedule.timetables.includes.partials.rooms')--}}
                         </div>
                     </div>
                     <div class="clearfix"></div>
