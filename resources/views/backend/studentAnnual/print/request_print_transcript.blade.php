@@ -260,6 +260,7 @@
         }
 
         function update_filter_class(callback) {
+            $('#filter_class').empty();
             $.ajax({
                 type: 'POST',
                 url: filter_class_url,
@@ -482,6 +483,9 @@
             });
             $(document.body).on("change", "#filter_gender", function (e) {
                 redraw_student_list();
+            });
+            $(document.body).on("change", "#filter_academic_year", function (e) {
+                update_filter_class(redraw_student_list);
             });
         });
 
