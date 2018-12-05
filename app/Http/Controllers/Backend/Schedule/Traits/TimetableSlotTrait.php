@@ -127,6 +127,26 @@ trait TimetableSlotTrait
                 'data' => 'required|array'
             ]);
 
+            $tmpLecturerIds = [];
+            if(count($request->data) > 0) {
+                $data = $request->data;
+                foreach ($data as $item) {
+                    array_push($tmpLecturerIds, $item['lecturer']['id']);
+                }
+
+                $firstLecturerId = null;
+                foreach ($tmpLecturerIds as $key => $lecturerId) {
+                    if($key == 0) {
+                        $firstLecturerId = $lecturerId;
+                    } else {
+                        if ($firstLecturerId != $lecturerId) {
+                            return message_error('Could not assign different lecturer');
+                        }
+                    }
+                }
+            }
+
+
             $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
             if ($timetableSlot instanceof TimetableSlot) {
                 TimetableGroupSession::where('timetable_slot_id', $timetableSlot->id)->delete();
