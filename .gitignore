@@ -35,9 +35,9 @@ bin/
 /public/assets/
 /public/score/
 !/public/score/
-!/public/assets/fonts
 /public/plugins/
 /public/plugins/DataTables-1.10.15/
 /public/build/
 /package-lock.json
 /public/node_modules/
+!/public/assets/fonts/
