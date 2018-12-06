@@ -260,6 +260,7 @@
         }
 
         function update_filter_class(callback) {
+            $('#filter_class').empty();
             $.ajax({
                 type: 'POST',
                 url: filter_class_url,
@@ -387,7 +388,7 @@
                         $('#students-table input:checked').each(function () {
                             selected_ids.push($(this).data('id'));
                         });
-                        print(selected_ids, true, true);
+                        print(selected_ids, true, true, true);
                     });
                     // print front
                     $(".btn-print-front").on("click", function () {
@@ -395,7 +396,7 @@
                         $('#students-table input:checked').each(function () {
                             selected_ids.push($(this).data('id'));
                         });
-                        print(selected_ids, false, true);
+                        print(selected_ids, false, true, true);
                     });
                     // print back
                     $(".btn-print-back").on("click", function () {
@@ -403,7 +404,7 @@
                         $('#students-table input:checked').each(function () {
                             selected_ids.push($(this).data('id'));
                         });
-                        print(selected_ids, true, false);
+                        print(selected_ids, true, false, true);
                     });
                     // print certificate
                     $(".btn-print-certificate").on("click", function () {
@@ -482,6 +483,9 @@
             });
             $(document.body).on("change", "#filter_gender", function (e) {
                 redraw_student_list();
+            });
+            $(document.body).on("change", "#filter_academic_year", function (e) {
+                update_filter_class(redraw_student_list);
             });
         });
 
