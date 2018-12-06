@@ -177,6 +177,26 @@
         @endif
     @endforeach
     @foreach($students->reverse() as $student)
+        <?php
+        $gpa = "";
+        $student_pass = true;
+        if ($transcript_type == "semester1") {
+            $last_score = $scores[$student['id']]["final_score_s1"];
+            $gpa = get_gpa($last_score, $passedScoreI);
+        } else {
+            $last_score = $scores[$student['id']]["final_score"];
+            $gpa = get_gpa($last_score, $passedScoreII);
+        }
+
+        foreach ($scores[$student['id']] as $key => $score) {
+            if (is_numeric($key)) {
+                if (intval($score["score"]) < 30 && intval($score["resit"]) < 30) {
+                    $student_pass = false;
+                }
+            }
+        }
+        ?>
+
         @if($student_pass && ($is_back == 'true'))
             <div class="page">
                 <div class="row">
