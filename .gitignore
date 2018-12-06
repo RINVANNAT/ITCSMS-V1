@@ -35,17 +35,9 @@ bin/
 /public/assets/
 /public/score/
 !/public/score/
+!/public/assets/fonts
 /public/plugins/
 /public/plugins/DataTables-1.10.15/
 /public/build/
 /package-lock.json
-/public/assets/fonts/Kh-Bokor.ttf
-/public/assets/fonts/khmer M2.volt.ttf
-/public/assets/fonts/KhmerOSMoulpali.ttf
-/public/assets/fonts/TACTIENG.TTF
-/public/assets/fonts/KhmerOSniroth.ttf
-/public/assets/fonts/Metal.ttf
-/public/assets/fonts/khmer M1.volt.ttf
-/public/assets/fonts/Bayon.ttf
-/public/assets/fonts/KhmerOSContent-Regular.ttf
 /public/node_modules/
