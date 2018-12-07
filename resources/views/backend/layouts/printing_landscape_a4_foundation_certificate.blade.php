@@ -17,60 +17,60 @@
     @yield('meta')
 
     <style>
-        @font-face {
-            font-family: franklin_gothic;
-            src: url("{{url('assets/fonts/Franklin Gothic Demi Cond Regular.ttf')}}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: franklin_gothic;--}}
+            {{--src: url("{{url('assets/fonts/Franklin Gothic Demi Cond Regular.ttf')}}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: arial-rounded;
-            src: url("{{url('assets/fonts/arial-rounded-mt-bold.ttf')}}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: arial-rounded;--}}
+            {{--src: url("{{url('assets/fonts/arial-rounded-mt-bold.ttf')}}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: bayon;
-            src: url("{{url('assets/fonts/Bayon.ttf')}}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: bayon;--}}
+            {{--src: url("{{url('assets/fonts/Bayon.ttf')}}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: kh-bokor;
-            src: url("{{url('assets/fonts/Kh-Bokor.ttf')}}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: kh-bokor;--}}
+            {{--src: url("{{url('assets/fonts/Kh-Bokor.ttf')}}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: khmerosmoulpali;
-            src: url("{{url('assets/fonts/KhmerOSMoulpali.ttf')}}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: khmerosmoulpali;--}}
+            {{--src: url("{{url('assets/fonts/KhmerOSMoulpali.ttf')}}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: metal;
-            src: url("{{url('assets/fonts/Metal.ttf')}}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: metal;--}}
+            {{--src: url("{{url('assets/fonts/Metal.ttf')}}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: tactieng;
-            src: url("{{url('assets/fonts/TACTIENG.TTF')}}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: tactieng;--}}
+            {{--src: url("{{url('assets/fonts/TACTIENG.TTF')}}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: khmeros;
-            src: url("{{url('assets/fonts/KhmerOSContent-Regular.ttf')}}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: khmeros;--}}
+            {{--src: url("{{url('assets/fonts/KhmerOSContent-Regular.ttf')}}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: khmer_m1;
-            src: url("{{ asset('assets/fonts/khmer M1.volt.ttf') }}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: khmer_m1;--}}
+            {{--src: url("{{ asset('assets/fonts/khmer M1.volt.ttf') }}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: khmer_m2;
-            src: url("{{ asset('assets/fonts/khmer M2.volt.ttf') }}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: khmer_m2;--}}
+            {{--src: url("{{ asset('assets/fonts/khmer M2.volt.ttf') }}");--}}
+        {{--}--}}
 
-        @font-face {
-            font-family: khmer_niroth;
-            src: url("{{ asset('assets/fonts/KhmerOSniroth.ttf') }}");
-        }
+        {{--@font-face {--}}
+            {{--font-family: khmer_niroth;--}}
+            {{--src: url("{{ asset('assets/fonts/KhmerOSniroth.ttf') }}");--}}
+        {{--}--}}
     </style>
     <!-- Styles -->
     @yield('before-styles-end')
