@@ -62,7 +62,7 @@
             </section>
 
             <!-- Main content -->
-            <section class="content">
+            <section class="content" id="app">
                 @include('includes.partials.messages')
                 @yield('content')
             </section><!-- /.content -->

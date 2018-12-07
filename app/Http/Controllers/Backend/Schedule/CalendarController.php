@@ -75,4 +75,8 @@ class CalendarController extends Controller
         }
         return Response::json(['status' => false]);
     }
+
+    public function getClass() {
+
+    }
 }

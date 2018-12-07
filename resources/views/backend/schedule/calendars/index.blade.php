@@ -12,6 +12,11 @@
 @endsection
 
 @section('after-styles-end')
+    <style>
+        .class-header {
+            background-color: #fafafa;
+        }
+    </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.print.css" media="print"/>
@@ -43,9 +48,16 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    {{--Rendering calendar--}}
-                    <div id="calendar"></div>
-                    {{--End rendering calendar--}}
+                    <div class="row">
+                        <div class="col-md-9">
+                            {{--Rendering calendar--}}
+                            <div id="calendar"></div>
+                            {{--End rendering calendar--}}
+                        </div>
+                        <div class="col-md-3">
+                            @include('backend.schedule.calendars.includes.class')
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,42 +68,41 @@
 @stop
 
 @section('after-scripts-end')
-
-    <!-- <script type="text/javascript" src="{{ asset('plugins/sweetalert2/dist/sweetalert2.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('plugins/select2/select2.full.min.js') }}"></script> -->
     <script type="text/javascript" src="{{ asset('js/backend/schedule/jquery-ui.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/moment/moment.min.js') }}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
-    <script type="text/javascript" src="{{ asset('plugins/fullcalendar-scheduler-1.9.4/scheduler.min.js') }}"></script>
-    <!-- <script type="text/javascript" src="{{ asset('js/backend/schedule/calendar.js') }}"></script> -->
-    <!-- <script type="text/javascript" src="{{ asset('plugins/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script> -->
-    <script type="text/javascript">
+    <script type="text/javascript" src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
 
+    <script type="text/javascript">
         $(function() {
             var date = new Date();
             var d = date.getDate(),
                 m = date.getMonth(),
                 y = date.getFullYear();
-            $('#calendar').fullCalendar({
-                defaultView: 'timetable',
+            var calendar = $('#calendar').fullCalendar({
+                defaultView: 'calendar',
                 defaultDate: '2017-01-01',
                 header: false,
                 footer: false,
                 views: {
-                    timetable: {
+                    calendar: {
                         type: 'agendaWeek',
-                        setHeight: '100px'
+                        setHeight: '50px'
                     }
                 },
                 allDaySlot: false,
                 hiddenDays: [0],
-                height: 735,
+                height: 600,
                 fixedWeekCount: false,
                 minTime: '07:00:00',
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
                 timezone: 'Asia/Phnom_Penh',
+                dayClick: function(date, jsEvent, view) {
+                    alert('clicked on ' + date.format());
+                }
             });
         });
     </script>
