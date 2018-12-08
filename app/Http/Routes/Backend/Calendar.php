@@ -28,6 +28,6 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::get('/events/repeat/{year}', 'CalendarController@renderRepeatEvent')->name('events.repeat');
 
 
-    Route::get('/get_classes', 'CalendarController@getClass')->name('get_class');
+    Route::post('calendars/get_classes', 'CalendarController@getClass')->name('get_class');
 });
 

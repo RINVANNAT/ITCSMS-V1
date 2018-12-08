@@ -287,7 +287,18 @@ var app = new Vue({
 				toggleLoading(false)
 				notify('error', error, 'Error')
 			})
-		}
+		},
+        getCalendarClassses() {
+            axios.post('calendars/get_classes').then((response) => {
+                if (response.data.code === 1) {
+
+                }
+                console.log(response.data)
+            })
+                .catch((error) => {
+                    console.log(error)
+                })
+        }
 	},
 	mounted() {
 		this.getGroups()

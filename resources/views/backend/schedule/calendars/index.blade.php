@@ -104,6 +104,7 @@
                     alert('clicked on ' + date.format());
                 }
             });
+
         });
     </script>
 

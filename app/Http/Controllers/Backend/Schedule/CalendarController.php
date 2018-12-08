@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Schedule;
 
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCalendarController;
+use App\Http\Controllers\Backend\Traits\FilteringTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Calendar\CreateEventRequest;
 use App\Models\Department;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Response;
 class CalendarController extends Controller
 {
     use AjaxCalendarController;
+    use FilteringTrait;
 
     /**
      * @var EloquentEventRepository
@@ -77,6 +79,6 @@ class CalendarController extends Controller
     }
 
     public function getClass() {
-
+        return message_success($this->get_available_class(2018));
     }
 }
