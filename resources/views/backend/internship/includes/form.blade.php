@@ -9,7 +9,7 @@
                 <label class="col-md-3 control-label">Ref. Number</label>
                 <div class="col-md-9">
                     <input class="form-control"
-                           value="{{ $internship->id }}"
+                           value="{{ $internship->number }}"
                            readonly
                            name="person"
                            type="text">
@@ -193,7 +193,7 @@
                     <div class="col-md-9">
                         <select class="form-control"
                                 tabindex="12"
-                                name="academic_year"
+                                name="academic_year_id"
                                 id="academic_year">
                             @foreach($academic_years as $academic_year)
                                 @if(isset($pre_academic_year))

@@ -677,4 +677,9 @@ class TimetableController extends Controller
             return message_error($exception->getMessage());
         }
     }
+
+    public function get_conflict_info ()
+    {
+        return 'N/A';
+    }
 }
