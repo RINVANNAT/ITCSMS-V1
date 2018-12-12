@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Schedule;
 
 use App\Http\Controllers\Backend\Schedule\Traits\CloneTimetableTrait;
 use App\Http\Controllers\Backend\Schedule\Traits\ExportCourseToSlotTrait;
+use App\Http\Controllers\Backend\Schedule\Traits\OptionTimetableTrait;
 use App\Http\Controllers\Backend\Schedule\Traits\TimetableAssignmentTrait;
 use App\Http\Controllers\Backend\Schedule\Traits\TimetableSlotTrait;
 use App\Http\Controllers\Controller;
@@ -42,6 +43,7 @@ class TimetableController extends Controller
     use CloneTimetableTrait,
         ExportCourseToSlotTrait,
         TimetableAssignmentTrait,
+        OptionTimetableTrait,
         TimetableSlotTrait;
 
     public function index()

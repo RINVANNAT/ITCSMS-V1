@@ -2,6 +2,17 @@
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
+use App\Models\DepartmentOption;
+use App\Models\Employee;
+use App\Models\Grade;
+use App\Models\Group;
+use App\Models\Room;
+use App\Models\Schedule\Timetable\TimetableGroup;
+use App\Models\Schedule\Timetable\Week;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 /**
  * Trait OptionTimetableTrait
  *
@@ -123,5 +134,15 @@ trait OptionTimetableTrait
             ->orderBy('employee_name_kh', 'asc')
             ->get();
         return array('status' => true, 'code' => 200, 'data' => $employees);
+    }
+
+    public function getTimetableGroup()
+    {
+        return message_success(TimetableGroup::get());
+    }
+
+    public function get_rooms ()
+    {
+        return message_success([]);
     }
 }
