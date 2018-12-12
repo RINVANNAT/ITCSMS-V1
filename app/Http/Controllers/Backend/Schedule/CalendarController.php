@@ -19,19 +19,12 @@ use Illuminate\Support\Facades\Response;
  */
 class CalendarController extends Controller
 {
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
     public function index()
     {
         $departments = Department::all();
         return view('backend.schedule.calendars.index', compact('departments'));
     }
 
-    /**
-     * @param CreateEventRequest $request
-     * @return mixed
-     */
     public function store(CreateEventRequest $request)
     {
         if ($this->createEvent($request) == true) {
