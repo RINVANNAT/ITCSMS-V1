@@ -45,6 +45,7 @@ class SystemVoteController extends Controller
             ->get();
 
         $departments = Department::where('is_specialist', true)
+            ->orWhere('id', 8)
             ->orderBy('name_en', 'asc')
             ->get();
 
