@@ -224,7 +224,7 @@ class StudentApiController extends Controller
                 ->orWhere('students.name_kh', 'ilike', "%$request->filtertext%");
         }
 
-        $students->select('students.*')
+        $students->select('students.id', 'students.dob', 'students.photo', 'students.email', 'students.name_latin', 'students.name_kh')
             ->orderBy('students.name_latin', 'asc');
 
         $result = $students->paginate($numberPerPage);
