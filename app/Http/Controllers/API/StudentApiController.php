@@ -221,7 +221,7 @@ class StudentApiController extends Controller
 
         if(isset($request->filtertext)) {
             $students->where('students.name_latin', 'ilike', "%$request->filtertext%")
-                ->orWhere('students.name_latin', 'ilike', "%$request->filtertext%");
+                ->orWhere('students.name_kh', 'ilike', "%$request->filtertext%");
         }
 
         $students->select('students.*')
