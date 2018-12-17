@@ -50,5 +50,4 @@ trait TimetableGroupTrait
             return message_error($exception->getMessage());
         }
     }
-
 }
