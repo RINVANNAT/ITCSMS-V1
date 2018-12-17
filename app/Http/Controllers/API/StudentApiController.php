@@ -5,10 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\StudentApiRequest;
 use App\Models\Student;
-use App\Models\StudentAnnual;
 use App\Traits\StudentScore;
 use App\Utils\FormParamManager;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
 class StudentApiController extends Controller
@@ -163,13 +163,13 @@ class StudentApiController extends Controller
         $studentIdCard = isset($dataParams['student_id_card']) ? $dataParams['student_id_card'] : null;
 
         $student = DB::table('students AS s')
-            ->join(DB::raw('(SELECT * FROM '.'"studentAnnuals"'.' WHERE academic_year_id = (SELECT MAX(academic_year_id) FROM '.'"studentAnnuals"'.')) AS sa'), function($join) use ($studentIdCard) {
+            ->join(DB::raw('(SELECT * FROM ' . '"studentAnnuals"' . ' WHERE academic_year_id = (SELECT MAX(academic_year_id) FROM ' . '"studentAnnuals"' . ')) AS sa'), function ($join) use ($studentIdCard) {
                 $join->on('s.id', '=', 'sa.student_id')
-                    ->where('s.id_card', '=',$studentIdCard );
+                    ->where('s.id_card', '=', $studentIdCard);
             })->first();
 
         $classmates = DB::table('studentAnnuals')
-            ->join('students', function($query) use($student){
+            ->join('students', function ($query) use ($student) {
                 $query->on('students.id', '=', 'studentAnnuals.student_id')
                     ->where('studentAnnuals.department_id', '=', $student->department_id)
                     ->where('studentAnnuals.degree_id', '=', $student->degree_id)
@@ -181,5 +181,54 @@ class StudentApiController extends Controller
 
         return $classmates;
 
+    }
+
+    public function getStudents(Request $request)
+    {
+        if (isset($request->number_per_page)) {
+            $numberPerPage = $request->number_per_page;
+        } else {
+            $numberPerPage = 10;
+        }
+        $currentPage = $request->page;
+
+        Paginator::currentPageResolver(function () use ($currentPage) {
+            return $currentPage;
+        });
+
+        $students = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
+            ->distinct('studentAnnuals.id');
+
+        if (isset($request->academic_year_id)) {
+            $students->where('studentAnnuals.academic_year_id', $request->academic_year_id);
+        }
+
+        if (isset($request->department_id)) {
+            $students->where('studentAnnuals.department_id', $request->department_id);
+        }
+
+        if (isset($request->department_option_id)) {
+            $students->where('studentAnnuals.department_option_id', $request->department_option_id);
+        }
+
+        if (isset($request->degree_id)) {
+            $students->where('studentAnnuals.degree_id', $request->degree_id);
+        }
+
+        if (isset($request->grade_id)) {
+            $students->where('studentAnnuals.grade_id', $request->grade_id);
+        }
+
+        if(isset($request->filtertext)) {
+            $students->where('students.name_latin', 'ilike', "%$request->filtertext%")
+                ->orWhere('students.name_kh', 'ilike', "%$request->filtertext%");
+        }
+
+        $students->select('students.*')
+            ->orderBy('students.name_latin', 'asc');
+
+        $result = $students->paginate($numberPerPage);
+
+        return ['code' => 1, 'status' => 'success', 'total_page' => $result->lastPage(), 'data' => $result->getCollection()];
     }
 }
