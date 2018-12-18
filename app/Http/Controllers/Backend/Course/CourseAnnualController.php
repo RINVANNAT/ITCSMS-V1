@@ -1,11 +1,10 @@
 <?php namespace App\Http\Controllers\Backend\Course;
 
-use App\Exceptions\GeneralException;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\GenerateStudentTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\ProficencyScoreTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\StudentStatisticTrait;
-use App\Http\Controllers\Backend\StudentTrait\PrintAttestationTrait;
 use App\Http\Controllers\Backend\StudentTrait\AverageFinalYearTrait;
+use App\Http\Controllers\Backend\StudentTrait\PrintAttestationTrait;
 use App\Http\Controllers\Backend\StudentTrait\PrintTranscriptTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
@@ -32,13 +31,10 @@ use App\Models\Enum\ScoreEnum;
 use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
 use App\Models\Grade;
-use App\Models\GroupStudentAnnual;
-use App\Models\ResitStudentAnnual;
 use App\Models\Score;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Models\StudentAnnual;
-use App\Models\UserLog;
 use App\Repositories\Backend\Absence\AbsenceRepositoryContract;
 use App\Repositories\Backend\Average\AverageRepositoryContract;
 use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
@@ -47,7 +43,6 @@ use App\Repositories\Backend\CourseAnnualScore\CourseAnnualScoreRepositoryContra
 use App\Repositories\Backend\CourseSession\CourseSessionRepositoryContract;
 use App\Repositories\Backend\Percentage\PercentageRepositoryContract;
 use App\Repositories\Backend\ResitStudentAnnual\ResitStudentAnnualRepositoryContract;
-use App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract;
 use App\Traits\CourseAnnualTrait;
 use App\Traits\CourseSessionTrait;
 use App\Traits\ScoreProp;
@@ -88,7 +83,6 @@ class CourseAnnualController extends Controller
     protected $courseAnnualClasses;
     protected $courseSessions;
     protected $resitStudentAannuals;
-    protected $timetableSlots;
 
     /**
      * @param CourseAnnualRepositoryContract $courseAnnualRepo
@@ -101,8 +95,7 @@ class CourseAnnualController extends Controller
         AverageRepositoryContract $averageRepo,
         CourseAnnualClassRepositoryContract $courseAnnualClassRepo,
         CourseSessionRepositoryContract $courseSessionRepo,
-        ResitStudentAnnualRepositoryContract $resitStudentRepo,
-        TimetableSlotRepositoryContract $timetableSlotRepo
+        ResitStudentAnnualRepositoryContract $resitStudentRepo
 
     )
     {
@@ -114,7 +107,6 @@ class CourseAnnualController extends Controller
         $this->courseAnnualClasses = $courseAnnualClassRepo;
         $this->courseSessions = $courseSessionRepo;
         $this->resitStudentAannuals = $resitStudentRepo;
-        $this->timetableSlots = $timetableSlotRepo;
     }
 
     /**
