@@ -26,5 +26,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::get('/find_events_by_year/{year}', 'CalendarController@findEventsByYear')->name('events.findByYear');
     // Store and view all repeat event.
     Route::get('/events/repeat/{year}', 'CalendarController@renderRepeatEvent')->name('events.repeat');
+
+
+    Route::post('calendars/get_classes', 'CalendarController@getClass')->name('get_class');
 });
 
