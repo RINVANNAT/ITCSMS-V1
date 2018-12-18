@@ -260,6 +260,7 @@ class CourseAnnualController extends Controller
      * @param Request $request
      * @return string
      * this function will return groups of student as a view (selection)
+     * @throws \Throwable
      */
     public function getStudentGroupSelection(Request $request)
     {
