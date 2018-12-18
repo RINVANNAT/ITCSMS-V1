@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Backend\Schedule;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCalendarController;
 use App\Http\Controllers\Backend\Traits\FilteringTrait;
 >>>>>>> fedaae8fa343ed7fcb7f22e72491f4e7643b0b46
+=======
+>>>>>>> 02174d3efc980c369f28bf9cdc13d9f3fffaf30d
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Calendar\CreateEventRequest;
 use App\Models\Department;
@@ -24,6 +27,7 @@ use Illuminate\Support\Facades\Response;
  */
 class CalendarController extends Controller
 {
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
     use AjaxCalendarController;
@@ -68,6 +72,8 @@ class CalendarController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
 >>>>>>> fedaae8fa343ed7fcb7f22e72491f4e7643b0b46
+=======
+>>>>>>> 02174d3efc980c369f28bf9cdc13d9f3fffaf30d
     public function index()
     {
         $departments = Department::all();
@@ -86,6 +92,9 @@ class CalendarController extends Controller
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 02174d3efc980c369f28bf9cdc13d9f3fffaf30d
     public function createEvent(CreateEventRequest $request)
     {
         if (!empty($request->dailyYear)) {
@@ -185,6 +194,9 @@ class CalendarController extends Controller
         ]);
     }
 
+    /**
+     * @return array
+     */
     public function listEventsOnSideLeft()
     {
         $events = Event::latest();
@@ -444,9 +456,12 @@ class CalendarController extends Controller
             return (bool)true;
         }
         return (bool)false;
+<<<<<<< HEAD
 =======
     public function getClass() {
         return message_success($this->get_available_class(2018));
 >>>>>>> fedaae8fa343ed7fcb7f22e72491f4e7643b0b46
+=======
+>>>>>>> 02174d3efc980c369f28bf9cdc13d9f3fffaf30d
     }
 }
