@@ -79,7 +79,7 @@
                 ajax: '{{ route('internship.data') }}',
                 columns: [
                     {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
-                    {data: 'id', name: 'id'},
+                    {data: 'number', name: 'number'},
                     {data: 'title', name: 'title'},
                     {data: 'training_field', name: 'training_field'},
                     {data: 'students', name: 'students', orderable: false, searchable: false},

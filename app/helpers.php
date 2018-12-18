@@ -581,3 +581,31 @@ if (!function_exists('message_error')) {
         );
     }
 }
+
+if (!function_exists('sort_groups')) {
+    function sort_groups(array $groups)
+    {
+        usort($groups, function ($a, $b) {
+            if (is_numeric($a['code']) && !is_numeric($b['code'])) {
+                return 1;
+            } else if (!is_numeric($a['code']) && is_numeric($b['code'])) {
+                return -1;
+            } else {
+                return ($a['code'] < $b['code']) ? -1 : 1;
+            }
+        });
+    }
+}
+
+if (!function_exists('durations')) {
+    function durations(\Carbon\Carbon $start, \Carbon\Carbon $end)
+    {
+        $start = \Carbon\Carbon::parse($start);
+        $end = \Carbon\Carbon::parse($end);
+        if (($end->minute > 0 && $start->minute == 0) || ($end->minute == 0 && $start->minute > 0)) {
+            return $start->diffInHours($end) + 0.5;
+        } else {
+            return $start->diffInHours($end);
+        }
+    }
+}

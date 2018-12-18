@@ -11,58 +11,25 @@ use App\Models\Schedule\Timetable\TimetableGroupSlot;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Response;
 
 /**
  * Class AjaxCloneTimetableController
  * @package App\Http\Controllers\Backend\Schedule\Traits
  */
-trait AjaxCloneTimetableController
+trait CloneTimetableTrait
 {
-    /**
-     * @param CloneTimetableRequest $request
-     * @return mixed
-     */
-    public function cloneTimetable(CloneTimetableRequest $request)
-    {
-        // return message_success($request->all);
-        // return Response::json(['status' => true, 'data' => $request->all()]);
-    }
-
-    /**
-     * Get all weeks by semester.
-     *
-     * @return mixed
-     */
-    public function get_all_weeks()
-    {
-        // return Response::json(['weeks' => Week::where('semester_id', request('id'))->get()], 200);
-    }
-
-    /**
-     * Pass data to clone timetable form.
-     *
-     * @param FormCloneTimetableRequest $request
-     * @return mixed
-     */
     public function clone_timetable_form(FormCloneTimetableRequest $request)
     {
         if (isset($request->semester)) {
-            // get all weeks by semester request.
             $weeks = Week::where('semester_id', $request->semester)->get();
-            // find groups
-            // $groups = Group::select('groups.code', 'groups.id')->get()->toArray();
-            // $groups = $this->timetableSlotRepo->sort_groups($groups);
-            return Response::json(['weeks' => $weeks, 'groups' => []], 200);
+            return [
+                'weeks' => $weeks,
+                'groups' => [],
+                'status' => 200,
+            ];
         }
     }
 
-    /**
-     * Clone timetable.
-     *
-     * @param CloneTimetableRequest $request
-     * @return mixed
-     */
     public function clone_timetable(CloneTimetableRequest $request)
     {
         DB::beginTransaction();
