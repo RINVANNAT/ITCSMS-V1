@@ -135,6 +135,9 @@ class CalendarController extends Controller
         ]);
     }
 
+    /**
+     * @return array
+     */
     public function listEventsOnSideLeft()
     {
         $events = Event::latest();
