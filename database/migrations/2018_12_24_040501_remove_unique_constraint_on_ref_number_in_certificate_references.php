@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateTableCertificateReferenceWithFieldLevel extends Migration
+class RemoveUniqueConstraintOnRefNumberInCertificateReferences extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class UpdateTableCertificateReferenceWithFieldLevel extends Migration
     public function up()
     {
         Schema::table('certificate_references', function (Blueprint $table) {
-            $table->string('level', 50)->nullable();
+            $table->dropUnique('certificate_references_ref_number_unique');
         });
     }
 
@@ -25,7 +25,7 @@ class UpdateTableCertificateReferenceWithFieldLevel extends Migration
     public function down()
     {
         Schema::table('certificate_references', function (Blueprint $table) {
-            $table->dropColumn('level');
+            $table->unique(['ref_number']);
         });
     }
 }

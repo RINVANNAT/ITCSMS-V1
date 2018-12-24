@@ -208,19 +208,19 @@
                             *Seuil de réussite pour obtenir le niveau : 50/100
                         </p>
                         <p class="description-small">
-                            @if($student->grade_id == 1)
-                                <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
-                            @elseif($student->grade_id == 2)
-                                <span class="blue">Le niveau A2 :</span> niveau intermédiaire ou de survie
-                            @elseif($student->grade_id == 3)
-                                <span class="green">Le niveau B1 :</span> niveau seuil
-                            @elseif($student->grade_id == 4)
-                                <span class="green">Le niveau B2 :</span> niveau avancé ou indépendant
-                            @elseif($student->grade_id == 5)
-                                <span class="green">Le niveau C1 :</span>
+                            @if(isset($certificate_references[$student->id]))
+                                @if($certificate_references[$student->id]['level'] == 'A1')
+                                    <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
+                                @elseif($certificate_references[$student->id]['level'] == 'A2')
+                                    <span class="blue">Le niveau A2 :</span> niveau intermédiaire ou de survie
+                                @elseif($certificate_references[$student->id]['level'] == 'B1')
+                                    <span class="green">Le niveau B1 :</span> niveau seuil
+                                @elseif($certificate_references[$student->id]['level'] == 'B2')
+                                    <span class="green">Le niveau B2 :</span> niveau avancé ou indépendant
+                                @elseif($certificate_references[$student->id]['level'] == 'C1')
+                                    <span class="green">Le niveau C1 :</span>
+                                @endif
                             @endif
-
-                            <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
                         </p>
 
                         <p class="description-extra-small">
@@ -368,16 +368,18 @@
                                     *Seuil de réussite pour obtenir le niveau : 50/100
                                 </p>
                                 <p class="description-small">
-                                    @if($student->grade_id == 1)
-                                        <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
-                                    @elseif($student->grade_id == 2)
-                                        <span class="blue">Le niveau A2 :</span> niveau intermédiaire ou de survie
-                                    @elseif($student->grade_id == 3)
-                                        <span class="green">Le niveau B1 :</span> niveau seuil
-                                    @elseif($student->grade_id == 4)
-                                        <span class="green">Le niveau B2 :</span> niveau avancé ou indépendant
-                                    @elseif($student->grade_id == 5)
-                                        <span class="green">Le niveau C1 :</span>
+                                    @if(isset($certificate_references[$student->id]))
+                                        @if($certificate_references[$student->id]['level'] == 'A1')
+                                            <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
+                                        @elseif($certificate_references[$student->id]['level'] == 'A2')
+                                            <span class="blue">Le niveau A2 :</span> niveau intermédiaire ou de survie
+                                        @elseif($certificate_references[$student->id]['level'] == 'B1')
+                                            <span class="green">Le niveau B1 :</span> niveau seuil
+                                        @elseif($certificate_references[$student->id]['level'] == 'B2')
+                                            <span class="green">Le niveau B2 :</span> niveau avancé ou indépendant
+                                        @elseif($certificate_references[$student->id]['level'] == 'C1')
+                                            <span class="green">Le niveau C1 :</span>
+                                        @endif
                                     @endif
                                 </p>
 
@@ -417,16 +419,18 @@
                             a comblé avec succès un niveau de langue française
 
                             <?php
-                            if($student->grade_id == 1) {
-                                echo "<span class='blue' style='font-size: 21pt;'> &nbsp;A1</span>";
-                            } else if($student->grade_id == 2){
-                                echo "<span class='blue' style='font-size: 21pt;'>  &nbsp;A2</span>";
-                            } else if($student->grade_id == 3){
-                                echo "<span class='green' style='font-size: 21pt;'>  &nbsp;B1</span>";
-                            } else if($student->grade_id == 4){
-                                echo "<span class='green' style='font-size: 21pt;'>  &nbsp;B2</span>";
-                            } else if($student->grade_id == 5){
-                                echo "<span class='green' style='font-size: 21pt;'>  &nbsp;C1</span>";
+                            if(isset($certificate_references[$student->id])){
+                                if($certificate_references[$student->id]['level'] == 'A1') {
+                                    echo "<span class='blue' style='font-size: 21pt;'> &nbsp;A1</span>";
+                                } else if($certificate_references[$student->id]['level'] == 'A2'){
+                                    echo "<span class='blue' style='font-size: 21pt;'>  &nbsp;A2</span>";
+                                } else if($certificate_references[$student->id]['level'] == 'B1'){
+                                    echo "<span class='green' style='font-size: 21pt;'>  &nbsp;B1</span>";
+                                } else if($certificate_references[$student->id]['level'] == 'B2'){
+                                    echo "<span class='green' style='font-size: 21pt;'>  &nbsp;B2</span>";
+                                } else if($certificate_references[$student->id]['level'] == 'C1'){
+                                    echo "<span class='green' style='font-size: 21pt;'>  &nbsp;C1</span>";
+                                }
                             }
                             ?>
                         du Cadre Européen Commun de Référence pour les Langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.

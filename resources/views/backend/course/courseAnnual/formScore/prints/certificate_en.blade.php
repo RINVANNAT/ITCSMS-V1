@@ -87,7 +87,18 @@
                     Institut de Technologie du Cambodge
                 </p>
                 <p style="text-align: left !important; font-weight: normal;">
-                    N<sup style="font-weight: lighter;">0</sup>............ITC/SA
+                    N<sup style="font-weight: lighter;">0</sup> &nbsp;&nbsp;&nbsp;
+                    @if(isset($certificate_references[$student->id]))
+                        @if((int) $certificate_references[$student->id]['ref_number'] < 10)
+                            00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                        @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
+                            0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                        @else
+                            {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                        @endif
+                    @else
+                        ............ITC/SA
+                    @endif
                 </p>
             </div>
 
@@ -158,8 +169,6 @@
                                     } else if(strtolower($competencies[$competency_id]->name) == "s"){
                                         $po = '<span class="red_col">'.$competency_score->score.'</span>/'.$property->max;
                                         $total = $total + $competency_score->score;
-                                    } else if(strtolower($competencies[$competency_id]->name) == "ielts band score"){
-                                        $total = '<span class="red_col">'.$total.'</span>/'.$property->max;
                                     }
                                 }
                             }
@@ -199,7 +208,7 @@
                             </td>
 
                             <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-weight: bold">
-                                {!! $total !!} /100
+                                {!! number_format((float)$total, 2, '.', '') !!} /100
                             </td>
 
                         </tr>
