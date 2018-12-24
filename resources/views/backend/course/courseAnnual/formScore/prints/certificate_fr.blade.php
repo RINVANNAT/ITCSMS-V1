@@ -237,12 +237,16 @@
                             Institut de Technologie du Cambodge
                         </p>
                         <span class="text-13" style="font-style: italic;">Réf.:  &nbsp;&nbsp;&nbsp;
-                            @if((int) $certificate_references[$student->id]['ref_number'] < 10)
-                                00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
-                            @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
-                                0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
+                            @if(isset($certificate_references[$student->id]))
+                                @if((int) $certificate_references[$student->id]['ref_number'] < 10)
+                                    00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
+                                @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
+                                    0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
+                                @else
+                                    {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
+                                @endif
                             @else
-                                {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
+                                &nbsp;&nbsp; ITC.SF
                             @endif
                         </span>
                     </div>
@@ -287,7 +291,6 @@
                 @else
                     née
                 @endif
-
                 le {{$day." ".$month." ".$year}},
             </span>
                 </div>
