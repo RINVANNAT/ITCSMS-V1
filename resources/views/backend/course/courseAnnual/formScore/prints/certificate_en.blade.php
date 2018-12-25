@@ -246,7 +246,7 @@
                             $c_month = $now->formatLocalized('%B');
                             $c_year = $now->formatLocalized('%Y');
                             ?>
-                            <b>Phnom Penh, ITC, {{$c_day." ".$c_month." ".$c_year}}</b>
+                            <b>Phnom Penh, {{$c_day." ".$c_month." ".$c_year}}</b>
                         <p style="margin-top: -10px !important; text-align: center">
                             F. The Director of the Institute of Technology of Cambodia <br/>
                             Deputy Director
