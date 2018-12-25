@@ -76,31 +76,31 @@
 @section('content')
     @foreach($students as $student)
         <div class="page">
-            <div class="row text-right title" style="margin-top: 8mm;">
-                <p class="p1">
-                    Kingdom of Cambodia
-                </p>
-                <p style="margin-right: 18px; font-weight: normal">
-                    Nation Religion King
-                </p>
-                <p class="p2" style="text-align: left !important;">
-                    Institut de Technologie du Cambodge
-                </p>
-                <p style="text-align: left !important; font-weight: normal;">
-                    &nbsp;
+            <div class="row title" style="margin-top: 8mm;">
+                <div class="pull-left">
+                    <p class="text-14" style="font-size: 13pt; font-weight: bold">
+                        Institut de Technologie du Cambodge
+                    </p>
                     {{--N<sup style="font-weight: lighter;">0</sup> &nbsp;&nbsp;&nbsp;--}}
                     {{--@if(isset($certificate_references[$student->id]))--}}
-                        {{--@if((int) $certificate_references[$student->id]['ref_number'] < 10)--}}
-                            {{--00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
-                        {{--@elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)--}}
-                            {{--0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
-                        {{--@else--}}
-                            {{--{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
-                        {{--@endif--}}
+                    {{--@if((int) $certificate_references[$student->id]['ref_number'] < 10)--}}
+                    {{--00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
+                    {{--@elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)--}}
+                    {{--0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
                     {{--@else--}}
-                        {{--............ITC/SA--}}
+                    {{--{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
                     {{--@endif--}}
-                </p>
+                    {{--@else--}}
+                    {{--............ITC/SA--}}
+                    {{--@endif--}}
+                </div>
+                <div class="pull-right text-center" style="margin-top: -7mm">
+                    <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
+                        Kingdom of Cambodia <br/>
+                        Nation Religion King  <br/>
+                        <span style="font-family: tactieng !important; font-size: 35pt">7</span>
+                    </p>
+                </div>
             </div>
 
             <div class="row text-center attestation_title">
