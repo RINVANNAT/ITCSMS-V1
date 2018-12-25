@@ -76,7 +76,7 @@
 @section('content')
     @foreach($students as $student)
         <div class="page">
-            <div class="row text-right title" style="margin-top: 10mm;">
+            <div class="row text-right title" style="margin-top: 8mm;">
                 <p class="p1">
                     Kingdom of Cambodia
                 </p>
@@ -87,18 +87,19 @@
                     Institut de Technologie du Cambodge
                 </p>
                 <p style="text-align: left !important; font-weight: normal;">
-                    N<sup style="font-weight: lighter;">0</sup> &nbsp;&nbsp;&nbsp;
-                    @if(isset($certificate_references[$student->id]))
-                        @if((int) $certificate_references[$student->id]['ref_number'] < 10)
-                            00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
-                        @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
-                            0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
-                        @else
-                            {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
-                        @endif
-                    @else
-                        ............ITC/SA
-                    @endif
+                    &nbsp;
+                    {{--N<sup style="font-weight: lighter;">0</sup> &nbsp;&nbsp;&nbsp;--}}
+                    {{--@if(isset($certificate_references[$student->id]))--}}
+                        {{--@if((int) $certificate_references[$student->id]['ref_number'] < 10)--}}
+                            {{--00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
+                        {{--@elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)--}}
+                            {{--0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
+                        {{--@else--}}
+                            {{--{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
+                        {{--@endif--}}
+                    {{--@else--}}
+                        {{--............ITC/SA--}}
+                    {{--@endif--}}
                 </p>
             </div>
 
