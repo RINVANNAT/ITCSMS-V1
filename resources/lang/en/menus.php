@@ -87,6 +87,7 @@ return [
             'report_student_age' => 'Students/Age Statistic',
             'report_student_redouble' => 'Students/Redouble Statistic',
             'report_student_degree' => 'Students/Techniques Statistic',
+            'report_student_radie' => 'Students/Radie Statistic',
         ],
 
         'error' => [

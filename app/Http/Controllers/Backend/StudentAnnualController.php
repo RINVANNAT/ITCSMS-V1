@@ -1362,6 +1362,144 @@ class StudentAnnualController extends Controller
 
                 })->export('xls');
                 break;
+            case 4:
+                $data = $this->get_student_radie($params['academic_year_id'],$params['degree_id'],$scholarships,$params['semester_id']);
+
+                $degree_name = Degree::find($params['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
+                Excel::create("ស្ថិតិនិស្សិតដែលបានលុបឈ្មោះ".$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
+
+                    // Set the title
+                    $excel->setTitle("ស្ថិតិនិស្សិតដែលបានលុបឈ្មោះ");
+
+                    // Chain the setters
+                    $excel->setCreator('Department of Study & Student Affair')
+                        ->setCompany('Institute of Technology of Cambodia');
+
+                    $excel->sheet('New sheet', function($sheet) use ($data,$degree_name,$academic_year_name) {
+
+                        $sheet->setOrientation('landscape');
+                        // Set top, right, bottom, left
+                        $sheet->setPageMargin(array(
+                            0.25, 0.30, 0.25, 0.30
+                        ));
+
+                        // Set all margins
+                        $sheet->setPageMargin(0.25);
+
+                        $sheet->row(1, array(
+                            "ព្រះរាជាណាចក្រកម្ពុជា"
+                        ));
+                        $sheet->appendRow(array(
+                            "ជាតិ សាសនា ព្រះមហាក្សត្រ"
+                        ));
+                        $sheet->appendRow(array(
+                            "ក្រសួងអប់រំ យុវជន ​និងកីឡា"
+                        ));
+                        $sheet->appendRow(array(
+                            "ឈ្មោះគ្រឹះស្ថានសិក្សាៈ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា"
+                        ));
+                        $sheet->appendRow(array(
+                            "ស្ថិតិនិស្សិតដែលបានលុបឈ្មោះ ថ្នាក់".$degree_name."ឆ្នាំសិក្សា".$academic_year_name
+                        ));
+
+                        $sheet->rows(array(
+                            array("ល.រ","មហាវិទ្យាល័យ","ឯកទេស / ជំនាញ", "រយៈពេល","ឆ្នាំទី១",'','','',"ឆ្នាំទី២",'','','',"ឆ្នាំទី៣",'','','',"ឆ្នាំទី៤",'','','',"ឆ្នាំទី៥",'','','',"សរុប",'','',''),
+                            array('','','','បប',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",''),
+                            array('','','','',"សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី"),
+                        ));
+
+                        $key = 1;
+                        $count = 1;
+                        foreach ($data as $department) {
+                            if($key <sizeof($data)) {
+                                foreach ($department['department_options'] as $option) {
+                                    $row = array($count, $department['name_kh']);
+                                    array_push($row, $option['code']);
+                                    array_push($row,'3');
+                                    foreach ($option['data'] as $grade) {
+                                        array_push($row, $grade['st']);
+                                        array_push($row, $grade['sf']);
+                                        array_push($row, $grade['pt']);
+                                        array_push($row, $grade['pf']);
+                                    }
+                                    $sheet->appendRow(
+                                        $row
+                                    );
+                                    $count++;
+                                }
+                            }
+                            $key++;
+                        }
+
+                        $row = array("សរុប",'','','');
+                        foreach(end($data) as $total){
+                            array_push($row, $total['st']);
+                            array_push($row, $total['sf']);
+                            array_push($row, $total['pt']);
+                            array_push($row, $total['pf']);
+                        }
+                        $sheet->appendRow(
+                            $row
+                        );
+
+                        $sheet->rows(array(
+                            array("","	សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន"),
+                            array('','','','','','','','','','','','','','','','','ធ្វើនៅ............ថ្ងៃទី.............ខែ............ឆ្នាំ២០១...... '),
+                            array('','','','','','','','','','','','','','','','',"សាកលវិទ្យាធិការ/នាយក")
+                        ));
+
+                        $sheet->mergeCells('A1:AB1');
+                        $sheet->mergeCells('A2:AB2');
+                        $sheet->mergeCells('A3:AB3');
+                        $sheet->mergeCells('A4:AB4');
+                        $sheet->mergeCells('A5:AB5');
+                        $sheet->mergeCells('A6:A8');
+                        $sheet->mergeCells('B6:B8');
+                        $sheet->mergeCells('C6:C8');
+
+                        $sheet->mergeCells('E6:H6');
+                        $sheet->mergeCells('I6:L6');
+                        $sheet->mergeCells('M6:P6');
+                        $sheet->mergeCells('Q6:T6');
+                        $sheet->mergeCells('U6:X6');
+                        $sheet->mergeCells('Y6:AB6');
+
+                        $sheet->mergeCells('E7:F7');
+                        $sheet->mergeCells('G7:H7');
+                        $sheet->mergeCells('I7:J7');
+                        $sheet->mergeCells('K7:L7');
+                        $sheet->mergeCells('M7:N7');
+                        $sheet->mergeCells('O7:P7');
+                        $sheet->mergeCells('Q7:R7');
+                        $sheet->mergeCells('S7:T7');
+                        $sheet->mergeCells('U7:V7');
+                        $sheet->mergeCells('W7:X7');
+                        $sheet->mergeCells('Y7:Z7');
+                        $sheet->mergeCells('AA7:AB7');
+
+                        $sheet->mergeCells('A'.(8+$count).':C'.(8+$count));
+                        $sheet->mergeCells('B'.(9+$count).':AB'.(9+$count));
+                        $sheet->mergeCells('Q'.(10+$count).':AB'.(10+$count));
+                        $sheet->mergeCells('Q'.(11+$count).':AB'.(11+$count));
+
+                        $sheet->cells('A1:AB2', function($cells) {
+                            $cells->setAlignment('center');
+                            $cells->setValignment('middle');
+                        });
+                        $sheet->cells('A5:AB'.(8+$count), function($cells) {
+                            $cells->setAlignment('center');
+                            $cells->setValignment('middle');
+                        });
+                        $sheet->cells('Q'.(8+$count).':Q'.(9+$count), function($cells) {
+                            $cells->setAlignment('center');
+                            $cells->setValignment('middle');
+                        });
+                        $sheet->setBorder('A6:AB'.(8+$count), 'thin');
+                    });
+
+                })->export('xls');
+                break;
             default:
         }
     }

@@ -33,7 +33,8 @@
           <ul class="dropdown-menu" role="menu">
             <li><a href="{{ route('admin.student.reporting',1) }}">{{ trans('menus.backend.reporting.report_student_age') }}</a></li>
             <li><a href="{{ route('admin.student.reporting',2) }}">{{ trans('menus.backend.reporting.report_student_redouble') }}</a></li>
-              <li><a href="{{ route('admin.student.reporting',3) }}">{{ trans('menus.backend.reporting.report_student_degree') }}</a></li>
+            <li><a href="{{ route('admin.student.reporting',3) }}">{{ trans('menus.backend.reporting.report_student_degree') }}</a></li>
+              <li><a href="{{ route('admin.student.reporting',4) }}">{{ trans('menus.backend.reporting.report_student_radie') }}</a></li>
             <li class="divider"></li>
             <li><a href="#">Print All Report</a></li>
 
