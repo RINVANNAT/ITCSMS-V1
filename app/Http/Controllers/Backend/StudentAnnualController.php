@@ -18,10 +18,12 @@ use App\Http\Requests\Backend\Student\UpdateStudentRequest;
 use App\Http\Requests\Backend\Student\GenerateStudentGroupRequest;
 use App\Http\Requests\Backend\Student\GenerateStudentIDCardRequest;
 use App\Models\AcademicYear;
+use App\Models\Access\User\User;
 use App\Models\Configuration;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
+use App\Models\Employee;
 use App\Models\Enum\ScoreEnum;
 use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
@@ -93,8 +95,15 @@ class StudentAnnualController extends Controller
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $origins = Origin::lists('name_kh','id');
         $semesters = Semester::lists('name_kh','id');
+        $employee = Employee::where('user_id', Auth::user()->id)->first();
+        if (isset($employee->department->id)) {
+            $department_id = $employee->department->id;
+        } else {
+            $department_id = null;
+        }
 
-        return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options','academicYears','origins','semesters'));
+
+        return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options','academicYears','origins','semesters', 'department_id'));
     }
 
     public function popup_index(){
