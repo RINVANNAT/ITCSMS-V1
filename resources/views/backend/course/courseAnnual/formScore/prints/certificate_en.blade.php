@@ -79,23 +79,12 @@
             <div class="row title" style="margin-top: 8mm;">
                 <div class="pull-left">
                     <p class="text-14" style="font-size: 13pt; font-weight: bold">
-                        Institut de Technologie du Cambodge
+                        Institut de Technologie du Cambodge </br>
+                        English Section
                     </p>
-                    {{--N<sup style="font-weight: lighter;">0</sup> &nbsp;&nbsp;&nbsp;--}}
-                    {{--@if(isset($certificate_references[$student->id]))--}}
-                    {{--@if((int) $certificate_references[$student->id]['ref_number'] < 10)--}}
-                    {{--00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
-                    {{--@elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)--}}
-                    {{--0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
-                    {{--@else--}}
-                    {{--{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA--}}
-                    {{--@endif--}}
-                    {{--@else--}}
-                    {{--............ITC/SA--}}
-                    {{--@endif--}}
                 </div>
                 <div class="pull-right text-center" style="margin-top: -7mm">
-                    <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
+                    <p class="text-14" style="font-size: 14pt !important; line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
                         Kingdom of Cambodia <br/>
                         Nation Religion King  <br/>
                         <span style="font-family: tactieng !important; font-size: 35pt">7</span>
@@ -109,13 +98,13 @@
                </span>
             </div>
 
-            <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; /*margin-top: 15mm*/ margin-top: 8mm;">
+            <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 13pt; /*margin-top: 15mm*/ margin-top: 8mm;">
             <span>
                 The Director of the Institute of Technology of Cambodia certifies that 
             </span>
             </div>
 
-            <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; /*margin-top: 12mm*/margin-top: 8mm; font-weight: bold">
+            <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 13pt; /*margin-top: 12mm*/margin-top: 8mm; font-weight: bold">
             <span style="line-height: 1.6">
                 @if($student->gender_id == 1)
                     Mr.
@@ -139,7 +128,7 @@
                 <span>
                     Transcript
                 </span>
-                    <table class="table" style="width: 100%;font-size: 12px; line-height: 3mm">
+                    <table class="table" style="width: 100%;font-size: 13px; line-height: 3mm">
                         <thead>
                         <tr class="set_border">
                             <th class="text-center">Band score level</th>
@@ -221,22 +210,36 @@
                         <p style="font-size: 9pt; font-family: 'Calibri Light (Headings)'; text-align: left; line-height: 0pt !important;">
                             *Notes
                         </p>
-                        <p style="text-align: left !important;font-size: 6.5pt; font-family: 'Calibri Light (Headings)'; text-align: left">
+                        <p style="text-align: left !important;font-size: 7.5pt; font-family: 'Calibri Light (Headings)'; text-align: left">
                             - The minimum requirement average score for each skill is 5/25. <br/>
                             - The success threshold to obtain the level is 50/100. <br/>
                             - The attestation will not be issued for the 2nd time. <br/>
                             - This attestation is issued to the bearer for any use deemed applicable.
                         </p>
+                        <p style="text-align: left !important;font-size: 10pt; font-family: 'Calibri Light (Headings)'; text-align: left">
+                            N<sup style="font-weight: lighter;">0</sup> &nbsp;&nbsp;&nbsp;
+                            @if(isset($certificate_references[$student->id]))
+                                @if((int) $certificate_references[$student->id]['ref_number'] < 10)
+                                    00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                                @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
+                                    0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                                @else
+                                    {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                                @endif
+                            @else
+                                ............ITC/SA
+                            @endif
+                        </p>
                     </div>
 
                 </div>
                 <div style="width: 160mm; float: left; margin-left: 15mm; text-align: justify">
-                    <p style="font-family: 'Calibri Light'; font-size: 12pt; line-height: 1.5;">
+                    <p style="font-family: 'Calibri Light'; font-size: 13pt; line-height: 1.5;">
                         Has successfully passed the English Language Exam equivalent to Level <span style="font-size: 30px !important;">{{$level}}</span> of the Common European Framework of Reference for Language (CEFR) at the time of level exam session taking place at the Institute of Technology of Cambodia on {{ \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start)->format('F, jS Y') }}.
                     </p>
 
                     <div class="pull-right" style="margin-top: 8mm">
-                        <p class="text-center title" style="font-size: 12pt">
+                        <p class="text-center title" style="font-size: 13pt">
                             <?php
                             if(($issued_date == null) or ($issued_date == "")){
                                 $now = \Carbon\Carbon::now();
