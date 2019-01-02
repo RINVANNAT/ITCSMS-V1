@@ -79,7 +79,7 @@
             <div class="row title" style="margin-top: 8mm;">
                 <div class="pull-left">
                     <p class="text-14" style="font-size: 13pt; font-weight: bold">
-                        Institut de Technologie du Cambodge </br>
+                        Institute of Technology of Cambodia </br>
                         English Section
                     </p>
                 </div>
