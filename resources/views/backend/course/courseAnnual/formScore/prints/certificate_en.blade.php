@@ -220,7 +220,7 @@
                             N<sup style="font-weight: lighter;">0</sup> &nbsp;&nbsp;&nbsp;
                             @if(isset($certificate_references[$student->id]))
                                 @if((int) $certificate_references[$student->id]['ref_number'] < 10)
-                                    00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; 
+                                    00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp;
                                 @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
                                     0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp;
                                 @else
