@@ -220,11 +220,11 @@
                             N<sup style="font-weight: lighter;">0</sup> &nbsp;&nbsp;&nbsp;
                             @if(isset($certificate_references[$student->id]))
                                 @if((int) $certificate_references[$student->id]['ref_number'] < 10)
-                                    00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                                    00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; 
                                 @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
-                                    0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                                    0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp;
                                 @else
-                                    {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC/SA
+                                    {{$certificate_references[$student->id]['ref_number']}}
                                 @endif
                             @else
                                 ............ITC/SA
@@ -252,7 +252,7 @@
                             ?>
                             <b>Phnom Penh, {{$c_day." ".$c_month." ".$c_year}}</b>
                         <p style="margin-top: -10px !important; text-align: center">
-                            F. The Director of the Institute of Technology of Cambodia <br/>
+                            For The Director of the Institute of Technology of Cambodia <br/>
                             Deputy Director
                         </p>
                         </p>
