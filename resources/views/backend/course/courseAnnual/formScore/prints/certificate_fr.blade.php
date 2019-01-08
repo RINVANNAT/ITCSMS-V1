@@ -236,19 +236,6 @@
                         <p class="text-14" style="font-size: 13pt; font-weight: bold">
                             Institut de Technologie du Cambodge
                         </p>
-                        <span class="text-13" style="font-style: italic;">Réf.:  &nbsp;&nbsp;&nbsp;
-                            @if(isset($certificate_references[$student->id]))
-                                @if((int) $certificate_references[$student->id]['ref_number'] < 10)
-                                    00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
-                                @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
-                                    0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
-                                @else
-                                    {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
-                                @endif
-                            @else
-                                &nbsp;&nbsp; ITC.SF
-                            @endif
-                        </span>
                     </div>
                     <div class="pull-right text-center" style="padding-right: 9mm; margin-top: -7mm">
                         <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
@@ -284,7 +271,7 @@
                 $month = strtolower(month_mois($month));
                 $year = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%Y');
                 ?>
-                {{strtoupper($student->name_latin)}}, <br/><br/>
+                {{strtoupper($student->name_latin)}}, <br/>
                 ID : {{$student->id_card}}, <br/>
                 @if($student->gender_id == 1)
                     né
@@ -358,8 +345,20 @@
                             </tbody>
                         </table>
 
-                        <span style="margin-left: 7mm" class="red_col">{!! $admission !!}</span>
-
+                        <span style="margin-left: 7mm" class="red_col">{!! $admission !!}</span> <br/>
+                        <span class="text-13" style="font-style: italic;">Réf.:  &nbsp;&nbsp;&nbsp;
+                            @if(isset($certificate_references[$student->id]))
+                                @if((int) $certificate_references[$student->id]['ref_number'] < 10)
+                                    00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; SF
+                                @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
+                                    0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; SF
+                                @else
+                                    {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; SF
+                                @endif
+                            @else
+                                &nbsp;&nbsp; SF
+                            @endif
+                        </span>
 
                         <div class="row" style="margin-top: 5%;line-height: 3mm;">
                             <div class="col-md-12 col-xs-12" style="margin-left: 5mm; padding-right: 0mm">
