@@ -20,6 +20,9 @@ trait ReportingTrait
 {
     public function get_student_list_by_age($academic_year_id, $degree, $date,$scholarships, $semester_id){
 
+        if($semester_id == 3) {
+            $semester_id = 1; // End year is the same as first semester
+        }
         $grades = [1,2,3,4,5];
         $ages = array(
             ['min'=>0,'max'=>16,'name'=>'<16','data'=> array()],
@@ -135,6 +138,12 @@ trait ReportingTrait
     }
 
     public function get_student_redouble($academic_year_id , $degree, $scholarships, $semester_id){
+        if($semester_id == 3) {
+            $semester_id = 1; // End year is the same as first semester
+            $semester_for_redouble = [1,2];
+        } else {
+            $semester_for_redouble = [$semester_id];
+        }
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         $grades = [1,2,3,4,5];
         $array_total = array(
@@ -178,6 +187,7 @@ trait ReportingTrait
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('redouble_student.academic_year_id','=',$academic_year_id)
+                        ->whereIN('redouble_student.semester_id',$semester_for_redouble)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
                         ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count();
@@ -192,6 +202,7 @@ trait ReportingTrait
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('redouble_student.academic_year_id','=',$academic_year_id)
+                        ->whereIN('redouble_student.semester_id',$semester_for_redouble)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
                         ->where('students.gender_id','=',2)
@@ -208,6 +219,7 @@ trait ReportingTrait
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('redouble_student.academic_year_id','=',$academic_year_id)
+                        ->whereIN('redouble_student.semester_id',$semester_for_redouble)
                         ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
@@ -224,6 +236,7 @@ trait ReportingTrait
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('redouble_student.academic_year_id','=',$academic_year_id)
+                        ->whereIN('redouble_student.semester_id',$semester_for_redouble)
                         ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
@@ -276,6 +289,9 @@ trait ReportingTrait
     }
 
     public function get_student_radie($academic_year_id , $degree, $scholarships, $semester_id){
+        if($semester_id == 3) {
+            $semester_id = 1;
+        }
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         $grades = [1,2,3,4,5];
         $array_total = array(
@@ -409,6 +425,9 @@ trait ReportingTrait
     }
 
     public function get_student_by_group($academic_year_id , $degree, $only_foreigner,$scholarships,$semester_id){
+        if($semester_id == 3){
+            $semester_id = 1;
+        }
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         $grades = [1,2,3,4,5];
 

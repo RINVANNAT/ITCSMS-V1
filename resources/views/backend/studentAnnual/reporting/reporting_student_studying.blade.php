@@ -67,7 +67,7 @@
                             </div>
                             {!! Form::label('semester', trans('labels.backend.reporting.semester_id'), ['class' => 'col-lg-2 control-label']) !!}
                             <div class="col-lg-4">
-                                {!! Form::select('semester_id', ["1" => "Semester 1", "2" => "Semester 2"],null, ['class' => 'form-control', 'id'=>'input_semester']) !!}
+                                {!! Form::select('semester_id', ["1" => "Semester 1", "2" => "Semester 2","3" => "End Year"],null, ['class' => 'form-control', 'id'=>'input_semester']) !!}
                             </div>
                         </div>
                         <div class="form-group">
