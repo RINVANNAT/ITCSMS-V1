@@ -230,14 +230,14 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <p class="tran-content line-height">
-                                        បានបញ្ចប់ថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋានដោយជោគជ័យនៅ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
+                                        បានបញ្ចប់ថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋានដោយជោគជ័យនៅ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា (សាខាត្បូងឃ្មុំ)
                                         ក្នុងឆ្នាំសិក្សា {{$student['academic_year_kh']}}។
                                     </p>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="tran-last-content line-height sub-content-margin-top-kh">
+                                    <p class="line-height sub-content-margin-top-kh" style="margin-top: 45px !important;">
                                         វិញ្ញាបនបត្រនេះ ប្រគល់ជូនសាមីជនដើម្បីយកទៅប្រើប្រាស់តាមការដែលអាចប្រើបាន។
                                     </p>
                                 </div>
@@ -252,7 +252,7 @@
                                     @endif
                                 </div>
                                 <div class="col-md-8 col-xs-8">
-                                    <div align="center" style="margin-top: 5mm">
+                                    <div align="center" style="margin-top: 7mm">
                                         <p>
                                             <?php
                                             $d = \Carbon\Carbon::createFromFormat("d/m/Y", $issued_date);
@@ -294,16 +294,16 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="line-height tran-content">
+                                    <p class="line-height" style="margin-top: 25px">
                                         has successfully completed Foundation Year Course at Institute of Technology of
-                                        Cambodia in
+                                        Cambodia (Tbong Khmum Branch) in
                                         academic year {{$student['academic_year_latin']}}
                                     </p>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="line-height tran-last-content sub-content-margin-top-en">
+                                    <p class="line-height tran-last-content" style="margin-top: 5px">
                                         This certificate is presented to the bearer with all rights and privileges
                                         thereto
                                         pertaining.

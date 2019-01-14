@@ -318,7 +318,12 @@ trait PrintTranscriptTrait
                 "dept_option_id" => ""
             );
             $ranking_data = collect(json_decode($this->get_total_score_summary($params))->data)->keyBy("student_id_card");
-            $view = 'backend.studentAnnual.print.foundation_certificate';
+
+            if (config('app.app_branch') == 'TK') {
+                $view = 'backend.studentAnnual.print.foundation_certificate_tk';
+            } else {
+                $view = 'backend.studentAnnual.print.foundation_certificate';
+            }
             /*return view($view,
                 compact(
                     'ranking_data',
