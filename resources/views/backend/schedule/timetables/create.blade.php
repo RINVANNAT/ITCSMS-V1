@@ -86,7 +86,7 @@
                         </div>
                         <div class="col-md-3">
                             @include('backend.schedule.timetables.includes.partials.courses-sessions')
-                            @include('backend.schedule.timetables.includes.partials.rooms')
+                            {{--@include('backend.schedule.timetables.includes.partials.rooms')--}}
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -179,6 +179,7 @@
                 }
             })
         }
+
         /** get suggest rooms */
         function get_suggest_room(academic_year_id, week_id, timetable_slot_id) {
             $.ajax({
@@ -236,6 +237,7 @@
                 }
             })
         }
+
         /** search suggest rooms */
         function search_suggest_room(academic_year_id, week_id, timetable_slot_id, room_number) {
             $.ajax({
@@ -293,6 +295,7 @@
                 }
             })
         }
+
         /** get timetable slots */
         function get_timetable_slots() {
             let data = $('#options-filter').serializeArray();
@@ -314,6 +317,7 @@
                 }
             });
         }
+
         /** create timetable slot */
         function create_timetable_slots(copiedEventObject) {
             toggleLoading(true);
@@ -403,37 +407,23 @@
 
         /** resize timetable slot */
         function resize_timetable_slot(timetable_slot_id, end_date, revertFunc) {
-            $.ajax({
-                type: 'POST',
-                url: '{!! route('resize_timetable_slot') !!}',
-                data: {
-                    timetable_slot_id: timetable_slot_id,
-                    end: end_date
-                },
-                success: function (response) {
-                    if (response.status === true) {
-                        notify('info', 'Timetable slot have been changed.', 'Resize Timetable Slot');
-                    } else {
-                        notify('error', 'Something went wrong.', 'Resize Timetable Slot');
-                        revertFunc();
-                    }
-                },
-                error: function (response) {
-                    if (response.status === 403) {
-                        notify('error', 'You are not allowed to resize timetable slot.', 'Unauthorized');
-                    } else {
-                        notify('error', response.message, "Resize timetable Slot");
-                    }
-                    get_timetable_slots();
-                    get_course_programs();
-                },
-                complete: function () {
-                    get_timetable_slots();
-                    get_course_programs();
-                    $('#timetable').fullCalendar({
-                        eventDurationEditable: true
-                    });
+            axios.post('{!! route('resize_timetable_slot') !!}', {
+                timetable_slot_id: timetable_slot_id,
+                end: end_date
+            }).then((response) => {
+                if (response.data.code === 1) {
+                    notify('info', 'Timetable slot have been changed.', 'Resize Timetable Slot');
+                } else {
+                    notify('error', 'Something went wrong.', 'Resize Timetable Slot');
+                    revertFunc();
                 }
+                get_timetable_slots();
+                get_course_programs();
+                $('#timetable').fullCalendar({
+                    eventDurationEditable: true
+                });
+            }).catch((error) => {
+                notify('error', error, "Resize timetable Slot");
             })
         }
 
@@ -444,7 +434,7 @@
                 url: '{!! route('remove_timetable_slot') !!}',
                 data: {timetable_slot_id: event.id},
                 success: function (response) {
-                    if (response.status === true) {
+                    if (response.code === 1) {
                         $('#timetable').fullCalendar('removeEvent', event.id);
                         notify('info', 'Timetable slot remove from timetable.', 'Remove Timetable Slot');
                     }
@@ -548,28 +538,13 @@
                         object += '</div></div></div>';
                     } else {
                         object += '<div class="side-course" id="' + event.id + '"​​​>';
-	                    object += `<span class="hidden timetable-slot-id">${event.id}</span>`
+                        object += `<span class="hidden timetable-slot-id">${event.id}</span>`
                         // check conflict room and render
                         object += '<div class="fc-title">' + (event.course_name).substr(0, 20) + '...';
                         if (typeof event.type !== 'undefined') {
                             object += '<span class="text-primary"> (' + event.type + ')</span> ';
                         }
-                        object += '</div>';
-
-                        // check conflict lecturer and render
-                        if (typeof event.conflict_lecturer !== 'undefined') {
-                            if (event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length > 0) {
-                                object += '<p class="text-primary conflict">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
-                            }
-                            else {
-                                object += '<p class="text-primary">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
-                            }
-                        }
-                        else {
-                            object += '<p class="text-primary">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
-                        }
-
-                        object += '</div>';
+                        object += '</div></div>'
                     }
 
                     if (!event.hasOwnProperty('slotsForLanguage')) {
@@ -591,10 +566,10 @@
                             if (event.groups.length > 0) {
                                 var groups = '<p>Gr: ';
                                 event.groups.forEach((eachGroup) => {
-                                	groups += `
-                                	    <span class="remove-group-from-timetable-slot">
-                                	        <span class="timetable-slot-id hidden">`+event.id+`</span>
-                                	        <span class="group-id hidden">`+eachGroup.id+`</span>`+eachGroup.code+`
+                                    groups += `
+                                	    <span class="group-timetable-slot">
+                                	        <span class="timetable-slot-id hidden">` + event.id + `</span>
+                                	        <span class="group-id hidden">` + eachGroup.id + `</span>` + eachGroup.code + `
                                 	    </span>
                                 	`
                                 })
@@ -624,7 +599,8 @@
                             remove_timetable_slots(event);
                             $('#timetable').fullCalendar('removeEvent', event.id);
                         }
-                    } catch (e) {}
+                    } catch (e) {
+                    }
                 },
                 loading: function (isLoading, view) {
                     if (isLoading) {
@@ -649,9 +625,9 @@
 
             // Compare
             return (x >= offset.left
-            // && y >= offset.top
-            && x <= offset.right
-            && y <= offset.bottom);
+                // && y >= offset.top
+                && x <= offset.right
+                && y <= offset.bottom);
 
         };
 
@@ -736,7 +712,7 @@
 
         function reset_timetable() {
             let selected_week = []
-            $('.render_weeks input:checked').each(function() {
+            $('.render_weeks input:checked').each(function () {
                 selected_week.push(parseInt($(this).val()));
             });
             if ($('input[id="all-weeks"]').is(':checked') == true) {
@@ -774,18 +750,18 @@
 
             // filter options
             @if(isset($academic_year_id))
-                $("select[name='academicYear'] option[value={{ $academic_year_id }}]").attr('selected', true);
-                $("select[name='department'] option[value={{ $department_id }}]").attr('selected', true);
-                $("select[name='degree'] option[value={{ $degree_id }}]").attr('selected', true);
-                $("select[name='option'] option[value={{ $option_id }}]").attr('selected', true);
-                $("select[name='grade'] option[value={{ $grade_id }}]").attr('selected', true);
-                $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
-                $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
-                $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
-                get_course_programs();
+            $("select[name='academicYear'] option[value={{ $academic_year_id }}]").attr('selected', true);
+            $("select[name='department'] option[value={{ $department_id }}]").attr('selected', true);
+            $("select[name='degree'] option[value={{ $degree_id }}]").attr('selected', true);
+            $("select[name='option'] option[value={{ $option_id }}]").attr('selected', true);
+            $("select[name='grade'] option[value={{ $grade_id }}]").attr('selected', true);
+            $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
+            $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
+            $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
+            get_course_programs();
             @else
-                get_options($('select[name="department"] :selected').val());
-                get_weeks($('select[name="semester"] :selected').val());
+            get_options($('select[name="department"] :selected').val());
+            get_weeks($('select[name="semester"] :selected').val());
             @endif
 
             get_timetable_slots();
@@ -831,10 +807,10 @@
                     },
                     error: function (response) {
                         if (response.status === 403) {
-                            notify('error', 'You are not allow to remove room.', 'Unauthorized');
+                            notify('error', 'You are not allow to remove room.', 'Unauthorized')
                         }
                         else {
-                            notify('error', 'Something went wrong.', 'Remove Room');
+                            notify('error', 'Something went wrong.', 'Remove Room')
                         }
                     },
                     complete: function () {
@@ -845,35 +821,29 @@
 
             // add room to timetable slot.
             $(document).on('click', '.rooms > .info-box', function (e) {
-                var dom_room = $(this);
-                $.ajax({
-                    type: 'POST',
-                    url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
-                    data: {
-                        timetable_slot_id: $('.side-course.course-selected').attr('id'),
-                        room_id: $(this).find('.room_id').text()
-                    },
-                    success: function (response) {
-                        if (response.status === true) {
-                            $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.find('.room_name').text() + '</p>');
-                            dom_room.find('.info-box-icon').removeClass('bg-aqua').addClass('bg-red');
-                            dom_room.css('cursor', 'not-allowed');
-                            notify('success', 'Room was added', 'Add Room');
-                            get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), $('.side-course.course-selected').attr('id'));
-                        } else {
-                            notify('warning', 'Please select which course.', 'Add Room');
-                        }
-                        get_rooms();
-                    },
-                    error: function (response) {
-                        if (response.status === 403) {
-                            notify('error', 'You can not add room.', 'Unauthorized');
-                        } else {
-                            notify('error', 'Something went wrong.', 'Add Room');
-                        }
+                var dom_room = $(this)
+                if ($('.side-course.course-selected').attr('id') === undefined) {
+                    notify('info', 'Please select course session', 'Add Room')
+                    return 0
+                }
+                axios.post('/admin/schedule/timetables/insert_room_into_timetable_slot', {
+                    timetable_slot_id: $('.side-course.course-selected').attr('id'),
+                    room_id: $(this).find('.room_id').text()
+                }).then((response) => {
+                    if (response.data.code === 1) {
+                        // $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.find('.room_name').text() + '</p>')
+                        dom_room.find('.info-box-icon').removeClass('bg-aqua').addClass('bg-red')
+                        dom_room.css('cursor', 'not-allowed')
+                        get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), $('.side-course.course-selected').attr('id'))
+                        notify('success', 'Room was added', 'Add Room')
+                    } else {
+                        notify('info', response.data.message, 'Add Room')
                     }
-                });
-            });
+                    get_rooms()
+                }).catch((error) => {
+                    notify('error', error, 'Add Room')
+                })
+            })
 
             // get timetable slot by on change semester option.
             $(document).on('change', 'select[name="semester"]', function () {
@@ -1012,43 +982,52 @@
                         if (response.status === true) {
                             var course_session_item = '';
                             if (response.course_sessions.length > 0) {
-	                            $.each(response.course_sessions, function (key, val) {
-		                            if (val.teacher_name === null) {
-			                            course_session_item += '<li class="course-item disabled">';
-		                            }
-		                            else {
-			                            course_session_item += '<li class="course-item">';
-		                            }
-		                            course_session_item += '<span class="handle ui-sortable-handle">' +
-			                            '<i class="fa fa-ellipsis-v"></i> ' +
-			                            '<i class="fa fa-ellipsis-v"></i>' +
-			                            '</span>' +
-			                            '<span class="text course-name">' + val.course_name + '</span><br>';
-		                            if (val.teacher_name === null) {
-			                            course_session_item += '<span style="margin-left: 28px;" class="teacher_name bg-danger badge">Unsigned</span><br/>';
-		                            } else {
-			                            course_session_item += '<span style="margin-left: 28px;" class="leacher_name">' + val.teacher_name + '</span><br/>';
-		                            }
-		                            if (val.tp !== 0) {
-			                            course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
-				                            '<span class="times">' + val.remaining + '</span> H'
-		                            }
-		                            else if (val.td !== 0) {
-			                            course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
-				                            '<span class="times">' + val.remaining + '</span> H'
-		                            }
-		                            else {
-			                            course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
-				                            '<span class="times">' + val.remaining + '</span> H'
-		                            }
-		                            course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
-		                            course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>'
-	                            })
+                                $.each(response.course_sessions, function (key, val) {
+                                    if (val.teacher_name === null) {
+                                        course_session_item += '<li class="course-item disabled">';
+                                    }
+                                    else {
+                                        course_session_item += '<li class="course-item">';
+                                    }
 
-	                            $('.courses.todo-list').html(course_session_item);
-	                            drag_course_session()
+                                    course_session_item += '<span class="text course-name">' + val.course_name + '</span><br>'
+
+                                    if (val.tp !== 0) {
+                                        course_session_item += '<span class="course-type"><strong>TP</strong></span> : ' +
+                                            '<span class="times">' + val.total_hours + '</span> H <br/>'
+                                    }
+                                    else if (val.td !== 0) {
+                                        course_session_item += '<span class="course-type"><strong>TD</strong></span> : ' +
+                                            '<span class="times">' + val.total_hours + '</span> H <br/>'
+                                    }
+                                    else {
+                                        course_session_item += '<span class="course-type"><strong>Course</strong></span> : ' +
+                                            '<span class="times">' + val.total_hours + '</span> H <br/>'
+                                    }
+
+                                    if (val.groups.length > 0) {
+                                        course_session_item += '<div class="list-groups"><span><strong>Groups: </strong></span>'
+                                        val.groups.forEach((eachGroup) => {
+                                            course_session_item += '<span class="bg-success badge remove-group-from-course-program"><span class="group-id hidden">' + eachGroup.id + '</span>' + eachGroup.code + '</span>'
+                                        })
+                                        course_session_item += '</div>'
+                                    } else {
+                                        course_session_item += `
+                                            <div class="list-groups">
+                                                <span><strong>Groups: </strong></span>
+                                                <span class="teacher_name bg-danger badge">No Groups</span><br/>
+                                            </div>
+                                        `
+                                    }
+
+                                    course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
+                                    course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                                })
+
+                                $('.courses.todo-list').html(course_session_item);
+                                drag_course_session()
                             } else {
-	                            $('.courses.todo-list').html("<li class='course-item'>The 0 courses are found.</li>");
+                                $('.courses.todo-list').html("<li class='course-item'>The 0 courses are found.</li>");
                             }
                         }
                     },
@@ -1093,7 +1072,7 @@
                 $('.timetable-group-course input').prop('checked', false);
             });
 
-            $(document).on('click', '.all-groups', function() {
+            $(document).on('click', '.all-groups', function () {
                 if ($(this).is(':checked')) {
                     $('.timetable-group-course input').prop('checked', true);
                 } else {
@@ -1101,7 +1080,7 @@
                 }
             });
 
-            $(document).on('click', '.group', function() {
+            $(document).on('click', '.group', function () {
                 $('.all-groups').prop('checked', false);
             });
         });

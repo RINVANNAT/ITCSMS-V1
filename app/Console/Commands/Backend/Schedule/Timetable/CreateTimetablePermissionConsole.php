@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\Backend\Schedule\Timetable;
 
-use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Illuminate\Console\Command;
 
 /**
@@ -28,13 +27,10 @@ class CreateTimetablePermissionConsole extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @param EloquentTimetableSlotRepository $timetableSlotRepository
      */
-    public function __construct(EloquentTimetableSlotRepository $timetableSlotRepository)
+    public function __construct()
     {
         parent::__construct();
-        $this->timetableSlotRepo = $timetableSlotRepository;
     }
 
     /**
@@ -44,6 +40,6 @@ class CreateTimetablePermissionConsole extends Command
      */
     public function handle()
     {
-        $this->timetableSlotRepo->set_permission_create_timetable();
+        //
     }
 }

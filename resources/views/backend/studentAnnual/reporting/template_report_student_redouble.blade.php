@@ -20,7 +20,11 @@
         <td colspan="28" align="center" class="blue">
             <span>ស្ថិតិនិស្សិតត្រួតថ្នាក់ </span>
             <span class="font-muol">ថ្នាក់ {{$degree_name}} </span>
-            <span>ឆ្នាំសិក្សា<span id="academicYear">{{$academic_year_name}} ឆមាសទី {{$semester_id}}</span></span>
+            <span>ឆ្នាំសិក្សា<span id="academicYear">{{$academic_year_name}}
+                    @if($semester_id !=3)
+                        ឆមាសទី {{$semester_id}}
+                    @endif
+                </span></span>
         </td>
     </tr>
     <tr align="center" class="insertBorder">

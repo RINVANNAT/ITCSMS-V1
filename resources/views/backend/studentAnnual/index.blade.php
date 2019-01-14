@@ -161,7 +161,7 @@
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control filter','id'=>'filter_academic_year')) !!} '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control filter','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
                     '{!! Form::select('grade',$grades,null, array('class'=>'form-control filter','id'=>'filter_grade','placeholder'=>'Grade')) !!} '+
-                    '{!! Form::select('department',$departments,null, array('class'=>'form-control filter','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
+                    '{!! Form::select('department',$departments,$department_id, array('class'=>'form-control filter','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
                     '{!! Form::select('gender',$genders,null, array('class'=>'form-control filter','id'=>'filter_gender','placeholder'=>'Gender')) !!} '+
                     '{!! Form::select('option',$options,null, array('class'=>'form-control filter','id'=>'filter_option','placeholder'=>'Option')) !!} '+
                     '{!! Form::select('semester',$semesters,null, array('class'=>'form-control filter','id'=>'filter_semester')) !!} '+

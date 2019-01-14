@@ -3,6 +3,7 @@
 @section ('title', 'ITC - TTMS')
 
 @section('page-header')
+
     <h1>
         {{ trans('labels.backend.schedule.timetable.title') }}
         <small>{{ trans('labels.backend.schedule.timetable.sub_index_title') }}</small>

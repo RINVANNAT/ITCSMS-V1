@@ -253,8 +253,9 @@ function get_employees(query = null) {
 
 function assign_lecturer_to_course_program() {
 	$(document).on('click', 'li.select2-results__option', function () {
-		let slot_id = $('.course-program-selected').find('.slot-id').text();
-		if (slot_id !== '') {
+		let slot_id = $('.course-program-selected').find('.slot-id').text()
+		console.log(parseInt(slot_id))
+		if (parseInt(slot_id) > 0) {
 			let lecturer_id = $(this).find('.lecturer_id').text();
 			axios.post('/admin/schedule/timetables/assign_lecturer_to_course_program', {
 				slot_id: slot_id,
@@ -264,16 +265,24 @@ function assign_lecturer_to_course_program() {
 				notify('info', response.data.message, 'Assign Lecturer');
 			})
 		}
-		let timetable_slot_id = $('.side-course.course-selected').attr('id');
-		if (timetable_slot_id !== '') {
+		
+		let timetable_slot_id = $('.side-course.course-selected').attr('id')
+		console.log(parseInt(timetable_slot_id))
+		if (parseInt(timetable_slot_id) > 0) {
 			let lecturer_id = $(this).find('.lecturer_id').text();
 			axios.post('/admin/schedule/timetables/assign_lecturer_to_timetable_slot', {
 				timetable_slot_id: timetable_slot_id,
 				lecturer_id: lecturer_id
-			}).then(response => {
+			}).then((response) => {
+				if (response.data.code === 1) {
+					notify('info', response.data.message, 'Assign Lecturer');
+				} else {
+					notify('info', response.data.message, 'Assign Lecturer')
+				}
 				get_course_programs();
 				get_timetable_slots();
-				notify('info', response.data.message, 'Assign Lecturer');
+			}).catch((error) => {
+				notify('info', error, 'Assign Lecturer')
 			})
 		}
 	})

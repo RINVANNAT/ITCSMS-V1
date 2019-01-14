@@ -117,6 +117,15 @@ class InternshipController extends Controller
                     }
                 }
             } else {
+                $lastInternship = Internship::where('academic_year_id', $request->academic_year_id)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                if ($lastInternship instanceof Internship) {
+                    $request['number'] = $lastInternship->number + 1;
+                }else {
+                    $request['number'] = 1;
+                }
+
                 $internship = Internship::create($request->all());
                 if ($internship instanceof Internship) {
                     foreach ($request->students as $studentAnnualId) {
@@ -238,7 +247,8 @@ class InternshipController extends Controller
      */
     public function data()
     {
-        $internships = Internship::select('*')->latest();
+        $internships = Internship::orderBy('created_at', 'desc')
+            ->select('*');
         return Datatables::of($internships)
             ->addColumn('students', function ($internship) {
                 $students = array();
@@ -265,8 +275,8 @@ class InternshipController extends Controller
                     'Web: <strong>' . $internship->web . '</strong>';
             })
             ->addColumn('actions', function ($internship) {
-                return '<a href="' . route('internship.edit', $internship) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"></i></a>' .
-                    ' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';
+                return '<a href="' . route('internship.edit', $internship) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"></i></a>';
+                    /*' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';*/
             })
             ->addColumn('checkbox', function ($internship) {
                 if (is_null($internship->printed_at)) {

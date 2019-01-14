@@ -31,7 +31,7 @@
                 <!-- Profile Image -->
                 <div class="box box-primary">
                     <div class="box-body box-profile">
-                        <img class="profile-user-img img-responsive" src="{{config('app.smis_server')}}/img/profiles/{{$student->photo}}" alt="User profile picture">
+                        <img class="profile-user-img img-responsive" src="{{$smis_server->value}}/img/profiles/{{$student->photo}}" alt="User profile picture">
 
                         <h3 class="profile-username text-center">{{$student->name_kh}}</h3>
 

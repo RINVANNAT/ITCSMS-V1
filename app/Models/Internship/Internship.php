@@ -20,7 +20,9 @@ class Internship extends Model
         'end',
         'issue_date',
         'is_name',
-        'company_id'
+        'company_id',
+        'number',
+        'academic_year_id'
     ];
 
     protected static function boot()

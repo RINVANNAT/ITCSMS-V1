@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.students.title'))
+@section ('title', trans('labels.backend.students.title')." | Radié ".trans('menus.backend.reporting.title') )
 
 @section('page-header')
     <h1>
         {{ trans('labels.backend.students.title') }}
-        <small>{{ trans('menus.backend.reporting.title') }}</small>
+        <small>Radié {{ trans('menus.backend.reporting.title') }}</small>
     </h1>
 
 @endsection
@@ -61,13 +61,9 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            {!! Form::label('name', trans('labels.backend.reporting.is_foreigner'), ['class' => 'col-lg-2 control-label']) !!}
-                            <div class="col-lg-4">
-                                {!! Form::checkbox('only_foreigner', 'TRUE',false,['id'=>'only_foreigner']) !!}
-                            </div>
                             {!! Form::label('semester', trans('labels.backend.reporting.semester_id'), ['class' => 'col-lg-2 control-label']) !!}
                             <div class="col-lg-4">
-                                {!! Form::select('semester_id', ["1" => "Semester 1", "2" => "Semester 2","3" => "End Year"],null, ['class' => 'form-control', 'id'=>'input_semester']) !!}
+                                {!! Form::select('semester_id', ["1" => "Semester 1", "2" => "Semester 2", "3" => "End Year"],null, ['class' => 'form-control', 'id'=>'input_semester']) !!}
                             </div>
                         </div>
                         <div class="form-group">
@@ -81,7 +77,6 @@
                             </div>
                         </div>
                     </form>
-
                 </div>
                 <div class="col-lg-2 vcenter">
                     <a class="btn btn-app" id="search_btn">

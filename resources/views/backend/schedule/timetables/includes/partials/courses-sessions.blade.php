@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-12">
-        <div class="box box-default" style="border: 1px solid #dddddd;">
+        <div class="box box-default" style="border: 1px solid #dddddd; height: 760px !important;">
             <div class="box-header with-border">
                 <div class="input-group margin">
                     <input type="text"
@@ -16,7 +16,7 @@
                     </span>
                 </div>
             </div>
-            <div class="box-body courses-sessions">
+            <div class="box-body courses-sessions" style="height: 670px;">
                 @if(access()->allow('drag-course-session'))
                 <ul class="courses todo-list"></ul>
                 @else

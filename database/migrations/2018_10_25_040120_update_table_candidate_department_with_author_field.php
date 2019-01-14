@@ -13,7 +13,7 @@ class UpdateTableCandidateDepartmentWithAuthorField extends Migration
     public function up()
     {
         Schema::table('candidate_department', function (Blueprint $table) {
-            $table->increments('id');
+            // $table->increments('id');
             $table->timestamps();
             $table->integer('create_uid')->unsigned()->index()->nullable();
             $table->integer('write_uid')->unsigned()->index()->nullable();

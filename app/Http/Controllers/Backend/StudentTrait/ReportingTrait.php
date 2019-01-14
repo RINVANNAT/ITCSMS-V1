@@ -20,6 +20,9 @@ trait ReportingTrait
 {
     public function get_student_list_by_age($academic_year_id, $degree, $date,$scholarships, $semester_id){
 
+        if($semester_id == 3) {
+            $semester_id = 1; // End year is the same as first semester
+        }
         $grades = [1,2,3,4,5];
         $ages = array(
             ['min'=>0,'max'=>16,'name'=>'<16','data'=> array()],
@@ -135,10 +138,14 @@ trait ReportingTrait
     }
 
     public function get_student_redouble($academic_year_id , $degree, $scholarships, $semester_id){
-
+        if($semester_id == 3) {
+            $semester_id = 1; // End year is the same as first semester
+            $semester_for_redouble = [1,2];
+        } else {
+            $semester_for_redouble = [$semester_id];
+        }
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         $grades = [1,2,3,4,5];
-
         $array_total = array(
             array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
             array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
@@ -147,10 +154,7 @@ trait ReportingTrait
             array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
             array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0)
         );
-
-
         foreach($departments as &$department) {
-
             $empty_option = array(
                 'id'=>null,
                 'name_kh'=>$department['name_kh'],
@@ -158,15 +162,11 @@ trait ReportingTrait
                 'name_fr'=>$department['name_fr'],
                 'code'=>$department['code']
             );
-
             if($department['department_options'] == null || count($department['department_options']) == 0){
                 $department['department_options'] = [$empty_option];
             } else {
                 array_unshift($department['department_options'], $empty_option);
             }
-
-            //dd($department);
-
             foreach($department['department_options'] as &$option){
 
                 $records = array();
@@ -187,6 +187,7 @@ trait ReportingTrait
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('redouble_student.academic_year_id','=',$academic_year_id)
+                        ->whereIN('redouble_student.semester_id',$semester_for_redouble)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
                         ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count();
@@ -201,6 +202,7 @@ trait ReportingTrait
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('redouble_student.academic_year_id','=',$academic_year_id)
+                        ->whereIN('redouble_student.semester_id',$semester_for_redouble)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
                         ->where('students.gender_id','=',2)
@@ -217,6 +219,7 @@ trait ReportingTrait
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('redouble_student.academic_year_id','=',$academic_year_id)
+                        ->whereIN('redouble_student.semester_id',$semester_for_redouble)
                         ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
@@ -233,6 +236,7 @@ trait ReportingTrait
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('redouble_student.academic_year_id','=',$academic_year_id)
+                        ->whereIN('redouble_student.semester_id',$semester_for_redouble)
                         ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
@@ -284,7 +288,146 @@ trait ReportingTrait
         return $departments;
     }
 
+    public function get_student_radie($academic_year_id , $degree, $scholarships, $semester_id){
+        if($semester_id == 3) {
+            $semester_id = 1;
+        }
+        $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
+        $grades = [1,2,3,4,5];
+        $array_total = array(
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0)
+        );
+        foreach($departments as &$department) {
+            $empty_option = array(
+                'id'=>null,
+                'name_kh'=>$department['name_kh'],
+                'name_en'=>$department['name_en'],
+                'name_fr'=>$department['name_fr'],
+                'code'=>$department['code']
+            );
+            if($department['department_options'] == null || count($department['department_options']) == 0){
+                $department['department_options'] = [$empty_option];
+            } else {
+                array_unshift($department['department_options'], $empty_option);
+            }
+            foreach($department['department_options'] as &$option){
+
+                $records = array();
+                $t_st = 0;
+                $t_sf = 0;
+                $t_pt = 0;
+                $t_pf = 0;
+
+                foreach($grades as $grade){
+
+                    $total = DB::table('studentAnnuals')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('students.radie','=',true)
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
+                        ->where('studentAnnuals.degree_id','=',$degree)
+                        ->where('studentAnnuals.grade_id','=',$grade)
+                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
+                        ->where('studentAnnuals.department_id','=',$department['id'])
+                        ->where('studentAnnuals.department_option_id','=',$option['id'])->count();
+
+                    $total_female = DB::table('studentAnnuals')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('students.radie','=',true)
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
+                        ->where('studentAnnuals.degree_id','=',$degree)
+                        ->where('studentAnnuals.grade_id','=',$grade)
+                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
+                        ->where('studentAnnuals.department_id','=',$department['id'])
+                        ->where('studentAnnuals.department_option_id','=',$option['id'])
+                        ->where('students.gender_id','=',2)->count(); // 2 is female
+
+                    $scholarship_total =  DB::table('studentAnnuals')
+                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('students.radie','=',true)
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
+                        ->where('studentAnnuals.degree_id','=',$degree)
+                        ->where('studentAnnuals.grade_id','=',$grade)
+                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
+                        ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
+                        ->where('studentAnnuals.department_id','=',$department['id'])
+                        ->where('studentAnnuals.department_option_id','=',$option['id'])->count();
+
+                    $scholarship_female =  DB::table('studentAnnuals')
+                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('students.radie','=',true)
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
+                        ->where('studentAnnuals.degree_id','=',$degree)
+                        ->where('studentAnnuals.grade_id','=',$grade)
+                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
+                        ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
+                        ->where('studentAnnuals.department_id','=',$department['id'])
+                        ->where('studentAnnuals.department_option_id','=',$option['id'])
+                        ->where('students.gender_id','=',2)->count(); // 2 is female
+
+                    $array = array(
+                        'st' => $scholarship_total,
+                        'sf' => $scholarship_female,
+                        'pt' => $total-$scholarship_total,
+                        'pf' => $total_female-$scholarship_female
+                    );
+
+                    $t_st += $array['st'];
+                    $t_sf += $array['sf'];
+                    $t_pt += $array['pt'];
+                    $t_pf += $array['pf'];
+
+                    array_push($records,$array);
+
+                    // unset unnecessary variables
+
+                    unset($query);
+                    unset($minDate);
+                    unset($maxDate);
+                    unset($total);
+                    unset($total_female);
+                    unset($scholarship_total);
+                    unset($scholarship_female);
+
+                    $array_total[$grade-1]['st'] += $array['st'];
+                    $array_total[$grade-1]['sf'] += $array['sf'];
+                    $array_total[$grade-1]['pt'] += $array['pt'];
+                    $array_total[$grade-1]['pf'] += $array['pf'];
+                }
+
+                array_push($records,array('st'=>$t_st,'sf'=>$t_sf,'pt'=>$t_pt,'pf'=>$t_pf));
+                $array_total[5]['st'] += $t_st;
+                $array_total[5]['sf'] += $t_sf;
+                $array_total[5]['pt'] += $t_pt;
+                $array_total[5]['pf'] += $t_pf;
+
+                $option['data'] = $records;
+            }
+
+
+        }
+        array_push($departments,$array_total);
+        return $departments;
+    }
+
     public function get_student_by_group($academic_year_id , $degree, $only_foreigner,$scholarships,$semester_id){
+        if($semester_id == 3){
+            $semester_id = 1;
+        }
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         $grades = [1,2,3,4,5];
 
@@ -531,6 +674,24 @@ trait ReportingTrait
                     return view('backend.studentAnnual.reporting.print_report_student_studying',compact('id','data','degree_name','academic_year_name','only_foreigner','semester_id'));
                 }
                 break;
+            case 4:
+                if(isset($params['scholarships'])){
+                    $scholarships = $params['scholarships'];
+                } else {
+                    $scholarships = [];
+                }
+
+                $semester_id = $params['semester_id'];
+                $data = $this->get_student_radie($params['academic_year_id'],$params['degree_id'],$scholarships,$semester_id);
+                $degree_name = Degree::find($params['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
+
+                if($is_preview){
+                    return view('backend.studentAnnual.reporting.template_report_student_radie',compact('id','data','degree_name','academic_year_name','semester_id'));
+                } else{
+                    return view('backend.studentAnnual.reporting.print_report_student_radie',compact('id','data','degree_name','academic_year_name','semester_id'));
+                }
+                break;
             default:
                 $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
         }
@@ -552,6 +713,9 @@ trait ReportingTrait
                 break;
             case 3:
                 $view = 'backend.studentAnnual.reporting.reporting_student_studying';
+                break;
+            case 4:
+                $view = 'backend.studentAnnual.reporting.reporting_student_radie';
                 break;
             default:
                 return redirect(route('admin.studentAnnuals.index'));

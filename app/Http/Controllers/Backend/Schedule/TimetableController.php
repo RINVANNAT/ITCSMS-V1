@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Backend\Schedule;
 
-use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
-use App\Http\Controllers\Backend\Schedule\Traits\AjaxCRUDTimetableController;
-use App\Http\Controllers\Backend\Schedule\Traits\ExportTimetableController;
-use App\Http\Controllers\Backend\Schedule\Traits\PrintTimetableController;
-use App\Http\Controllers\Backend\Schedule\Traits\TimetableSessionTrait;
+use App\Http\Controllers\Backend\Schedule\Traits\CloneTimetableTrait;
+use App\Http\Controllers\Backend\Schedule\Traits\ExportCourseToSlotTrait;
+use App\Http\Controllers\Backend\Schedule\Traits\OptionTimetableTrait;
+use App\Http\Controllers\Backend\Schedule\Traits\TimetableAssignmentTrait;
 use App\Http\Controllers\Backend\Schedule\Traits\TimetableSlotTrait;
-use App\Http\Controllers\Backend\Schedule\Traits\ViewTimetableByTeacherController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
@@ -21,8 +19,6 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
-use App\Models\Group;
-use App\Models\Room;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableGroup;
@@ -31,14 +27,11 @@ use App\Models\Schedule\Timetable\TimetableGroupSlot;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
-use App\Repositories\Backend\Schedule\Timetable\TimetableRepositoryContract;
-use App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Validator;
 use Yajra\Datatables\Datatables;
 
 /**
@@ -47,48 +40,12 @@ use Yajra\Datatables\Datatables;
  */
 class TimetableController extends Controller
 {
-    use AjaxCRUDTimetableController,
-        AjaxCloneTimetableController,
-        TimetableSlotTrait,
-        TimetableSessionTrait,
-        PrintTimetableController,
-        ExportTimetableController,
-        ViewTimetableByTeacherController;
+    use CloneTimetableTrait,
+        ExportCourseToSlotTrait,
+        TimetableAssignmentTrait,
+        OptionTimetableTrait,
+        TimetableSlotTrait;
 
-    /**
-     * @var TimetableRepositoryContract
-     */
-    protected $timetableRepository;
-
-    /**
-     * @var TimetableSlotRepositoryContract
-     */
-    protected $timetableSlotRepository;
-
-    /**
-     * TimetableController constructor.
-     *
-     * @param TimetableSlotRepositoryContract $timetableSlotRepository
-     * @param TimetableRepositoryContract $timetableRepository
-     */
-    public function __construct
-    (
-        TimetableSlotRepositoryContract $timetableSlotRepository,
-        TimetableRepositoryContract $timetableRepository
-    )
-    {
-        $this->timetableSlotRepository = $timetableSlotRepository;
-        $this->timetableRepository = $timetableRepository;
-        $this->setRepository($this->timetableRepository, $this->timetableSlotRepository);
-        $this->setTimetableSlotRepo($timetableSlotRepository);
-        $this->setTimetableSlotRepository($timetableSlotRepository);
-    }
-
-    /**
-     * Timetable home page.
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
     public function index()
     {
         $now = Carbon::now('Asia/Phnom_Penh');
@@ -113,11 +70,6 @@ class TimetableController extends Controller
         ]);
     }
 
-    /**
-     * Get all timetables.
-     *
-     * @return mixed
-     */
     public function get_timetables()
     {
         $academic_year_id = request('academicYear');
@@ -126,7 +78,6 @@ class TimetableController extends Controller
         $grade_id = request('grade');
         $option_id = request('option');
         $semester_id = request('semester');
-        $group_id = request('group');
 
         $timetables = Timetable::join('weeks', 'weeks.id', '=', 'timetables.week_id')
             ->join('academicYears', 'academicYears.id', '=', 'timetables.academic_year_id')
@@ -221,19 +172,6 @@ class TimetableController extends Controller
             ->make(true);
     }
 
-    /**
-     * Create timetable page.
-     *
-     * @param null $academic
-     * @param null $department
-     * @param null $degree
-     * @param null $option
-     * @param null $grade
-     * @param null $semester
-     * @param null $group
-     * @param $week
-     * @return mixed
-     */
     public function create($academic = null, $department = null, $degree = null, $option = null, $grade = null, $semester = null, $group = null, $week = null)
     {
         $now = Carbon::now('Asia/Phnom_Penh');
@@ -318,13 +256,6 @@ class TimetableController extends Controller
         return abort(404);
     }
 
-    /**
-     * Show timetable's details page.
-     *
-     * @param Timetable $timetable
-     * @param ShowTimetableRequest $showTimetableRequest
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
     public function show(Timetable $timetable, ShowTimetableRequest $showTimetableRequest)
     {
         $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
@@ -368,38 +299,71 @@ class TimetableController extends Controller
         return view('backend.schedule.timetables.show', compact('timetableSlots', 'timetable', 'now', 'createTimetablePermissionConfiguration', 'options'));
     }
 
-    /**
-     * @param CreateTimetableSlotRequest $request
-     * @param CreateTimetableRequest $requestTimetable
-     * @return int
-     */
     public function store(CreateTimetableSlotRequest $request, CreateTimetableRequest $requestTimetable)
     {
-        $findTimetable = $this->timetableRepository->find_timetable_is_existed($requestTimetable);
-        $new_timetable_slot = new TimetableSlot();
-        if ($findTimetable instanceof Timetable) {
-            $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($findTimetable, $request);
+        $timetable = $this->firstOrCreateTimetable($requestTimetable);
+        $timetableSlots = [];
+        if ($timetable instanceof Timetable) {
+            $timetableSlots = $this->createTimetableSlot($timetable, $request);
         } else {
-            $newTimetable = $this->timetableRepository->create_timetable($requestTimetable);
+            $newTimetable = $this->createNewTimetable($requestTimetable);
             if ($newTimetable instanceof Timetable) {
-                $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
+                $timetableSlots = $this->createTimetableSlot($newTimetable, $request);
             }
         }
-        if ($new_timetable_slot) {
-            return Response::json([
-                'status' => true,
-                'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot)
-            ]);
-        }
-        return Response::json(['status' => false]);
+        return [
+            'status' => true,
+            'timetable_slot' => json_decode($timetableSlots)
+        ];
     }
 
-    /**
-     * Delete timetable.
-     *
-     * @param DeleteTimetableRequest $request
-     * @return mixed
-     */
+    private function firstOrCreateTimetable(CreateTimetableRequest $request)
+    {
+        $this->validate($request, [
+            'academicYear' => 'required',
+            'department' => 'required',
+            'degree' => 'required',
+            'grade' => 'required',
+            'semester' => 'required',
+            'weekly' => 'required',
+        ]);
+        $timetable = Timetable::where([
+            'academic_year_id' => $request->academicYear,
+            'department_id' => $request->department,
+            'degree_id' => $request->degree,
+            'grade_id' => $request->grade,
+            'option_id' => $request->option == null ? null : $request->option,
+            'semester_id' => $request->semester,
+            'week_id' => $request->weekly,
+        ])->first();
+
+        if ($timetable instanceof Timetable) {
+            return $timetable;
+        }
+        return false;
+    }
+
+    private function createNewTimetable(CreateTimetableRequest $request)
+    {
+        try {
+            $newTimetable = new Timetable();
+            $newTimetable->academic_year_id = $request->academicYear;
+            $newTimetable->department_id = $request->department;
+            $newTimetable->degree_id = $request->degree;
+            $newTimetable->grade_id = $request->grade;
+            $newTimetable->option_id = $request->option == null ? null : $request->option;
+            $newTimetable->semester_id = $request->semester;
+            $newTimetable->week_id = $request->weekly;
+
+            if ($newTimetable->save()) {
+                return $newTimetable;
+            }
+            return false;
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
+    }
+
     public function delete(DeleteTimetableRequest $request)
     {
         $timetable = Timetable::find($request->id);
@@ -420,70 +384,93 @@ class TimetableController extends Controller
         }
     }
 
-
     public function reset(Request $request)
     {
         DB::beginTransaction();
         try {
-            $timetable_slots = Timetable::join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
-                ->where([
-                    'timetables.academic_year_id' => $request->academic_year_id,
-                    'timetables.department_id' => $request->department_id,
-                    'timetables.option_id' => $request->department_option_id,
-                    'timetables.degree_id' => $request->degree_id,
-                    'timetables.grade_id' => $request->grade_id,
-                    'timetables.semester_id' => $request->semester_id
-                ]);
-
-            if ($request->selected_week != 'all') {
-                $timetable_slots = $timetable_slots->whereIn('timetables.week_id', $request->selected_week);
-            }
-
-            $timetable_slots = $timetable_slots->select('timetable_slots.*')
+            $weekIds = array_unique($request->selected_week);
+            $timetables = Timetable::where([
+                'timetables.academic_year_id' => $request->academic_year_id,
+                'timetables.department_id' => $request->department_id,
+                'timetables.option_id' => $request->department_option_id,
+                'timetables.degree_id' => $request->degree_id,
+                'timetables.grade_id' => $request->grade_id,
+                'timetables.semester_id' => $request->semester_id
+            ])
+                ->whereIn('week_id', $weekIds)
                 ->get();
+            if (count($timetables) > 0) {
+                foreach ($timetables as $timetable) {
+                    if ($timetable instanceof Timetable) {
+                        $timetableSlots = $timetable->timetableSlots;
+                        if (count($timetableSlots) > 0) {
+                            foreach ($timetableSlots as $timetableSlot) {
+                                if ($timetableSlot instanceof TimetableSlot) {
+                                    $groupIds = TimetableGroupSession::where([
+                                        'timetable_slot_id' => $timetableSlot->id
+                                    ])->pluck('timetable_group_id');
 
-            foreach ($timetable_slots as $timetable_slot) {
-                $slot = Slot::find($timetable_slot->slot_id);
-                if ($slot instanceof Slot && count($slot->timetableGroupSlots) > 0) {
-                    foreach ($slot->timetableGroupSlots as $groupSlot) {
-                        $timetableGroupSlot = TimetableGroupSlot::find($groupSlot->id);
-                        $timetableGroupSlot->total_hours_remain += (float)$timetable_slot->durations;
-                        $timetableGroupSlot->update();
+                                    foreach ($groupIds as $groupId) {
+                                        $timetableGroupSlot = TimetableGroupSlot::where([
+                                            'slot_id' => $timetableSlot->slot_id,
+                                            'timetable_group_id' => $groupId
+                                        ])->first();
+                                        if ($timetableGroupSlot instanceof TimetableGroupSlot) {
+                                            $timetableGroupSlot->total_hours_remain += $timetableSlot->durations;
+                                            $timetableGroupSlot->update();
+                                            TimetableGroupSession::where([
+                                                'timetable_slot_id' => $timetableSlot->id,
+                                                'timetable_group_id' => $groupId
+                                            ])->delete();
+                                        }
+                                    }
+                                    $timetableSlot->delete();
+                                }
+                            }
+                        }
                     }
-                    TimetableSlot::find($timetable_slot->id)->delete();
                 }
             }
-
             DB::commit();
-            return message_success($timetable_slots);
+            return message_success($timetables);
         } catch (\Exception $exception) {
             DB::rollback();
             return message_error($exception->getMessage());
         }
     }
 
-    public function storeTimetableGroup(Request $request)
+    public function publish(Request $request)
     {
+        try {
+            $this->validate($request, [
+                'academicYear' => 'required',
+                'department' => 'required',
+                'degree' => 'required',
+                'grade' => 'required',
+                'semester' => 'required',
+                'weekly' => 'required'
+            ]);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required'
-        ]);
+            $timetable = Timetable::where([
+                'academic_year_id' => $request->academicYear,
+                'department_id' => $request->department,
+                'degree_id' => $request->degree,
+                'grade_id' => $request->grade,
+                'option_id' => $request->option == null ? null : $request->option,
+                'group_id' => $request->group == null ? null : $request->group,
+                'semester_id' => $request->semester,
+                'week_id' => $request->weekly,
+            ])->first();
 
-        if ($validator->fails()) {
-            return message_error($validator->errors());
+            if ($timetable instanceof Timetable) {
+                $timetable->update([
+                    'completed' => true
+                ]);
+                return message_success([]);
+            }
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
         }
-
-        $newGroup = TimetableGroup::firstOrCreate([
-            'code' => $request->name,
-            'parent_id' => $request->parent_id == '' ? null : $request->parent_id
-        ]);
-
-        return message_success(TimetableGroup::where('id', $newGroup->id)->with('parent')->first());
-    }
-
-    public function searchTimetableGroup()
-    {
-        return message_success(TimetableGroup::where('code', 'ilike', "%" . request('query') . "%")->get());
     }
 
     public function assignGroup(Request $request)
@@ -523,7 +510,7 @@ class TimetableController extends Controller
             'slot_id' => 'required',
             'timetable_group_id' => 'required'
         ]);
-
+        DB::beginTransaction();
         try {
             $timetableGroupSlot = TimetableGroupSlot::where([
                 'slot_id' => $request->slot_id,
@@ -531,126 +518,21 @@ class TimetableController extends Controller
             ])->first();
 
             if ($timetableGroupSlot instanceof TimetableGroupSlot) {
+
+                $timetableSlotIds = TimetableSlot::where([
+                    'slot_id' => $request->slot_id
+                ])->pluck('id');
+
+                TimetableGroupSession::whereIn('timetable_slot_id', $timetableSlotIds)
+                    ->where('timetable_group_id', $request->timetable_group_id)
+                    ->delete();
                 $timetableGroupSlot->delete();
+                DB::commit();
                 return message_success([]);
             }
             return message_error('Could not delete group!');
         } catch (\Exception $exception) {
-            return message_error($exception->getMessage());
-        }
-    }
-
-
-    public function assignGroupToTimetableSlot(Request $request)
-    {
-        DB::beginTransaction();
-        $this->validate($request, [
-            'timetable_slot_id' => 'required',
-            'timetable_group_id' => 'required'
-        ]);
-
-        try {
-            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
-
-            if ($timetableSlot instanceof TimetableSlot) {
-                $slot = Slot::find($timetableSlot->slot_id);
-
-                $timetableGroupSession = TimetableGroupSession::where([
-                    'timetable_slot_id' => $request->timetable_slot_id,
-                    'timetable_group_id' => $request->timetable_group_id
-                ])->first();
-
-                if (is_null($timetableGroupSession)) {
-                    $timetableGroupSession = TimetableGroupSession::create([
-                        'timetable_slot_id' => $request->timetable_slot_id,
-                        'timetable_group_id' => $request->timetable_group_id
-                    ]);
-                }
-
-                $timetableGroupSlot = TimetableGroupSlot::where([
-                    'slot_id' => $slot->id,
-                    'timetable_group_id' => $request->timetable_group_id
-                ])->first();
-
-                if (is_null($timetableGroupSlot)) {
-                    TimetableGroupSlot::create([
-                        'slot_id' => $slot->id,
-                        'timetable_group_id' => $request->timetable_group_id,
-                        'total_hours' => $slot->total_hours,
-                        'total_hours_remain' => ($slot->total_hours - $timetableSlot->durations)  // eliminate hours by default session durations
-                    ]);
-                }
-                DB::commit();
-                return message_success($timetableGroupSession);
-            }
-            return message_error('The timetable slot could not found!');
-        } catch (\Exception $exception) {
             DB::rollback();
-            return message_error($exception->getMessage());
-        }
-    }
-
-
-    public function removeGroupFromTimetableSlot(Request $request)
-    {
-        $this->validate($request, [
-            'timetable_slot_id' => 'required',
-            'timetable_group_id' => 'required'
-        ]);
-
-        DB::beginTransaction();
-        try {
-            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
-            $durations = $timetableSlot->durations;
-            if ($timetableSlot instanceof TimetableSlot) {
-                $slot = Slot::find($timetableSlot->slot_id);
-                if ($slot instanceof Slot) {
-                    $timetableGroupSession = TimetableGroupSession::where([
-                        'timetable_slot_id' => $request->timetable_slot_id,
-                        'timetable_group_id' => $request->timetable_group_id
-                    ])->first();
-
-                    if ($timetableGroupSession instanceof TimetableGroupSession) {
-                        $timetableGroupSession->delete();
-                    }
-
-                    // update timetable group slot
-                    $timetableGroupSlot = TimetableGroupSlot::where([
-                        'slot_id' => $slot->id,
-                        'timetable_group_id' => $request->timetable_group_id
-                    ])->first();
-
-                    if ($timetableGroupSlot instanceof TimetableGroupSlot) {
-                        $timetableGroupSlot->total_hours_remain += $durations;
-                        $timetableGroupSlot->update();
-                    }
-                    DB::commit();
-                    return message_success([]);
-                }
-            }
-            return message_error('Could not delete group!');
-        } catch (\Exception $exception) {
-            DB::rollback();
-            return message_error($exception->getMessage());
-        }
-    }
-
-    public function getTimetableGroup()
-    {
-        return message_success(TimetableGroup::with('parent')->get());
-    }
-
-
-    public function getRooms ()
-    {
-        try {
-            $rooms = Room::join('buildings', 'buildings.id', '=', 'rooms.building_id')
-                ->select([
-                    DB::raw("CONCAT(buildings.code, '-', rooms.name) as code"),
-                    'rooms.id as id'
-                ])->get();
-            return message_success($rooms);
-        } catch (\Exception $exception) {
             return message_error($exception->getMessage());
         }
     }

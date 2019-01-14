@@ -31,7 +31,8 @@ class CertificateReference extends Model
      * @var array
      */
     protected $casts = [
-        "ref_number" => "string"
+        "ref_number" => "string",
+        "level" => "string"
     ];
 
 	public static $rules = [
