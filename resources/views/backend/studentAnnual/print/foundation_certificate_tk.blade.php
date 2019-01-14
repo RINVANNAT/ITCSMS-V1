@@ -206,13 +206,13 @@
                     <div class="col-md-6 col-xs-6">
                         <div class="khmer_section" style="padding: 10mm 10mm 10mm 5mm">
                             <p class="text-center h2_khmer_title"><strong>នាយក</strong></p>
-                            <p class="tran-header text-center">បញ្ជាក់ថា​ :</p>
+                            <p class="tran-header text-center">បញ្ជាក់ថា​ ៖</p>
                             <div class="row" style="margin-top: 10mm">
                                 <div class="col-md-6">
-                                    <p class="left">និស្សិតឈ្មោះ: <strong>{{$student['name_kh']}}</strong></p>
+                                    <p class="left">និស្សិតឈ្មោះ៖ <strong>{{$student['name_kh']}}</strong></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="right" style="margin-right: 7px">ភេទ: {{to_khmer_gender($student['gender'])}}</p>
+                                    <p class="right" style="margin-right: 7px">ភេទ៖ {{to_khmer_gender($student['gender'])}}</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -224,7 +224,7 @@
                                     $dob_d = $dob->day;
                                     ?>
                                     <p class="left">
-                                        ថ្ងៃខែឆ្នាំកំណើត: {{to_khmer_number($dob_d)}} {{to_khmer_month($dob_m)}} {{to_khmer_number($dob_y)}}</p>
+                                        ថ្ងៃខែឆ្នាំកំណើត៖ {{to_khmer_number($dob_d)}} {{to_khmer_month($dob_m)}} {{to_khmer_number($dob_y)}}</p>
                                 </div>
                             </div>
                             <div class="row">
