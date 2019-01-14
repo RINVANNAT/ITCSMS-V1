@@ -16,6 +16,9 @@
             /*default: 50px;*/
             margin-top: 30px !important;
         }
+        .oriented {
+            height: 30px;
+        }
     </style>
 @endsection
 
@@ -87,7 +90,7 @@
                                         @endif
                                     @endif
                                 @endforeach
-                                <tr valign="bottom" style="height: 30px">
+                                <tr class="oriented" valign="bottom">
                                     <th>មុខវិជ្ជាតម្រង់ទិស</th>
                                     <th class="english_section" colspan="3">Oriented Subjects</th>
                                 </tr>
@@ -149,7 +152,7 @@
                                             </tr>
                                         </table>
                                     </div>
-                                    <div class="remark">
+                                    <div class="remark" style="margin-top: 7px">
                                         <span class="smallest_text"><b>*</b> <span>វិញ្ញាបនបត្រនេះមិនចេញជូនជាលើកទី២ទេ។</span></span>
                                     </div>
                                 </div>
@@ -201,7 +204,7 @@
             <div class="page">
                 <div class="row">
                     <div class="col-md-6 col-xs-6">
-                        <div class="border khmer_section">
+                        <div class="khmer_section" style="padding: 10mm 10mm 10mm 5mm">
                             <p class="text-center h2_khmer_title"><strong>នាយក</strong></p>
                             <p class="tran-header text-center">បញ្ជាក់ថា​ :</p>
                             <div class="row" style="margin-top: 10mm">
@@ -209,7 +212,7 @@
                                     <p class="left">និស្សិតឈ្មោះ: <strong>{{$student['name_kh']}}</strong></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="right">ភេទ: {{to_khmer_gender($student['gender'])}}</p>
+                                    <p class="right" style="margin-right: 7px">ភេទ: {{to_khmer_gender($student['gender'])}}</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -234,7 +237,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="tran-last-content line-height sub-content-margin-top-kh">
+                                    <p class="line-height sub-content-margin-top-kh" style="margin-top: 45px !important;">
                                         វិញ្ញាបនបត្រនេះ ប្រគល់ជូនសាមីជនដើម្បីយកទៅប្រើប្រាស់តាមការដែលអាចប្រើបាន។
                                     </p>
                                 </div>
@@ -249,7 +252,7 @@
                                     @endif
                                 </div>
                                 <div class="col-md-8 col-xs-8">
-                                    <div align="center" style="margin-top: 5mm">
+                                    <div align="center" style="margin-top: 7mm">
                                         <p>
                                             <?php
                                             $d = \Carbon\Carbon::createFromFormat("d/m/Y", $issued_date);
@@ -291,7 +294,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="line-height tran-content">
+                                    <p class="line-height" style="margin-top: 25px">
                                         has successfully completed Foundation Year Course at Institute of Technology of
                                         Cambodia (Tbong Khmum Branch) in
                                         academic year {{$student['academic_year_latin']}}
@@ -300,7 +303,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="line-height tran-last-content sub-content-margin-top-en">
+                                    <p class="line-height tran-last-content" style="margin-top: 5px">
                                         This certificate is presented to the bearer with all rights and privileges
                                         thereto
                                         pertaining.
