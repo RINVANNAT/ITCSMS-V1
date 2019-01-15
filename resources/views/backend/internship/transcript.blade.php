@@ -49,6 +49,9 @@
             p.list-student-item {
                 line-height: 0.8;
             }
+            .break-line {
+                margin-top: 4px;
+            }
         </style>
     </head>
 

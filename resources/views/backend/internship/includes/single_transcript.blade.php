@@ -77,7 +77,7 @@
 
     <div class="row text-justify">
         <div class="col-md-12">
-            <p>
+            <p class="break-line">
                 The internship period will take place from {{ (new \Carbon\Carbon($internship->start))->format('F d') }} to {{ (new \Carbon\Carbon($internship->end))->format('F d, Y') }} and would need to be scheduled by both your company and ITC.
             </p>
 
