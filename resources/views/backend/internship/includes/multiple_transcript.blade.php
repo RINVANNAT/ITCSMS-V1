@@ -61,7 +61,7 @@
         </div>
         <div class="student-list">
             @foreach($internship->students as $student)
-                <p>
+                <p class="list-student-item">
                     <strong>
                         @if($student->gender->code == 'M')
                             Mr.
