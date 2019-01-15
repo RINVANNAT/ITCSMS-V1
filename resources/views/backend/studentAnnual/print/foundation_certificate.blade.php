@@ -10,7 +10,8 @@
         }
         .sub-content-margin-top-en {
             /*default: 50px;*/
-            margin-top: 15px !important;
+            margin-top: 29px !important;
+            line-height: 1.5 !important;
         }
         .sub-content-margin-top-kh {
             /*default: 50px;*/
@@ -206,13 +207,13 @@
                     <div class="col-md-6 col-xs-6">
                         <div class="khmer_section" style="padding: 10mm 10mm 10mm 5mm">
                             <p class="text-center h2_khmer_title"><strong>នាយក</strong></p>
-                            <p class="tran-header text-center">បញ្ជាក់ថា​ :</p>
+                            <p class="tran-header text-center">បញ្ជាក់ថា​ ៖</p>
                             <div class="row" style="margin-top: 10mm">
                                 <div class="col-md-6">
-                                    <p class="left">និស្សិតឈ្មោះ: <strong>{{$student['name_kh']}}</strong></p>
+                                    <p class="left">និស្សិតឈ្មោះ៖ <strong>{{$student['name_kh']}}</strong></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="right" style="margin-right: 7px">ភេទ: {{to_khmer_gender($student['gender'])}}</p>
+                                    <p class="right" style="margin-right: 7px">ភេទ៖ {{to_khmer_gender($student['gender'])}}</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -224,7 +225,7 @@
                                     $dob_d = $dob->day;
                                     ?>
                                     <p class="left">
-                                        ថ្ងៃខែឆ្នាំកំណើត: {{to_khmer_number($dob_d)}} {{to_khmer_month($dob_m)}} {{to_khmer_number($dob_y)}}</p>
+                                        ថ្ងៃខែឆ្នាំកំណើត៖ {{to_khmer_number($dob_d)}} {{to_khmer_month($dob_m)}} {{to_khmer_number($dob_y)}}</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -252,7 +253,7 @@
                                     @endif
                                 </div>
                                 <div class="col-md-8 col-xs-8">
-                                    <div align="center" style="margin-top: 5mm">
+                                    <div align="center" style="margin-top: 6mm">
                                         <p>
                                             <?php
                                             $d = \Carbon\Carbon::createFromFormat("d/m/Y", $issued_date);
@@ -278,7 +279,7 @@
                         <div class="border margin-left-5 english_section">
                             <p align="center"><strong>DIRECTOR</strong></p>
                             <p class="tran-header text-center">Certifies that</p>
-                            <div class="row" style="margin-top: 10mm">
+                            <div class="row" style="margin-top: 8mm">
                                 <div class="col-md-8">
                                     <p class="left">Name: <strong>{{strtoupper($student['name_latin'])}}</strong></p>
                                 </div>
@@ -288,13 +289,13 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p class="left">Born
+                                    <p class="left" style="margin-top: -5px">Born
                                         on {{\Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student['dob'])->formatLocalized('%d %B %Y')}}</p>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="line-height tran-content">
+                                    <p class="line-height" style="margin-top: 29px; line-height: 1.5">
                                         has successfully completed Foundation Year Course at Institute of Technology of
                                         Cambodia in
                                         academic year {{$student['academic_year_latin']}}
@@ -313,10 +314,10 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div align="center">
-                                        <p>Issued at Phnom
-                                            Penh, {{\Carbon\Carbon::createFromFormat("d/m/Y",$issued_date)->formatLocalized('%d %B %Y')}}</p>
-                                        <p>For Director General of ITC</p>
-                                        <p>Deputy Director</p>
+                                        <div>Issued at Phnom
+                                            Penh, {{\Carbon\Carbon::createFromFormat("d/m/Y",$issued_date)->formatLocalized('%d %B %Y')}}</div>
+                                        <div style="margin-top: 1mm">For Director General of ITC</div>
+                                        <div style="margin-top: 1mm">Deputy Director</div>
                                     </div>
                                 </div>
                             </div>

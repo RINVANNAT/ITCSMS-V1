@@ -438,13 +438,13 @@ if (!function_exists('to_khmer_month')) {
             case "1":
                 return "មករា";
             case "2":
-                return "កុម្ភះ";
+                return "កុម្ភៈ";
             case "3":
-                return "មិនា";
+                return "មីនា";
             case "4":
                 return "មេសា";
             case "5":
-                return "ឪសភា";
+                return "ឧសភា";
             case "6":
                 return "មិថុនា";
             case "7":
