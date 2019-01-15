@@ -79,6 +79,7 @@ body {
 /*slide2*/
 .tran-content{
     margin-top: 30px;
+    font-family: khmer_niroth !important;
 }
 .tran-last-content{
     margin-top: 50px;

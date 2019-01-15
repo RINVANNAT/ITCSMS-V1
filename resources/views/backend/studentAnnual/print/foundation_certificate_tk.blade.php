@@ -47,7 +47,7 @@
             <div class="page">
                 <div class="row">
                     <div class="col-md-6 col-xs-6">
-                        <div class="border margin-right-5" align="center">
+                        <div class="border margin-right-5" align="center" style="padding: 10mm 10mm 10mm 3mm">
                             <h4 class="h2_khmer_title">ព្រឹត្តិបត្រពិន្ទុ</h4>
                             <h3 class="text-bold english_section" style="font-size: 20px">Academic Transcript</h3>
                             <div class="row">
@@ -70,7 +70,7 @@
                                 <tbody>
                                 @foreach($scores[$student['id']] as $key => $score)
                                     @if(is_numeric($key))
-                                        @if(strtolower($score['name_en']) != "technical drawing" && strtolower($score['name_en']) != "computer for engineering" && strtolower($score['name_en']) != "informatic" && strtolower($score['name_fr'] != 'informatique'))
+                                        @if((strtolower($score['name_en']) != "technical drawing") && (strtolower($score['name_en']) != "computer for engineering") && (strtolower($score['name_en']) != "informatic") && (strtolower($score['name_fr']) != "informatique"))
                                             <tr>
                                                 <td style="text-align: left;width: 35%">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
                                                 <td class="english_section"
@@ -204,7 +204,7 @@
             <div class="page">
                 <div class="row">
                     <div class="col-md-6 col-xs-6">
-                        <div class="khmer_section" style="padding: 10mm 10mm 10mm 5mm">
+                        <div class="khmer_section" style="padding: 10mm 10mm 10mm 3mm">
                             <p class="text-center h2_khmer_title"><strong>នាយក</strong></p>
                             <p class="tran-header text-center">បញ្ជាក់ថា​ ៖</p>
                             <div class="row" style="margin-top: 10mm">
@@ -212,7 +212,7 @@
                                     <p class="left">និស្សិតឈ្មោះ៖ <strong>{{$student['name_kh']}}</strong></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="right" style="margin-right: 7px">ភេទ៖ {{to_khmer_gender($student['gender'])}}</p>
+                                    <p class="right" style="margin-right: 9px">ភេទ៖ {{to_khmer_gender($student['gender'])}}</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -229,7 +229,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="tran-content line-height">
+                                    <p class="tran-content line-height" style="font-family: khmeros !important;">
                                         បានបញ្ចប់ថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋានដោយជោគជ័យនៅ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា (សាខាត្បូងឃ្មុំ)
                                         ក្នុងឆ្នាំសិក្សា {{$student['academic_year_kh']}}។
                                     </p>
@@ -264,7 +264,7 @@
                                             ខែ{{to_khmer_month($issue_m)}} ឆ្នាំ{{to_khmer_number($issue_y)}}
                                         </p>
                                         <p style="font-family: 'khmer_m2' !important;">
-                                            ជ. នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
+                                            ជ.នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
                                         </p>
                                         <p style="font-family: 'khmer_m2' !important;">
                                             នាយករង
