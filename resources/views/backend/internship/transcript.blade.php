@@ -19,7 +19,7 @@
                 margin: 0 auto;
                 border: 0 !important;
                 padding: 4.4cm 1.2cm 1.9cm 1.4cm;
-                border-radius: 0px !important;
+                student-listborder-radius: 0px !important;
                 background: white;
                 box-shadow: none !important;
                 position: relative;
@@ -34,6 +34,9 @@
                 display: inline-block;
                 vertical-align: top;
                 padding-left: 15px;
+            }
+            .student-list {
+                margin-top: 4px;
             }
             .contact_detail p {
                 line-height: 0.8em;
