@@ -288,13 +288,13 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p class="left">Born
+                                    <p class="left" style="margin-top: -2mm">Born
                                         on {{\Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student['dob'])->formatLocalized('%d %B %Y')}}</p>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="line-height" style="margin-top: 25px">
+                                    <p class="line-height" style="margin-top: 25px; line-height: 1.5 !important;">
                                         has successfully completed Foundation Year Course at Institute of Technology of
                                         Cambodia (Tbong Khmum Branch) in
                                         academic year {{$student['academic_year_latin']}}
@@ -303,7 +303,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="line-height tran-last-content" style="margin-top: 5px">
+                                    <p class="line-height tran-last-content" style="margin-top: 19px; line-height: 1.5 !important;">
                                         This certificate is presented to the bearer with all rights and privileges
                                         thereto
                                         pertaining.
@@ -313,10 +313,10 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div align="center">
-                                        <p>Issued at Phnom
-                                            Penh, {{\Carbon\Carbon::createFromFormat("d/m/Y",$issued_date)->formatLocalized('%d %B %Y')}}</p>
-                                        <p>For Director General of ITC</p>
-                                        <p>Deputy Director</p>
+                                        <div>Issued at Phnom
+                                            Penh, {{\Carbon\Carbon::createFromFormat("d/m/Y",$issued_date)->formatLocalized('%d %B %Y')}}</div>
+                                        <div style="margin-top: 1mm">For Director General of ITC</div>
+                                        <div style="margin-top: 1mm">Deputy Director</div>
                                     </div>
                                 </div>
                             </div>
