@@ -18,8 +18,8 @@
                 height: 297mm;
                 margin: 0 auto;
                 border: 0 !important;
-                padding: 3.4cm 1.2cm 1.9cm 1.4cm;
-                border-radius: 0px !important;
+                padding: 4.4cm 1.2cm 1.9cm 1.4cm;
+                student-listborder-radius: 0px !important;
                 background: white;
                 box-shadow: none !important;
                 position: relative;
@@ -35,12 +35,22 @@
                 vertical-align: top;
                 padding-left: 15px;
             }
+            .student-list {
+                margin-top: 4px;
+            }
             .contact_detail p {
                 line-height: 0.8em;
             }
             p, span{
                 font-family: times_new_roman_normal !important;
                 font-size: 18px !important;
+                line-height: 1.2;
+            }
+            p.list-student-item {
+                line-height: 0.8;
+            }
+            .break-line {
+                margin-top: 4px;
             }
         </style>
     </head>
