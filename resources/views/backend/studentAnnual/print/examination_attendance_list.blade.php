@@ -4,13 +4,13 @@
 @stop
 @section("after-styles-end")
     <style>
-
         .sign-title {
             margin-bottom: 10px;
             margin-top: 10px;
         }
         .title-size {
             font-size: 16px;
+            font-family: times_new_roman_normal !important;
         }
         .title {
             font-family: khmeros;
@@ -41,11 +41,11 @@
                             <span class="title-size">Institut de Technologie du Cambodge</span>
                         </div>
                         <div class="col-md-12">
-                            <span class="title-size">Departement : {{$department->name_fr}}</span>
+                            <span class="title-size" style="font-family: times_new_roman_normal !important;">Departement: {{$department->name_fr}}</span>
                         </div>
                     </div>
                     <div class="sign-title" align="center">
-                        <span class="title"><strong>សម្រង់វត្តមាននិស្សិតប្រលងបញ្ចប់ឆមាសទី {{to_khmer_number($semester)}}</strong></span>
+                        <span class="title" style="font-family: khmer_moul !important;">សម្រង់វត្តមាននិស្សិតប្រលងបញ្ចប់ឆមាសទី {{to_khmer_number($semester)}}</span>
                     </div>
 
                     <div class="sign-content">
@@ -106,7 +106,7 @@
                         <div class="col-xs-8"></div>
                         <div class="col-xs-4" align="center">
                             <div class="row">
-                                Phnom Penh, le .................... 2018
+                                Phnom Penh, le .................... {{$academic_year->id}}
                             </div>
                             <div class="row">
                                 Le Directeur Adjoint

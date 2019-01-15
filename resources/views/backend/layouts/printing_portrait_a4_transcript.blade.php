@@ -21,8 +21,8 @@
     {!! Html::style(elixir('css/student_transcript.css'), array('media' => 'print, screen')) !!}
     <style>
         @font-face {
-            font-family: times_new_roman_normal;
-            src: url("{{url('fonts/Times_New_Roman_Normal.ttf')}}");
+            font-family: khmer_moul;
+            src: url("{{url('assets/fonts/KhmerOS_muollight.ttf')}}");
         }
 
         h4, h3, h2, h1 {
@@ -69,7 +69,7 @@
         @media print {
             .page {
                 width: 210mm;
-                height: 297mm;
+                height: 99%;
                 padding-top: 13mm;
                 padding-left: 12mm;
                 padding-right: 18mm;
@@ -78,6 +78,7 @@
                 position: relative;
                 page-break-after: always;
                 page-break-before: always;
+                page-break: after;
             }
         }
          .custom-break-line {

@@ -72,10 +72,10 @@
             src: url("{{ asset('assets/fonts/KhmerOSniroth.ttf') }}");
         }
     </style>
+    {!! Html::style(elixir('css/foundation_certificate.css')) !!}
     <!-- Styles -->
     @yield('before-styles-end')
     {!! Html::style(elixir('css/backend.css')) !!}
-    {!! Html::style(elixir('css/foundation_certificate.css'), array('media' => 'print, screen')) !!}
     {{--<link rel="stylesheet" media="print, screen" href="{{ url('css/backend/printing_portrait_a4_transcript.css') }}">--}}
     <style>
 
