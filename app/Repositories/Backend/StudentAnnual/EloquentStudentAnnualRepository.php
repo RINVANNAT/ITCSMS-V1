@@ -451,8 +451,10 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
                             ->where('semester_id',1)
                             ->whereNull('department_id')
                             ->first();
-                        $group_student->group_id = $group->id;
-                        $group_student->update();
+                        if ($group_student instanceof GroupStudentAnnual) {
+                            $group_student->group_id = $group->id;
+                            $group_student->update();
+                        }
                     }
                 }
 
