@@ -204,7 +204,7 @@
             <div class="page">
                 <div class="row">
                     <div class="col-md-6 col-xs-6">
-                        <div class="khmer_section" style="padding: 10mm 10mm 10mm 3mm">
+                        <div class="khmer_section" style="padding: 10mm 10mm 10mm 3mm; font-family: khmer_s1 !important">
                             <p class="text-center h2_khmer_title"><strong>នាយក</strong></p>
                             <p class="tran-header text-center">បញ្ជាក់ថា​ ៖</p>
                             <div class="row" style="margin-top: 10mm">
@@ -229,7 +229,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="tran-content line-height" style="font-family: khmeros !important;">
+                                    <p class="tran-content line-height">
                                         បានបញ្ចប់ថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋានដោយជោគជ័យនៅ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា (សាខាត្បូងឃ្មុំ)
                                         ក្នុងឆ្នាំសិក្សា {{$student['academic_year_kh']}}។
                                     </p>

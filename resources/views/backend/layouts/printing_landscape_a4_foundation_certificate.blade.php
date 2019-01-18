@@ -58,6 +58,11 @@
         }
 
         @font-face {
+            font-family: khmer_s1;
+            src: url("{{url('assets/fonts/khmer s1.volt.ttf')}}");
+        }
+
+        @font-face {
             font-family: khmer_m1;
             src: url("{{ asset('assets/fonts/khmer M1.volt.ttf') }}");
         }
