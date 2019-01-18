@@ -22,6 +22,7 @@ use App\Models\StudentBac2;
 use App\Repositories\Backend\Candidate\CandidateRepositoryContract;
 use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -487,10 +488,19 @@ class CandidateController extends Controller
     public function register_candidate_department(\Illuminate\Http\Request $request)
     {
         $exam_id = $request->get('exam_id');
-        $exam = Exam::where('id', $exam_id)->first();
-        $departments = Department::where('parent_id', 11)->where('is_specialist', true)->orderBy('order')->get();
-
-        return view('backend.candidate.choose_department', compact('exam', 'departments'));
+        $exam = Exam::find($exam_id);
+        if ($exam instanceof Exam) {
+            $departments = Department::where('parent_id', 11)
+                ->where('is_specialist', true)
+                ->orderBy('order')
+                ->get();
+            $exams = Exam::where('name', 'ilike', "%Entrance%")
+                ->where('id', '!=', $exam->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+            return view('backend.candidate.choose_department', compact('exam', 'departments', 'exams'));
+        }
+        abort(404);
     }
 
     public function search_candidate(Request $request)
@@ -500,54 +510,81 @@ class CandidateController extends Controller
 
     public function store_candidate_department(\Illuminate\Http\Request $request)
     {
-        $candidate = Candidate::where('register_id', '=', $request->get("candidate_register_id"))->where("candidates.exam_id", "=", $request->get('exam_id'))->first();
-        // Validate candidate
-        if (!$candidate) {
-            return json_encode(array('success' => false, "message" => "This candidate register id is  invalid"));
-        }
-        // then find if this candidate already register
-        $candidate_departments = DB::table('candidate_department')
-            ->where("candidate_department.candidate_id", "=", $candidate->id)
-            ->first();
-        if ($candidate_departments) {
-            // this one already register, send error back
-            return json_encode(array('success' => false, "message" => "This candidate is already registered"));
-        } else {
-            $choices = $request->get("choice_department");
-            DB::beginTransaction();
-            foreach ($choices as $priority => $department_id) {
-                if ($priority == "" || $priority < 1 || $priority == null) {
-                    DB::rollback();
-                    return json_encode(array('success' => false, "message" => "Candidate priority is invalid"));
-                } else {
-                    if ($department_id == 1) {
-                        $department_id = 1;
-                    } else if ($department_id == 2) {
-                        $department_id = 2;
-                    } else if ($department_id == 3) {
-                        $department_id = 17;
-                    } else if ($department_id == 4) {
-                        $department_id = 3;
-                    } else if ($department_id == 5) {
-                        $department_id = 16;
-                    } else if ($department_id == 6) {
-                        $department_id = 4;
-                    } else if ($department_id == 7) {
-                        $department_id = 5;
-                    } else if ($department_id == 8) {
-                        $department_id = 7;
-                    } else if ($department_id == 9) {
-                        $department_id = 6;
+        $this->validate($request, [
+            'from_previous_year' => 'required'
+        ]);
+        try {
+            if ($request->from_previous_year == 'none') {
+                $candidate = Candidate::where('register_id', '=', $request->get("candidate_register_id"))->where("candidates.exam_id", "=", $request->get('exam_id'))->first();
+            } else {
+                $candidate = Candidate::where([
+                    'register_id' => $request->candidate_register_id,
+                    'exam_id' => $request->from_previous_year,
+                ])->first();
+
+                if ($candidate instanceof Candidate) {
+                    $foundCandidate = Candidate::where([
+                        'register_id' => $request->candidate_register_id,
+                        'from_previous_year' => $request->from_previous_year
+                    ])->first();
+                    if (!($foundCandidate instanceof Candidate)) {
+                        $candidate = $candidate->replicate();
+                        $candidate->exam_id = $request->exam_id;
+                        $candidate->from_previous_year = $request->from_previous_year;
+                        $candidate->save();
                     }
-                    CandidateDepartment::create([
-                        "candidate_id" => $candidate->id,
-                        "department_id" => $department_id,
-                        "rank" => $priority
-                    ]);
                 }
             }
-            DB::commit();
-            return json_encode(array('success' => true, "message" => "Candidate's department is registered"));
+            // Validate candidate
+            if (!($candidate instanceof Candidate)) {
+                return message_error("This candidate register id is invalid");
+            }
+            // then find if this candidate already register
+            $candidate_departments = DB::table('candidate_department')
+                ->where("candidate_department.candidate_id", "=", $candidate->id)
+                ->first();
+            if ($candidate_departments) {
+                // this one already register, send error back
+                return message_error("This candidate is already registered");
+            } else {
+                $choices = $request->get("choice_department");
+                DB::beginTransaction();
+                foreach ($choices as $priority => $department_id) {
+                    if ($priority == "" || $priority < 1 || $priority == null) {
+                        DB::rollback();
+                        return message_error("Candidate priority is invalid");
+                    } else {
+                        if ($department_id == 1) {
+                            $department_id = 1;
+                        } else if ($department_id == 2) {
+                            $department_id = 2;
+                        } else if ($department_id == 3) {
+                            $department_id = 17;
+                        } else if ($department_id == 4) {
+                            $department_id = 3;
+                        } else if ($department_id == 5) {
+                            $department_id = 16;
+                        } else if ($department_id == 6) {
+                            $department_id = 4;
+                        } else if ($department_id == 7) {
+                            $department_id = 5;
+                        } else if ($department_id == 8) {
+                            $department_id = 7;
+                        } else if ($department_id == 9) {
+                            $department_id = 6;
+                        }
+                        CandidateDepartment::create([
+                            "candidate_id" => $candidate->id,
+                            "department_id" => $department_id,
+                            "rank" => $priority
+                        ]);
+                    }
+                }
+                DB::commit();
+                return message_success(["Candidate's department is registered"]);
+            }
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
         }
     }
 
@@ -790,5 +827,4 @@ class CandidateController extends Controller
             });
         })->export('xlsx');
     }
-
 }
