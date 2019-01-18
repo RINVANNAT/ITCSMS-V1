@@ -204,7 +204,7 @@
             <div class="page">
                 <div class="row">
                     <div class="col-md-6 col-xs-6">
-                        <div class="khmer_section" style="padding: 10mm 10mm 10mm 3mm; font-family: khmer_s1 !important">
+                        <div class="khmer_section" style="padding: 10mm 10mm 10mm 3mm; font-family: khmer_s1 !important; font-size: 13.5px">
                             <p class="text-center h2_khmer_title"><strong>នាយក</strong></p>
                             <p class="tran-header text-center">បញ្ជាក់ថា​ ៖</p>
                             <div class="row" style="margin-top: 10mm">
@@ -229,7 +229,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="tran-content line-height">
+                                    <p class="tran-content line-height" style="margin-top: 24px !important;">
                                         បានបញ្ចប់ថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋានដោយជោគជ័យនៅ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា (សាខាត្បូងឃ្មុំ)
                                         ក្នុងឆ្នាំសិក្សា {{$student['academic_year_kh']}}។
                                     </p>
@@ -237,7 +237,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="line-height sub-content-margin-top-kh" style="margin-top: 45px !important;">
+                                    <p class="line-height sub-content-margin-top-kh" style="margin-top: 42px !important;">
                                         វិញ្ញាបនបត្រនេះ ប្រគល់ជូនសាមីជនដើម្បីយកទៅប្រើប្រាស់តាមការដែលអាចប្រើបាន។
                                     </p>
                                 </div>
@@ -253,7 +253,7 @@
                                 </div>
                                 <div class="col-md-8 col-xs-8">
                                     <div align="center" style="margin-top: 7mm">
-                                        <p>
+                                        <div>
                                             <?php
                                             $d = \Carbon\Carbon::createFromFormat("d/m/Y", $issued_date);
                                             $issue_d = $d->day;
@@ -262,13 +262,13 @@
                                             ?>
                                             រាជធានីភ្នំពេញ ថ្ងៃទី{{to_khmer_number($issue_d)}}
                                             ខែ{{to_khmer_month($issue_m)}} ឆ្នាំ{{to_khmer_number($issue_y)}}
-                                        </p>
-                                        <p style="font-family: 'khmer_m2' !important;">
+                                        </div>
+                                        <div style="font-family: 'khmer_m2' !important; margin-top: 5px">
                                             ជ.នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
-                                        </p>
-                                        <p style="font-family: 'khmer_m2' !important;">
+                                        </div>
+                                        <div style="font-family: 'khmer_m2' !important; margin-top: 6px">
                                             នាយករង
-                                        </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -313,7 +313,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div align="center">
-                                        <div>Issued at Phnom
+                                        <div style="margin-top: 4px">Issued at Phnom
                                             Penh, {{\Carbon\Carbon::createFromFormat("d/m/Y",$issued_date)->formatLocalized('%d %B %Y')}}</div>
                                         <div style="margin-top: 1mm">For Director General of ITC</div>
                                         <div style="margin-top: 1mm">Deputy Director</div>
