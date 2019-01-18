@@ -445,14 +445,15 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
                     $studentAnnual->scholarships()->sync($input['scholarship_ids']);
                 }
                 if(isset($input['group_id'])){
-                    // Problem with semester
-                    // dd(Group::find($input['group_id']));
-                    $group_student = GroupStudentAnnual::where('student_annual_id',$studentAnnual->id)
-                                            ->where('semester_id',1)
-                                            ->whereNull('department_id')
-                                            ->first();
-                    $group_student->group_id = $input['group_id'];
-                    $group_student->update();
+                    $group = Group::find($input['group_id']);
+                    if ($group instanceof Group) {
+                        $group_student = GroupStudentAnnual::where('student_annual_id',$studentAnnual->id)
+                            ->where('semester_id',1)
+                            ->whereNull('department_id')
+                            ->first();
+                        $group_student->group_id = $group->id;
+                        $group_student->update();
+                    }
                 }
 
 
