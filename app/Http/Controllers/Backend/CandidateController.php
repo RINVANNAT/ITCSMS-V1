@@ -609,8 +609,10 @@ class CandidateController extends Controller
             ->select([
                 'candidate_department.*', 'departments.code as department_code',
                 'candidates.register_id', 'candidates.name_kh', 'candidates.name_latin',
-                'dob', 'result'
-            ])->get();
+                'dob', 'result', 'candidates.created_at'
+            ])
+            ->orderBy('candidates.created_at', 'desc')
+            ->get();
 
         $candidates_by_register_id = collect($candidates)->sortByDesc('created_at')->groupBy('register_id');
         $datatable = [];
