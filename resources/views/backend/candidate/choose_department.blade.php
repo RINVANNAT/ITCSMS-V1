@@ -36,7 +36,7 @@
                                     @if(isset($exams) && count($exams) > 0)
                                         <div class="col-md-12">
                                             <select class="form-control" name="from_previous_year">
-                                                <option value="none" selected>None</option>
+                                                <option value="none" selected>Current Exam</option>
                                                 @foreach($exams as $item)
                                                     <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                 @endforeach

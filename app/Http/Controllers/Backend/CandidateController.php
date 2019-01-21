@@ -517,22 +517,32 @@ class CandidateController extends Controller
             if ($request->from_previous_year == 'none') {
                 $candidate = Candidate::where('register_id', '=', $request->get("candidate_register_id"))->where("candidates.exam_id", "=", $request->get('exam_id'))->first();
             } else {
-                $candidate = Candidate::where([
-                    'register_id' => $request->candidate_register_id,
-                    'exam_id' => $request->from_previous_year,
-                ])->first();
-
-                if ($candidate instanceof Candidate) {
-                    $foundCandidate = Candidate::where([
+                // start modify register_id
+                $exam = Exam::find($request->from_previous_year);
+                $newCandidateRegisterId = (int)((string)$exam->academic_year_id . (string)sprintf("%04d", $request->candidate_register_id));
+                if ($exam instanceof Exam) {
+                    // find previous year candidate first.
+                    $candidate = Candidate::where([
                         'register_id' => $request->candidate_register_id,
-                        'from_previous_year' => $request->from_previous_year
+                        'exam_id' => $request->from_previous_year,
                     ])->first();
-                    if (!($foundCandidate instanceof Candidate)) {
-                        $candidate = $candidate->replicate();
-                        $candidate->exam_id = $request->exam_id;
-                        $candidate->from_previous_year = $request->from_previous_year;
-                        $candidate->save();
+                    if ($candidate instanceof Candidate) {
+                        $foundCandidate = Candidate::where([
+                            'register_id' => $newCandidateRegisterId,
+                            'from_previous_year' => $request->from_previous_year
+                        ])->first();
+                        if (!($foundCandidate instanceof Candidate)) {
+                            $candidate = $candidate->replicate();
+                            $candidate->register_id = $newCandidateRegisterId;
+                            $candidate->exam_id = $request->exam_id;
+                            $candidate->from_previous_year = $request->from_previous_year;
+                            $candidate->save();
+                        } else {
+                            message_success('Candidate already existed!');
+                        }
                     }
+                } else {
+                    return message_error('Could not found exam');
                 }
             }
             // Validate candidate
