@@ -4,15 +4,6 @@
 @stop
 @section("after-styles-end")
     <style>
-        @font-face {
-            font-family: khmer_m1;
-            src: url("{{url('assets/fonts/Khmer_m1.volt.ttf')}}");
-        }
-
-        @font-face {
-            font-family: khmer_s1;
-            src: url("{{url('assets/fonts/Khmer s1.volt.ttf')}}");
-        }
         .sign-title {
             margin-bottom: 10px;
             margin-top: 10px;
