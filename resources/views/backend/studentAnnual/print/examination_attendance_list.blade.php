@@ -6,7 +6,7 @@
     <style>
         @font-face {
             font-family: khmer_m1;
-            src: url("{{url('assets/fonts/Khmer M1.volt.ttf')}}");
+            src: url("{{url('assets/fonts/Khmer_m1.volt.ttf')}}");
         }
 
         @font-face {
