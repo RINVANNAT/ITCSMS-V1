@@ -4,6 +4,15 @@
 @stop
 @section("after-styles-end")
     <style>
+        @font-face {
+            font-family: khmer_m1;
+            src: url("{{url('assets/fonts/Khmer M1.volt.ttf')}}");
+        }
+
+        @font-face {
+            font-family: khmer_s1;
+            src: url("{{url('assets/fonts/Khmer s1.volt.ttf')}}");
+        }
         .sign-title {
             margin-bottom: 10px;
             margin-top: 10px;
@@ -13,7 +22,7 @@
             font-family: times_new_roman_normal !important;
         }
         .title {
-            font-family: khmeros;
+            font-family: khmer_m1 !important;
         }
         th {
             background-color: #a8f1e7eb;
@@ -45,7 +54,7 @@
                         </div>
                     </div>
                     <div class="sign-title" align="center">
-                        <span class="title" style="font-family: khmer_m1 !important;">សម្រង់វត្តមាននិស្សិតប្រលងបញ្ចប់ឆមាសទី {{to_khmer_number($semester)}}</span>
+                        <span class="title">សម្រង់វត្តមាននិស្សិតប្រលងបញ្ចប់ឆមាសទី {{to_khmer_number($semester)}}</span>
                     </div>
 
                     <div class="sign-content">
@@ -60,25 +69,25 @@
                         <div class="row" style="line-height: 30px;">
                             <div class="col-md-12 col-lg-12">
                                 <span class="underline">
-                                    <span class="no_underline title" style="font-family: khmer_s1 !important;">មុខវិជ្ជា: </span> (M .............) .....................................................................................................................................
+                                    <span class="no_underline" style="font-family: khmer_s1 !important;">មុខវិជ្ជា: </span> (M .............) .....................................................................................................................................
                                 </span>
                             </div>
                             <div class="col-md-6 col-lg-6 col-xs-6">
-                                <span class="title" style="font-family: khmer_s1 !important;">ថ្ងៃទី  ខែ ឆ្នាំ</span> .........................................................
+                                <span style="font-family: khmer_s1 !important;">ថ្ងៃទី  ខែ ឆ្នាំ</span> .........................................................
                             </div>
                             <div class="col-md-6 col-lg-6 col-xs-6">
-                                <span class="title" style="font-family: khmer_s1 !important;">បន្ទប់លេខ</span> ...............................................................
+                                <span style="font-family: khmer_s1 !important;">បន្ទប់លេខ</span> ...............................................................
                             </div>
                         </div>
                         <div class="row" style="line-height: 30px;">
                             <div class="col-md-6 col-lg-6 col-xs-6">
-                                <span class="title" style="font-family: khmer_s1 !important;">រយះពេល</span> ...............................................................
+                                <span style="font-family: khmer_s1 !important;">រយះពេល</span> ...............................................................
                             </div>
                             <div class="col-md-3 col-lg-3 col-xs-3">
-                                <span class="title" style="font-family: khmer_s1 !important;">ចាប់ពីម៉ោង</span> ................
+                                <span style="font-family: khmer_s1 !important;">ចាប់ពីម៉ោង</span> ................
                             </div>
                             <div class="col-md-3 col-lg-3 col-xs-3">
-                                <span class="title" style="font-family: khmer_s1 !important;">ដល់ម៉ោង</span> ................
+                                <span style="font-family: khmer_s1 !important;">ដល់ម៉ោង</span> ................
                             </div>
                         </div>
                         <table class="table table-bordered">
