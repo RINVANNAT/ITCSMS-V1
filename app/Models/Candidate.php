@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 
 class Candidate extends Model
 {
+    public $table = "candidates";
 
     public $fillable = [
         "name_latin",
@@ -47,34 +48,19 @@ class Candidate extends Model
         "degree_id",
         "exam_id",
         "studentBac2_id",
-        "result"
+        "result",
+        "from_previous_year"
     ];
 
-
-    public $table = "candidates";
     protected $dates = ['dob'];
 
-    public function setDobAttribute($value)
-    {
-        $date = Carbon::createFromFormat('d/m/Y', $value);
-        $this->attributes['dob'] = $date->format('Y/m/d');
-    }
-
-    public function getToPayAttribute()
-    {
-        $scholarship_id = null;
-        $to_pay = \App\Models\SchoolFeeRate::where('promotion_id',$this->promotion_id)->where('degree_id',$this->_id);
-        if($this->gender_id == 2){
-            $scholarship_id = 1; // This is Boursier Partielle for all woman in ITC
-            $to_pay = $to_pay->where('scholarship_id',$scholarship_id);
-        }
-        $to_pay = $to_pay->first();
-		if($to_pay==null){
-			return 0;
-		} else {
-            return $to_pay->to_pay.$to_pay->to_pay_currency;
-		}
-    }
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+    ];
 
     /*public function getTotalTransactionAttribute(){
         $payslips = \App\Models\Payslip::where('candidate_id',$this->id)->get();
@@ -86,96 +72,131 @@ class Candidate extends Model
         }
     }*/
 
-	public function creator(){
-		return $this->belongsTo('App\Models\Access\User','create_uid');
-	}
-	public function lastModifier(){
-		return $this->belongsTo('App\Models\Access\User','write_uid');
-	}
-	public function academic_year(){
-		return $this->belongsTo('App\Models\AcademicYear','academic_year_id');
-	}
-
-    public function bacYear(){
-        return $this->belongsTo('App\Models\AcademicYear','bac_year');
+    public function setDobAttribute($value)
+    {
+        $date = Carbon::createFromFormat('d/m/Y', $value);
+        $this->attributes['dob'] = $date->format('Y/m/d');
     }
 
-    public function bacTotal(){
-        return $this->belongsTo('App\Models\GdeGrade','bac_total_grade');
-    }
-    public function bacMath(){
-        return $this->belongsTo('App\Models\GdeGrade','bac_math_grade');
-    }
-    public function bacPhys(){
-        return $this->belongsTo('App\Models\GdeGrade','bac_phys_grade');
-    }
-    public function bacChem(){
-        return $this->belongsTo('App\Models\GdeGrade','bac_chem_grade');
+    public function getToPayAttribute()
+    {
+        $scholarship_id = null;
+        $to_pay = \App\Models\SchoolFeeRate::where('promotion_id', $this->promotion_id)->where('degree_id', $this->_id);
+        if ($this->gender_id == 2) {
+            $scholarship_id = 1; // This is Boursier Partielle for all woman in ITC
+            $to_pay = $to_pay->where('scholarship_id', $scholarship_id);
+        }
+        $to_pay = $to_pay->first();
+        if ($to_pay == null) {
+            return 0;
+        } else {
+            return $to_pay->to_pay . $to_pay->to_pay_currency;
+        }
     }
 
-    public function exam(){
+    public function creator()
+    {
+        return $this->belongsTo('App\Models\Access\User', 'create_uid');
+    }
+
+    public function lastModifier()
+    {
+        return $this->belongsTo('App\Models\Access\User', 'write_uid');
+    }
+
+    public function academic_year()
+    {
+        return $this->belongsTo('App\Models\AcademicYear', 'academic_year_id');
+    }
+
+    public function bacYear()
+    {
+        return $this->belongsTo('App\Models\AcademicYear', 'bac_year');
+    }
+
+    public function bacTotal()
+    {
+        return $this->belongsTo('App\Models\GdeGrade', 'bac_total_grade');
+    }
+
+    public function bacMath()
+    {
+        return $this->belongsTo('App\Models\GdeGrade', 'bac_math_grade');
+    }
+
+    public function bacPhys()
+    {
+        return $this->belongsTo('App\Models\GdeGrade', 'bac_phys_grade');
+    }
+
+    public function bacChem()
+    {
+        return $this->belongsTo('App\Models\GdeGrade', 'bac_chem_grade');
+    }
+
+    public function exam()
+    {
         return $this->belongsTo('App\Models\Exam');
     }
 
-    public function gender(){
+    public function gender()
+    {
         return $this->belongsTo('App\Models\Gender');
     }
 
-    public function origin(){
-        return $this->belongsTo('App\Models\Origin','province_id');
+    public function origin()
+    {
+        return $this->belongsTo('App\Models\Origin', 'province_id');
     }
 
-    public function pob(){
-        return $this->belongsTo('App\Models\Origin','pob');
+    public function pob()
+    {
+        return $this->belongsTo('App\Models\Origin', 'pob');
     }
 
-    public function degree(){
+    public function degree()
+    {
         return $this->belongsTo('App\Models\Degree');
     }
 
-    public function department(){
+    public function department()
+    {
         return $this->belongsTo('App\Models\Department');
     }
 
-    public function grade(){
+    public function grade()
+    {
         return $this->belongsTo('App\Models\Grade');
     }
 
-    public function departments(){
+    public function departments()
+    {
         //return $this->belongsToMany('App\Models\Department')->withPivot('rank')->where('is_success',true);
-        return $this->belongsToMany('App\Models\Department','candidate_department')->withPivot('rank');
+        return $this->belongsToMany('App\Models\Department', 'candidate_department')->withPivot('rank');
     }
 
-
-    public function payslipClient(){
+    public function payslipClient()
+    {
         return $this->belongsTo('App\Models\PayslipClient');
     }
 
-    public function high_school(){
-        return $this->belongsTo('App\Models\HighSchool','highschool_id');
+    public function high_school()
+    {
+        return $this->belongsTo('App\Models\HighSchool', 'highschool_id');
     }
 
-    public function promotion(){
-        return $this->belongsTo('App\Models\Promotion','promotion_id');
+    public function promotion()
+    {
+        return $this->belongsTo('App\Models\Promotion', 'promotion_id');
     }
 
-    public function preferred_departments(){
+    public function preferred_departments()
+    {
         return $this->belongsToMany('App\Models\Department')->withPivot('rank');
     }
 
-    public function room(){
-        return $this->belongsTo('App\Models\ExamRoom','room_id');
+    public function room()
+    {
+        return $this->belongsTo('App\Models\ExamRoom', 'room_id');
     }
-
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-    ];
-
-	public static $rules = [
-	];
-
 }
