@@ -27,12 +27,12 @@
 
         @font-face {
             font-family: khmer_m1;
-            src: url("{{url('assets/fonts/Khmer M1.volt.ttf')}}");
+            src: url("{{url('assets/fonts/khmer M1.volt.ttf')}}");
         }
 
         @font-face {
             font-family: khmer_s1;
-            src: url("{{url('assets/fonts/Khmer s1.volt.ttf')}}");
+            src: url("{{url('assets/fonts/khmer s1.volt.ttf')}}");
         }
 
         h4, h3, h2, h1 {
