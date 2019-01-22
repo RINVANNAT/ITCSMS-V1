@@ -5,6 +5,7 @@ use App\Models\AcademicYear;
 use App\Models\Department;
 use App\Models\Gender;
 use App\Models\StudentAnnual;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -123,7 +124,9 @@ trait PrintExaminationAttendanceListTrait
 
         $academic_year = AcademicYear::where("id",$academic_year)->first();
         $department = Department::where("id",$department)->first();
-
+        return SnappyPdf::loadView("backend.studentAnnual.print.examination_attendance_list",
+            compact("data","academic_year","semester","department","by_group")
+        )->stream();
         return view("backend.studentAnnual.print.examination_attendance_list",compact("data","academic_year","semester","department","by_group"));
     }
 }
