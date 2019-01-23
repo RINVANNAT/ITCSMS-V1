@@ -60,7 +60,7 @@
                         <div class="row" style="line-height: 30px;">
                             <div class="col-md-12 col-lg-12">
                                 <span class="underline">
-                                    <span class="no_underline" style="font-family: khmer_s1 !important;">មុខវិជ្ជា: </span> (M .............) .....................................................................................................................................
+                                    <span class="no_underline" style="font-family: khmer_s1 !important;">មុខវិជ្ជា៖ </span> (M .............) .....................................................................................................................................
                                 </span>
                             </div>
                             <div class="col-md-6 col-lg-6 col-xs-6">
