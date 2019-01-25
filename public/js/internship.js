@@ -8,16 +8,14 @@ function setValues(company) {
 		$('#hot_line').val(company.hp)
 		$('#e_mail_address').val(company.mail)
 		$('#web').val(company.web)
-		// $('#title').val(company.title)
 		$('#training_field').val(company.training_field)
 	} else {
-		$('#address').val('')
+		/*$('#address').val('')
 		$('#phone').val('')
 		$('#hot_line').val('')
 		$('#e_mail_address').val('')
 		$('#web').val('')
-		// $('#title').val('')
-		$('#training_field').val('')
+		$('#training_field').val('')*/
 	}
 }
 
