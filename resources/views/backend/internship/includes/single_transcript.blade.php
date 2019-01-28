@@ -121,7 +121,7 @@
         </div>
 
         <div class="col-md-12" style="position: absolute; bottom: 0; right: 0;">
-            {{$internship->id}}
+            {{$internship->number}}
         </div>
     </div>
 </div>

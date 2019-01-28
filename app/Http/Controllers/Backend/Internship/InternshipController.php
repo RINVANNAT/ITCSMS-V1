@@ -90,14 +90,14 @@ class InternshipController extends Controller
                 $request['company'] = $company->name;
                 $request['company_id'] = $company->id;
             } else {
-                $findInternshipCompany = InternshipCompany::where('name', 'ilike', '%' . $company->name)
-                    ->orWhere('title', 'ilike', '%' . $company->title)
-                    ->orWhere('training_field', 'ilike', '%' . $company->training_field)
-                    ->first();
-                $request['company'] = $findInternshipCompany->name;
-                $request['company_id'] = $findInternshipCompany->id;
+                if (isset($company->id) && isset($company->name)) {
+                    $request['company'] = $company->name;
+                    $request['company_id'] = $company->id;
+                } else {
+                    return message_success("Could not found company!");
+                }
             }
-            
+
             if (array_key_exists('id', $request->all())) {
                 $internship = Internship::find($request->id);
                 if ($internship instanceof Internship) {
@@ -122,7 +122,7 @@ class InternshipController extends Controller
                     ->first();
                 if ($lastInternship instanceof Internship) {
                     $request['number'] = $lastInternship->number + 1;
-                }else {
+                } else {
                     $request['number'] = 1;
                 }
 
@@ -276,7 +276,7 @@ class InternshipController extends Controller
             })
             ->addColumn('actions', function ($internship) {
                 return '<a href="' . route('internship.edit', $internship) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"></i></a>';
-                    /*' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';*/
+                /*' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';*/
             })
             ->addColumn('checkbox', function ($internship) {
                 if (is_null($internship->printed_at)) {
