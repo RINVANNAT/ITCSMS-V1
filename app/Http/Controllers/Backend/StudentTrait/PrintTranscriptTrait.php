@@ -433,4 +433,107 @@ trait PrintTranscriptTrait
             return response()->json(['status' => 'fail', 'state' => 'Something went wrong! please try again or contact administrator']);
         }
     }
+
+    public function print_student_list_transcript(PrintTranscriptRequest $request) {
+        $academic_year = $request->get('academic_year');
+        $group = $request->get('group');
+        $gender = $request->get('gender');
+        $department_option = [];
+        $department = [];
+        $degree = [];
+        $grade = [];
+        $semester = 1;
+        $student_class = explode("_", $request->get('student_class'));
+        if (!empty($student_class)) {
+            if ($student_class[3] != null) {
+                $department_option[] = $student_class[3];
+            }
+            if ($student_class[2] != null) {
+                $department[] = $student_class[2];
+            }
+            if ($student_class[0] != null) {
+                $degree[] = $student_class[0];
+            }
+            if ($student_class[1] != null) {
+                $grade[] = $student_class[1];
+            }
+        }
+
+        // This will return all passed students in the given academic year/semester 1 as a collection
+        $studentAnnuals = StudentAnnual::select([
+            'studentAnnuals.id', 'groups.code as group', 'students.id_card', 'students.name_kh', 'students.dob as dob', 'students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
+            DB::raw("CONCAT(degrees.code,grades.code,departments.code,\"departmentOptions\".code) as class")
+        ])
+            ->leftJoin('students', 'students.id', '=', 'studentAnnuals.student_id')
+            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+            ->leftJoin('groups', 'groups.id', '=', 'group_student_annuals.group_id')
+            ->leftJoin('redouble_student', 'redouble_student.student_id', '=', 'students.id')
+            ->where('studentAnnuals.academic_year_id', $academic_year)
+            ->whereNull('group_student_annuals.department_id')
+            ->where(function ($query) use ($semester) {
+                $query->where("group_student_annuals.semester_id", $semester)->orWhereNull("group_student_annuals.semester_id");
+            })
+            ->where(function ($query) {
+                $query->where('students.radie', '=', false)->orWhereNull('students.radie');
+            })
+            ->whereNotIn('students.id', function ($query) use ($academic_year) {
+                $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id', '=', $academic_year);
+            });
+
+        if (!empty($department_option)) {
+            $studentAnnuals = $studentAnnuals->whereIN('departmentOptions.id', $department_option);
+        }
+        if (!empty($department)) {
+            $studentAnnuals = $studentAnnuals->whereIN('departments.id', $department);
+        }
+        if (!empty($degree)) {
+            $studentAnnuals = $studentAnnuals->whereIN('degrees.id', $degree);
+        }
+        if (!empty($grade)) {
+            $studentAnnuals = $studentAnnuals->whereIN('grades.id', $grade);
+        }
+        if ($group != null) {
+            $studentAnnuals = $studentAnnuals->where('groups.code', $group);
+        }
+        if ($gender != null) {
+            $studentAnnuals = $studentAnnuals->where('students.gender_id', $gender);
+        }
+
+        $studentAnnuals = $studentAnnuals->get()->toArray();
+
+        // Get printed transcript date
+        $printed_transcripts = DB::table("printed_transcripts")
+            ->where("academic_year_id", $academic_year)
+            ->get();
+        $printed_transcripts = collect($printed_transcripts)->groupBy("student_annual_id")->toArray();
+        foreach ($studentAnnuals as &$student) {
+            $student['printed_transcript'] = "";
+            $student['degree_id'] = $student_class[0];
+            $student['grade_id'] = $student_class[1];
+            $student['academic_year'] = $academic_year;
+            if (isset($printed_transcripts[$student['id']])) {
+                foreach ($printed_transcripts[$student['id']] as $transcript) {
+                    $transcript_date = Carbon::createFromFormat("Y-m-d H:i:s", $transcript->created_at)->toDayDateTimeString();
+                    if ($transcript->type == "year") {
+                        $student['printed_transcript'] = $student['printed_transcript'] . "<span class='label label-primary'>" . $transcript->type . " | " . $transcript_date . "</span><br/>";
+                    } else {
+                        $student['printed_transcript'] = $student['printed_transcript'] . "<span class='label label-success'>" . $transcript->type . " | " . $transcript_date . "</span><br/>";
+                    }
+
+
+                }
+            }
+        }
+        // Sort by multiple columns
+        $studentAnnuals = collect($studentAnnuals)->sortBy(function ($student) {
+            return sprintf('%-12s%s', $student['class'], $student['name_latin']);
+        });
+
+        return SnappyPdf::loadView('backend.studentAnnual.print.student_list_transcript', compact('studentAnnuals'))->setOption('footer-center','[page]/[topage]')->stream();
+    }
 }

@@ -253,6 +253,7 @@
         var print_url = "{{ route('admin.student.print_transcript') }}";
         var mark_url = "{{ route('admin.student.mark_printed_transcript') }}";
         var filter_class_url = '{{route('admin.filter.get_filter_by_class')}}';
+        var print_student_list_url = '{{route('admin.student.print_student_list_transcript')}}';
         var oTable;
 
         function redraw_student_list() {
@@ -470,7 +471,8 @@
                 '{!! Form::select('gender',$genders,null, array('class'=>'form-control filter','id'=>'filter_gender','placeholder'=>'Gender')) !!} ' +
                 '{!! Form::text('group',null, array('class'=>'form-control filter','id'=>'filter_group','placeholder'=>'Group')) !!} ' +
                 '<select name="student_class" class="form-control filter" multiple="multiple" id="filter_class"></select>' +
-                '{!! Form::select('academic_year',$academicYears,$academicYearSelected, array('class'=>'form-control filter','id'=>'filter_academic_year')) !!} '
+                '{!! Form::select('academic_year',$academicYears,$academicYearSelected, array('class'=>'form-control filter','id'=>'filter_academic_year')) !!} ' +
+                '<button type="button" data-toggle="tooltip" data-placement="right" title="You can print this student list " class="btn btn-default btn-sm btn-print-student-list"><i class="fa fa-print"></i> Print Student List</button>'
             );
 
             update_filter_class(redraw_student_list);
@@ -487,6 +489,22 @@
             $(document.body).on("change", "#filter_academic_year", function (e) {
                 update_filter_class(redraw_student_list);
             });
+
+            $(document.body).on("click", ".btn-print-student-list", function () {
+                
+                if ($("#filter_class").select2('data').length !== 1) {
+                    alert_error("", "You need to select only one class", null);
+                    return;
+                }
+
+                PopupCenterDual(
+                    print_student_list_url
+                    +'?academic_year=' + $('#filter_academic_year').val()
+                    +'&student_class=' + $("#filter_class").select2('data')[0].id
+                    +'&gender=' + $('#filter_gender').val()
+                    +'&group=' + $('#filter_group').val(),
+                    'Printing', '1200', '800');
+            })
         });
 
     </script>
