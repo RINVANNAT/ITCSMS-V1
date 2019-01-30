@@ -95,7 +95,8 @@
                     </tr>
                 </thead>
                 @php
-                    $index = 1
+                    $index = 1;
+                    $girl = 0
                 @endphp
                 <tbody>
                     @foreach($studentAnnuals as $studentAnnual)
@@ -108,6 +109,9 @@
                                 @if(strtolower($studentAnnual['gender']) == 'm')
                                     ប្រុស
                                 @else
+                                    @php
+                                        $girl++
+                                    @endphp
                                     ស្រី
                                 @endif
                             </td>
@@ -117,6 +121,9 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="row" style="font-size: 18px">
+            <strong>បញ្ចប់បញ្ជីត្រឹម {{$index-1}}នាក់ ក្នុងនោះមានស្រីចំនួន {{$girl}}នាក់</strong>
         </div>
     </div>
 </div>
