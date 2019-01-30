@@ -122,8 +122,8 @@
                 </tbody>
             </table>
         </div>
-        <div class="row" style="font-size: 16px; font-family: khmer_m1 !important;">
-            <strong>បញ្ចប់បញ្ជីត្រឹម {{$index-1}}នាក់ ក្នុងនោះមានស្រីចំនួន {{$girl}}នាក់</strong>
+        <div class="row" style="font-size: 14px; font-family: khmer_s1 !important;">
+            <strong>បញ្ចប់បញ្ជីត្រឹម {{$index-1}} នាក់ ក្នុងនោះមានស្រីចំនួន {{$girl}} នាក់</strong>
         </div>
     </div>
 </div>
