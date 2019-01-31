@@ -39,11 +39,13 @@
             src: url("{{ url('assets/fonts/khmer s1.volt.ttf') }}");
         }
 
-        .page {
+        div .page {
             margin: 0 auto;
             padding: 7mm 7mm 8mm 7mm;
             position: relative;
             font-family: "Times New Roman" !important;
+            page-break-after: always !important;
+            page-break-inside: avoid !important;
         }
         table, tr td, tr th {
             border: 0.5px solid #000000 !important;
