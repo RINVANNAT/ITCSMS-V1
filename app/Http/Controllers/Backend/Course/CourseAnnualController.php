@@ -435,10 +435,11 @@ class CourseAnnualController extends Controller
                     $this->createScorePercentage($request->midterm_score, $request->final_score, $storeCourseAnnual->id);
                 }
                 if ($storeCourseAnnualClass) {
+                    DB::commit();
                     return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
                 }
-                DB::commit();
             }
+            DB::rollback();
             return redirect()->back()->withFlashSuccess('Create Error!');
         } catch (\Exception $exception) {
             DB::rollback();
