@@ -1264,48 +1264,48 @@ trait StudentScore {
             }
         }
         $studentByCourse = $studentByCourse->get();
-
+        // @TODO (Mab changed some logic here.)
         $listStudentIds  = collect($studentByCourse)->pluck('student_id')->toArray();
-        $redoubleStudents = $this->redoubleByStudentIds($listStudentIds, $courseAnnual->academic_year_id);
 
-        foreach ($percentageInput as $input) {
+        if (count($listStudentIds) > 0) {
+            $redoubleStudents = $this->redoubleByStudentIds($listStudentIds, $courseAnnual->academic_year_id);
+            foreach ($percentageInput as $input) {
 
-            $savePercentageId = $this->percentages->create($input);// return the percentage id
+                $savePercentageId = $this->percentages->create($input);// return the percentage id
 
-            if ($studentByCourse) {
-                foreach ($studentByCourse as $studentScore) {
-                    if(!isset($redoubleStudents[$studentScore->student_id])) {
+                if ($studentByCourse) {
+                    foreach ($studentByCourse as $studentScore) {
+                        if(!isset($redoubleStudents[$studentScore->student_id])) {
 
-                        $input = [
-                            'course_annual_id' => $courseAnnualId,
-                            'student_annual_id' => $studentScore->student_annual_id,
-                            'department_id' => $courseAnnual->department_id,
-                            'degree_id' => $courseAnnual->degree_id,
-                            'grade_id' => $courseAnnual->grade_id,
-                            'academic_year_id' => $courseAnnual->academic_year_id,
-                            'semester_id' => $courseAnnual->semester_id,
-                            'socre_absence' => null,
-                            'percentage_id' => [$savePercentageId->id]
-                        ];
+                            $input = [
+                                'course_annual_id' => $courseAnnualId,
+                                'student_annual_id' => $studentScore->student_annual_id,
+                                'department_id' => $courseAnnual->department_id,
+                                'degree_id' => $courseAnnual->degree_id,
+                                'grade_id' => $courseAnnual->grade_id,
+                                'academic_year_id' => $courseAnnual->academic_year_id,
+                                'semester_id' => $courseAnnual->semester_id,
+                                'socre_absence' => null,
+                                'percentage_id' => [$savePercentageId->id]
+                            ];
 
-                        $saveScoreId = $this->courseAnnualScores->create($input);// return the socreId
-                        //$savePercentageScore = $this->courseAnnualScores->createPercentageScore($saveScoreId->id, $savePercentageId->id);
-                        if ($saveScoreId) {
-                            $check++;
+                            $saveScoreId = $this->courseAnnualScores->create($input);// return the socreId
+                            //$savePercentageScore = $this->courseAnnualScores->createPercentageScore($saveScoreId->id, $savePercentageId->id);
+                            if ($saveScoreId) {
+                                $check++;
+                            }
+
                         }
 
                     }
-
                 }
             }
+            if ($check == (count($studentByCourse) * count($percentageInput))) {
+                return true;
+            } else {
+                return false;
+            }
         }
-
-        if ($check == (count($studentByCourse) * count($percentageInput))) {
-            return true;
-        } else {
-            return false;
-        }
-
     }
 
 
