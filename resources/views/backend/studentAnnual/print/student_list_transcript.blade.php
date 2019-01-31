@@ -56,6 +56,7 @@
             font-family: khmer_m2;
             font-size: 18px;
             text-align: center;
+            margin-top: 10px;
         }
 
         thead {
