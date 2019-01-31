@@ -115,7 +115,7 @@
                                     ស្រី
                                 @endif
                             </td>
-                            <td>{{to_khmer_number(sprintf("%02d", (new \Carbon\Carbon($studentAnnual['dob']))->day))}} ខែ{{to_khmer_month((new \Carbon\Carbon($studentAnnual['dob']))->month)}} ឆ្នាំ{{to_khmer_number(sprintf("%04d", (new \Carbon\Carbon($studentAnnual['dob']))->year))}}</td>
+                            <td>{{to_khmer_number(sprintf("%02d", (new \Carbon\Carbon($studentAnnual['dob']))->day))}} {{to_khmer_month((new \Carbon\Carbon($studentAnnual['dob']))->month)}} {{to_khmer_number(sprintf("%04d", (new \Carbon\Carbon($studentAnnual['dob']))->year))}}</td>
                             <td></td>
                         </tr>
                     @endforeach
