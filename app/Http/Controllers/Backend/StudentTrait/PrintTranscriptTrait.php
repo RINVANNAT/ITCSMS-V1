@@ -534,6 +534,7 @@ trait PrintTranscriptTrait
             return sprintf('%-12s%s', $student['class'], $student['name_latin']);
         });
 
+//        return view('backend.studentAnnual.print.student_list_transcript', compact('studentAnnuals'));
         return SnappyPdf::loadView('backend.studentAnnual.print.student_list_transcript', compact('studentAnnuals'))->setOption('footer-center','[page]/[topage]')->stream();
     }
 }

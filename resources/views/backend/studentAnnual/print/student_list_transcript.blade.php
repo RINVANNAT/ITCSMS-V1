@@ -19,6 +19,14 @@
     <link media="all" type="text/css" rel="stylesheet" href="{{ asset('css/backend/prints/prints.css') }}">
 
     <style>
+        .table > thead > tr > th,
+        .table > thead > tr > td,
+        .table > tbody > tr > th,
+        .table > tbody > tr > td,
+        .table > tfoot > tr > th,
+        .table > tfoot > tr > td {
+            padding: 7px !important;
+        }
         @font-face {
             font-family: times_new_roman_normal;
             src: url("{{ asset('fonts/TIMES.TTF') }}");
