@@ -22,7 +22,7 @@
             </p>
         </div>
     </div>
-
+    @if(isset($internship->students) && count($internship->students) > 0)
     <div class="row">
         <div class="col-md-12">
             <br/>
@@ -113,7 +113,9 @@
             @endif
         </div>
     </div>
-
+    @else
+        <h3 class="text-center text-bold text-uppercase" style="margin-top: 200px; font-family: khmer_m1 !important;">(ពុំមាននិស្សិតទេ សូមមេត្តាបញ្ចូលនិស្សិតយ៉ាងតិចមួយនាក់)</h3>
+    @endif
     <div class="row">
         <div class="col-md-12" style="position: absolute;bottom: 0;left: 1cm;">
             <p>Deputy Director,</p>

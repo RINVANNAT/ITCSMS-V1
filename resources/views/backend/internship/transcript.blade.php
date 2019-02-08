@@ -1,8 +1,14 @@
 <htlml>
     <head>
         <title>Print Internship Certificate</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <link rel="stylesheet" href="{{ asset('css/backend/prints/prints.css') }}"/>
         <style type="text/css">
+            @font-face {
+                font-family: khmer_m1;
+                src: url("{{ asset('assets/fonts/Bayon.ttf') }}");
+            }
+
             @font-face {
                 font-family: times_new_roman_normal;
                 src: url("{{ asset('fonts/TIMES.TTF') }}");
