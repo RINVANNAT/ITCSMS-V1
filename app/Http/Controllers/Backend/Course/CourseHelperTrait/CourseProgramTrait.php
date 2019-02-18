@@ -27,8 +27,12 @@ trait CourseProgramTrait
         if (isset($request->department_id)) {
             $department = DB::table('departments')->where('id', $request->department_id)->first();
         } else {
-            $employee = Employee::where('user_id', $user->id)->first();
-            $department = Department::where('id', $employee->department_id)->first();
+            try {
+                $employee = Employee::where('user_id', $user->id)->first();
+                $department = Department::where('id', $employee->department_id)->first();
+            } catch (\Exception $e) {
+                return abort(404);
+            }
         }
 
         $degree = DB::table('degrees')->where('id', $request->degree_id)->first();
@@ -38,7 +42,7 @@ trait CourseProgramTrait
 
         $coursePrograms = DB::table('courses')
             ->where([
-                ['department_id', $request->department_id],
+                ['department_id', $department->id],
                 ['degree_id', $request->degree_id],
                 ['grade_id', $request->grade_id]
             ]);
