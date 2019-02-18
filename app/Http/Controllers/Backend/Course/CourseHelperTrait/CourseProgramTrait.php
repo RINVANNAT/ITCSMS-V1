@@ -23,35 +23,47 @@ trait CourseProgramTrait
 
         $arrayData = [];
         $user = auth()->user();
-
+        $departmentIds = [];
         if (isset($request->department_id)) {
             $department = DB::table('departments')->where('id', $request->department_id)->first();
+            array_push($departmentIds, $department->id);
         } else {
             try {
                 $employee = Employee::where('user_id', $user->id)->first();
                 $department = Department::where('id', $employee->department_id)->first();
+                array_push($departmentIds, $department->id);
             } catch (\Exception $e) {
-                return abort(404);
+                $deptIds = Department::where([
+                    'is_specialist' => true,
+                ])->pluck('id');
+                $departmentIds = $deptIds;
             }
         }
 
         $degree = DB::table('degrees')->where('id', $request->degree_id)->first();
         $grade = DB::table('grades')->where('id', $request->grade_id)->first();
 
-        $header = "Course Program - Department: " . $department->code . " , Degree: " . $degree->name_en . " ,Grade: " . $grade->code;
+        if (count($departmentIds) > 1) {
+            $header = "Course Program - All Departments";
+        } else {
+            $header = "Course Program - Department: " . $department->code . " , Degree: " . $degree->name_en . " ,Grade: " . $grade->code;
+        }
+
 
         $coursePrograms = DB::table('courses')
+            ->whereIn('department_id', $departmentIds)
             ->where([
-                ['department_id', $department->id],
                 ['degree_id', $request->degree_id],
-                ['grade_id', $request->grade_id]
+                ['grade_id', $request->grade_id],
+                ['active', true],
             ]);
 
         if (isset($request->semester_id) && $request->semester_id != '') {
             $coursePrograms = $coursePrograms->where('semester_id', $request->semester_id);
             $header = $header . " , Semester: " . $request->semester_id;
         }
-        if (isset($request->department_option_id) && $request->department_option_id != '') {
+
+        if (isset($request->department_option_id) && $request->department_option_id != 'undefined' && $request->department_option_id != '') {
 
             $coursePrograms = $coursePrograms->where('department_option_id', $request->department_option_id);
             $departmentOption = DB::table('departmentOptions')->where('id', $request->department_option_id)->first();
@@ -59,16 +71,19 @@ trait CourseProgramTrait
             $header = $header . " ,Option: " . $departmentOption->name_en;
         }
 
-        $coursePrograms = $coursePrograms->orderBy('semester_id')->get();
+        $coursePrograms = $coursePrograms->orderBy('department_id')
+            ->orderBy('semester_id')
+            ->get();
 
         foreach ($coursePrograms as $program) {
+            $dept = Department::find($program->department_id);
             $element = [
                 'ID' => $program->id,
                 'Name Khmer' => $program->name_kh,
                 'Name in French' => $program->name_fr,
                 'Name in English' => $program->name_en,
                 'Code' => $program->code,
-                'Class' => $degree->code . $grade->code . $department->code . (isset($departmentOption) ? $departmentOption->code : ''),
+                'Class' => $class = $degree->code . $grade->code . $dept->code . (isset($departmentOption) ? $departmentOption->code : ''),
                 'Semester' => 'semester ' . $program->semester_id,
                 'Time Course' => $program->time_course,
                 'Time TD' => $program->time_td,
