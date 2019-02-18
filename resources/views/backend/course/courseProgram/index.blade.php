@@ -121,7 +121,6 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-
             var toolbar_html =
                     @if($department_id != null)
                             ''+
@@ -316,8 +315,6 @@
                 data: {department_id: department_id},
                 dataType: "html",
                 success: function(resultData) {
-
-//                    console.log(resultData);
                     if($('#filter_dept_option').is(':visible')) {
                         $('#filter_dept_option').html(resultData);
                     } else {
@@ -332,14 +329,12 @@
 
         $('#export_file').on('click', function (e) {
             e.preventDefault();
-
             var url= $(this).attr('href');
             var department_id = $('#filter_department :selected').val();
             var degree_id = $('#filter_degree :selected').val();
             var grade_id = $('#filter_grade :selected').val();
             var semester_id = $('#filter_semester :selected').val();
             var department_option_id = $('#filter_dept_option :selected').val();
-
 
             if(department_id != null && department_id != '') {
 
@@ -356,8 +351,6 @@
                                 , '_blank'
                         )
 
-
-
                     } else {
                         notify('error', 'Attention! Please Select Grade!')
                     }
@@ -366,13 +359,26 @@
                 }
 
             } else {
-                notify('error', 'Attention! Please Select Department!')
+	            if(degree_id != null && degree_id != '') {
+
+		            if(grade_id != null && grade_id != '') {
+
+			            window.open(
+				            url+'?degree_id='+ degree_id +
+				            '&grade_id=' + grade_id+
+				            '&semester_id=' + semester_id+
+				            '&department_option_id=' + department_option_id
+				            , '_blank'
+			            )
+
+		            } else {
+			            notify('error', 'Attention! Please Select Grade!')
+		            }
+	            } else {
+		            notify('error', 'Attention! Please Select Degree!')
+	            }
             }
-
-
         });
-
-
 
     </script>
 @stop
