@@ -28,8 +28,10 @@ function load_group(method){
                     _method: method
                 },
                 success : function(data){
-
+                    console.log(data)
                     if(data != null){
+                        group_student = data.group_id
+                        group_code = data.group_code
 
                         $('.check_all_box').prop('checked', true);
                         var option_text = "";

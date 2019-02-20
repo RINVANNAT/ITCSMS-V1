@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="pull-right">
-                    <input type="submit" id="submit_form" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
+                    <button type="submit" id="submit_form" class="btn btn-success btn-xs">{{ trans('buttons.general.crud.create') }}</button>
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -54,12 +54,26 @@
         var $search_url = "{{route('admin.employee.search')}}";
         var base_url = '{{url('img/profiles/')}}';
         var get_group_url = "{{route('course_annual.get_group_filtering')}}";
+        var group_student = [];
+        var group_code = [];
         var depts = {
             sa: '{{config('access.departments.sa')}}',
             sf: '{{config('access.departments.sf')}}'
         };
 
         $(document).ready(function() {
+            $('#submit_form').on('click', function (e) {
+                e.preventDefault()
+                if (group_student.length <= 0) {
+                    alert_error("", "There is no student yet please contact to student office!", null);
+                } else if (group_code.length <= 0) {
+                    alert_error("", "This course already create!", null);
+                } else if ($('input[name="groups[]"]:checked').length <= 0 ) {
+                    alert_error("", "You need to select at least one group", null);
+                } else {
+                    $('.create_course_annual').submit()
+                }
+            });
 
             $('.create_course_annual').submit(function() {
                 toggleLoading(true);
