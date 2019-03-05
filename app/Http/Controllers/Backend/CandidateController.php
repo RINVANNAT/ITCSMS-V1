@@ -740,7 +740,7 @@ class CandidateController extends Controller
             ->get()
             ->toArray();
 
-        $raw_candidates = collect($raw_candidates)->groupBy('register_id');
+        $raw_candidates = collect($raw_candidates)->sortBy('register_id')->groupBy('register_id');
 
         // Prepare well structure candidates with the departments above
         $candidates = [];
@@ -780,7 +780,7 @@ class CandidateController extends Controller
                     ));
                 });
 
-                $sheet->mergeCells('A3:R3');
+                $sheet->mergeCells('A3:S3');
                 $sheet->cell('A3', function ($cell) {
                     $cell->setValue('បញ្ចើសម្រង់ជម្រើសនិសិ្សត');
                     $cell->setAlignment('center');
@@ -808,8 +808,9 @@ class CandidateController extends Controller
                 $sheet->cell('N6', '7th choice');
                 $sheet->cell('O6', '8th choice');
                 $sheet->cell('P6', '9th choice');
-                $sheet->cell('Q6', 'Pass');
-                $sheet->cell('R6', 'Reserve');
+                $sheet->cell('Q6', 'Score');
+                $sheet->cell('R6', 'Pass');
+                $sheet->cell('S6', 'Reserve');
 
                 $row = 7;
                 $number = 1;
@@ -830,14 +831,15 @@ class CandidateController extends Controller
                     $sheet->cell('N' . $row, $candidate['7']);
                     $sheet->cell('O' . $row, $candidate['8']);
                     $sheet->cell('P' . $row, $candidate['9']);
-                    $sheet->cell('Q' . $row, $candidate['pass']);
-                    $sheet->cell('R' . $row, $candidate['reserve']);
+                    $sheet->cell('Q' . $row, $candidate['score']);
+                    $sheet->cell('R' . $row, $candidate['pass']);
+                    $sheet->cell('S' . $row, $candidate['reserve']);
                     $number += 1;
                     $row += 1;
                 }
 
-                $sheet->setBorder('A6:R' . ($row - 1), 'thin');
-                $sheet->cells('A6:R' . '6', function ($cells) {
+                $sheet->setBorder('A6:S' . ($row - 1), 'thin');
+                $sheet->cells('A6:S' . '6', function ($cells) {
                     $cells->setValignment('center');
                     $cells->setAlignment('center');
                     $cells->setFont(array(
