@@ -606,10 +606,21 @@ class CandidateController extends Controller
             ->leftJoin('departments', 'candidate_department.department_id', '=', 'departments.id')
             ->where('candidates.active', true)
             ->where('candidates.exam_id', $exam_id)
+            ->where(function ($query) use ($request) {
+                if(isset($request->filtertext) && $request->filtertext != '' && !is_null($request->filtertext)) {
+                    $query->where('candidates.name_latin', 'ilike', "%$request->filtertext%")
+                        ->orWhere('candidates.name_kh', 'ilike', "%$request->filtertext%");
+                }
+            })
             ->select([
-                'candidate_department.*', 'departments.code as department_code',
-                'candidates.register_id', 'candidates.name_kh', 'candidates.name_latin',
-                'dob', 'result', 'candidates.created_at'
+                'candidate_department.*',
+                'departments.code as department_code',
+                'candidates.register_id',
+                'candidates.name_kh',
+                'candidates.name_latin',
+                'dob',
+                'result',
+                'candidates.created_at'
             ])
             ->orderBy('candidates.created_at', 'desc')
             ->get();
@@ -650,7 +661,6 @@ class CandidateController extends Controller
                 $datatable, $data
             );
         }
-
 
         $datatables = app('datatables')->of(collect($datatable));
         return $datatables
