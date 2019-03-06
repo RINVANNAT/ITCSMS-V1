@@ -28,6 +28,7 @@ use App\Models\ExamType;
 use App\Models\Origin;
 use App\Models\Room;
 use App\Models\SecretRoomScore;
+use App\Models\Student;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
 use Carbon\Carbon;
@@ -3429,10 +3430,17 @@ class ExamController extends Controller
         ]);
         try {
             $nbDeptNeed = $request->department;
-            $candidateIds = Candidate::join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
-                ->where('candidates.exam_id', $request->exam_id)
-                ->distinct('candidates.id')
-                ->pluck('candidate_department.candidate_id');
+            $exam = Exam::where('id', $request->get('exam_id'))->first();
+            //$candidateIds = Candidate::join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
+            //    ->where('candidates.exam_id', $request->exam_id)
+            //    ->distinct('candidates.id')
+            //    ->pluck('candidate_department.candidate_id');
+            $candidateIds = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=','students.id')
+                //sa.academic_year_id = 2019 and sa.grade_id = 1 and degree_id = 1;
+                ->where('studentAnnuals.academic_year_id',$exam->academic_year_id)
+                ->where('studentAnnuals.grade_id', 1)
+                ->where('studentAnnuals.degree_id',1)
+                ->pluck('students.can_id');
 
             $candidates = Candidate::whereIn('id', $candidateIds)
                 ->orderBy('total_score', 'desc')

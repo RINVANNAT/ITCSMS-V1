@@ -18,6 +18,7 @@ use App\Models\Gender;
 use App\Models\HighSchool;
 use App\Models\Origin;
 use App\Models\Promotion;
+use App\Models\Student;
 use App\Models\StudentBac2;
 use App\Repositories\Backend\Candidate\CandidateRepositoryContract;
 use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
@@ -727,10 +728,16 @@ class CandidateController extends Controller
             ->get()
             ->toArray();
         $departments = collect($departments)->keyBy('id'); // The result format is ['key' => 'code']
+        $candidateIds = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=','students.id')
+            //sa.academic_year_id = 2019 and sa.grade_id = 1 and degree_id = 1;
+            ->where('studentAnnuals.academic_year_id',$exam->academic_year_id)
+            ->where('studentAnnuals.grade_id', 1)
+            ->where('studentAnnuals.degree_id',1)
+            ->pluck('students.can_id');
         // Get all candidates that have chosen departments in raw format
         $raw_candidates = CandidateDepartment::join('candidates', 'candidate_department.candidate_id', '=', 'candidates.id')
             ->join('genders', 'candidates.gender_id', '=', 'genders.id')
-            ->where('candidates.exam_id', $exam->id)
+            ->whereIn('candidates.id', $candidateIds)
             ->select(
                 'candidates.register_id', 'candidates.name_kh',
                 'genders.code as gender', 'candidates.dob',
