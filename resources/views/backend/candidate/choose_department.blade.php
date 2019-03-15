@@ -196,6 +196,7 @@
 					url: '{!! route('admin.candidate.list_candidate_department')."?exam_id=".$exam->id !!}',
 					method: 'POST',
 					data: function (d) {
+					    d.filtertext = $('input[type=search]').val()
 					}
 				},
 				columns: [
