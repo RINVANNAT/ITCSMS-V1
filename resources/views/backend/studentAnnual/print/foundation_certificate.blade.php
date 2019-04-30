@@ -73,7 +73,7 @@
                                     @if(is_numeric($key))
                                         @if((strtolower($score['name_en']) != "technical drawing") && (strtolower($score['name_en']) != "computer for engineering") && (strtolower($score['name_en']) != "informatic") && (strtolower($score['name_fr']) != "informatique"))
                                             <tr>
-                                                <td style="text-align: left;width: 35%">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
+                                                <td style="text-align: left;width: 35%;">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
                                                 <td class="english_section"
                                                     style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                                 <td class="english_section"
@@ -210,7 +210,7 @@
                             <p class="tran-header text-center">បញ្ជាក់ថា​ ៖</p>
                             <div class="row" style="margin-top: 10mm">
                                 <div class="col-md-6">
-                                    <p class="left">និស្សិតឈ្មោះ&nbsp;&nbsp;&nbsp;៖ <strong><span style="font-family: khmer_s1 !important; font-size: 15px">{{$student['name_kh']}}</span></strong></p>
+                                    <p class="left">និស្សិតឈ្មោះ&nbsp;&nbsp;&nbsp;៖ <strong><span style="font-size: 14px">{{$student['name_kh']}}</span></strong></p>
                                 </div>
                                 <div class="col-md-6">
                                     <p class="right" style="margin-right: 9px">ភេទ៖ {{to_khmer_gender($student['gender'])}}</p>
