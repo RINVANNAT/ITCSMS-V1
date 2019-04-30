@@ -210,7 +210,7 @@
                             <p class="tran-header text-center">បញ្ជាក់ថា​ ៖</p>
                             <div class="row" style="margin-top: 10mm">
                                 <div class="col-md-6">
-                                    <p class="left">និស្សិតឈ្មោះ&nbsp;&nbsp;&nbsp;៖ <strong><span style="font-size: 14px">{{$student['name_kh']}} ហេង ចិត្ត្តា</span></strong></p>
+                                    <p class="left">និស្សិតឈ្មោះ&nbsp;&nbsp;&nbsp;៖ <strong><span style="font-size: 14px">{{$student['name_kh']}} ហេង ចិត្រ្តា</span></strong></p>
                                 </div>
                                 <div class="col-md-6">
                                     <p class="right" style="margin-right: 9px">ភេទ៖ {{to_khmer_gender($student['gender'])}}</p>
