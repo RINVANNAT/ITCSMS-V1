@@ -27,6 +27,8 @@
             }
         } else if ($back['degree_id'] == 2){
             $count = 2 - $back['grade_id'];
+        } else if ($back['degree_id'] == 3) {
+            $count = 2;
         }
         ?>
         <span class="expired_date">ថ្ងៃផុតកំណត់/Expiry date: 30 September {{$back['academic_year_id'] + $count}}</span>
