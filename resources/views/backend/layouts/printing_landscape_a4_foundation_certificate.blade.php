@@ -58,6 +58,11 @@
         }
 
         @font-face {
+            font-family: khmeros_bold;
+            src: url("{{url('assets/fonts/KhmerOSContent-Bold.ttf')}}");
+        }
+
+        @font-face {
             font-family: khmer_s1;
             src: url("{{url('assets/fonts/khmer s1.volt.ttf')}}");
         }
