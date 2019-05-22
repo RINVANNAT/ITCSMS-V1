@@ -736,8 +736,9 @@ class StudentAnnualController extends Controller
 
         //dd($data);
         foreach ($data as &$value){
-            $date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob'])->formatLocalized("%d/%b/%Y");
-            $value['dob'] = $date;
+            //$date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob'])->formatLocalized("%d/%b/%Y");
+            $date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob']);
+            $value['dob'] = $date->day .' '.to_khmer_month($date->month).' '.$date->year;
             $value['name_latin'] = strtoupper($value['name_latin']);
         }
 
