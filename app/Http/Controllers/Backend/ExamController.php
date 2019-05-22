@@ -3435,9 +3435,13 @@ class ExamController extends Controller
             //    ->where('candidates.exam_id', $request->exam_id)
             //    ->distinct('candidates.id')
             //    ->pluck('candidate_department.candidate_id');
+            $redoubleStudents = DB::table('redouble_student')
+                ->where('academic_year_id',$exam->academic_year_id)
+                ->pluck('student_id');
             $candidateIds = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=','students.id')
                 //sa.academic_year_id = 2019 and sa.grade_id = 1 and degree_id = 1;
                 ->where('studentAnnuals.academic_year_id',$exam->academic_year_id)
+                ->whereNotIn('studentAnnuals.student_id', $redoubleStudents)
                 ->where('studentAnnuals.grade_id', 1)
                 ->where('studentAnnuals.degree_id',1)
                 ->pluck('students.can_id');

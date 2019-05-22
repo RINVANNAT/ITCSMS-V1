@@ -728,17 +728,22 @@ class CandidateController extends Controller
             ->get()
             ->toArray();
         $departments = collect($departments)->keyBy('id'); // The result format is ['key' => 'code']
+        $redoubleStudents = DB::table('redouble_student')
+            ->where('academic_year_id',$exam->academic_year_id)
+            ->pluck('student_id');
         $candidateIds = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=','students.id')
             //sa.academic_year_id = 2019 and sa.grade_id = 1 and degree_id = 1;
             ->where('studentAnnuals.academic_year_id',$exam->academic_year_id)
+            ->whereNotIn('studentAnnuals.student_id', $redoubleStudents)
             ->where('studentAnnuals.grade_id', 1)
             ->where('studentAnnuals.degree_id',1)
-            ->pluck('students.can_id');
+            ->lists('students.id_card','students.can_id');
         // Get all candidates that have chosen departments in raw format
         $raw_candidates = CandidateDepartment::join('candidates', 'candidate_department.candidate_id', '=', 'candidates.id')
             ->join('genders', 'candidates.gender_id', '=', 'genders.id')
-            ->whereIn('candidates.id', $candidateIds)
+            ->whereIn('candidates.id', $candidateIds->keys())
             ->select(
+                'candidates.id as candidate_id',
                 'candidates.register_id', 'candidates.name_kh',
                 'genders.code as gender', 'candidates.dob',
                 'candidates.name_latin', 'candidate_department.*',
@@ -753,6 +758,7 @@ class CandidateController extends Controller
         $candidates = [];
         foreach ($raw_candidates as $key => $rawCandidate) {
             $tmpData = array(
+                'id_card' => $candidateIds[$rawCandidate->first()['candidate_id']], //$rawCandidate->first()['id_card'],
                 'name_kh' => $rawCandidate->first()['name_kh'],
                 'name_latin' => $rawCandidate->first()['name_latin'],
                 'register_id' => $rawCandidate->first()['register_id'],
@@ -801,52 +807,54 @@ class CandidateController extends Controller
 
                 $sheet->cell('A6', 'No.');
                 $sheet->cell('B6', 'Register ID');
-                $sheet->cell('C6', 'Name');
-                $sheet->cell('D6', 'Sex');
-                $sheet->cell('E6', 'DOB');
-                $sheet->cell('F6', 'Result');
-                $sheet->cell('G6', 'Score');
-                $sheet->cell('H6', '1st choice');
-                $sheet->cell('I6', '2nd choice');
-                $sheet->cell('J6', '3rd choice');
-                $sheet->cell('K6', '4th choice');
-                $sheet->cell('L6', '5th choice');
-                $sheet->cell('M6', '6th choice');
-                $sheet->cell('N6', '7th choice');
-                $sheet->cell('O6', '8th choice');
-                $sheet->cell('P6', '9th choice');
-                $sheet->cell('Q6', 'Score');
-                $sheet->cell('R6', 'Pass');
-                $sheet->cell('S6', 'Reserve');
+                $sheet->cell('C6', 'ID Card');
+                $sheet->cell('D6', 'Name');
+                $sheet->cell('E6', 'Sex');
+                $sheet->cell('F6', 'DOB');
+                $sheet->cell('G6', 'Result');
+                $sheet->cell('H6', 'Score');
+                $sheet->cell('I6', '1st choice');
+                $sheet->cell('J6', '2nd choice');
+                $sheet->cell('K6', '3rd choice');
+                $sheet->cell('L6', '4th choice');
+                $sheet->cell('M6', '5th choice');
+                $sheet->cell('N6', '6th choice');
+                $sheet->cell('O6', '7th choice');
+                $sheet->cell('P6', '8th choice');
+                $sheet->cell('Q6', '9th choice');
+                $sheet->cell('R6', 'Score');
+                $sheet->cell('S6', 'Pass');
+                $sheet->cell('T6', 'Reserve');
 
                 $row = 7;
                 $number = 1;
                 foreach ($candidates as $candidate) {
                     $sheet->cell('A' . $row, $number);
                     $sheet->cell('B' . $row, $candidate['register_id']);
-                    $sheet->cell('C' . $row, strtoupper($candidate['name_latin']));
-                    $sheet->cell('D' . $row, $candidate['gender']);
-                    $sheet->cell('E' . $row, $candidate['dob']);
-                    $sheet->cell('F' . $row, $candidate['result']);
-                    $sheet->cell('G' . $row, $candidate['score']);
-                    $sheet->cell('H' . $row, $candidate['1']);
-                    $sheet->cell('I' . $row, $candidate['2']);
-                    $sheet->cell('J' . $row, $candidate['3']);
-                    $sheet->cell('K' . $row, $candidate['4']);
-                    $sheet->cell('L' . $row, $candidate['5']);
-                    $sheet->cell('M' . $row, $candidate['6']);
-                    $sheet->cell('N' . $row, $candidate['7']);
-                    $sheet->cell('O' . $row, $candidate['8']);
-                    $sheet->cell('P' . $row, $candidate['9']);
-                    $sheet->cell('Q' . $row, $candidate['score']);
-                    $sheet->cell('R' . $row, $candidate['pass']);
-                    $sheet->cell('S' . $row, $candidate['reserve']);
+                    $sheet->cell('C' . $row, $candidate['id_card']);
+                    $sheet->cell('D' . $row, strtoupper($candidate['name_latin']));
+                    $sheet->cell('E' . $row, $candidate['gender']);
+                    $sheet->cell('F' . $row, $candidate['dob']);
+                    $sheet->cell('G' . $row, $candidate['result']);
+                    $sheet->cell('H' . $row, $candidate['score']);
+                    $sheet->cell('I' . $row, $candidate['1']);
+                    $sheet->cell('J' . $row, $candidate['2']);
+                    $sheet->cell('K' . $row, $candidate['3']);
+                    $sheet->cell('L' . $row, $candidate['4']);
+                    $sheet->cell('M' . $row, $candidate['5']);
+                    $sheet->cell('N' . $row, $candidate['6']);
+                    $sheet->cell('O' . $row, $candidate['7']);
+                    $sheet->cell('P' . $row, $candidate['8']);
+                    $sheet->cell('Q' . $row, $candidate['9']);
+                    $sheet->cell('R' . $row, $candidate['score']);
+                    $sheet->cell('S' . $row, $candidate['pass']);
+                    $sheet->cell('T' . $row, $candidate['reserve']);
                     $number += 1;
                     $row += 1;
                 }
 
-                $sheet->setBorder('A6:S' . ($row - 1), 'thin');
-                $sheet->cells('A6:S' . '6', function ($cells) {
+                $sheet->setBorder('A6:T' . ($row - 1), 'thin');
+                $sheet->cells('A6:T' . '6', function ($cells) {
                     $cells->setValignment('center');
                     $cells->setAlignment('center');
                     $cells->setFont(array(
