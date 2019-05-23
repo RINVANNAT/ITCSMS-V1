@@ -55,6 +55,7 @@
                     {!! Form::checkbox('name_latin', "name_latin",true) !!} {{trans('indexs.name_latin')}} <br/>
                     {!! Form::checkbox('name_kh', "name_kh",true) !!} {{trans('indexs.name_kh')}} <br/>
                     {!! Form::checkbox('dob', "dob",true) !!} {{trans('indexs.dob')}} <br/>
+                    {!! Form::checkbox('dob_kh', "dob_kh",true) !!} {{trans('indexs.dob_kh')}} <br/>
                     {!! Form::checkbox('gender_id', "gender_id",true) !!} {{trans('indexs.gender_id')}} <br/>
                     {!! Form::checkbox('origin_id', "origin_id",false) !!} {{trans('indexs.origin_id')}} <br/>
                     {!! Form::checkbox('pob', "pob",false) !!} {{trans('indexs.pob')}} <br/>

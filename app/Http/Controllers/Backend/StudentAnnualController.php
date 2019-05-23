@@ -738,7 +738,9 @@ class StudentAnnualController extends Controller
         foreach ($data as &$value){
             //$date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob'])->formatLocalized("%d/%b/%Y");
             $date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob']);
-            $value['dob'] = $date->day .' '.to_khmer_month($date->month).' '.$date->year;
+            $value['dob'] = $date->formatLocalized("%d/%b/%Y");
+            $value['dob_kh'] = to_khmer_number($date->day) .' '.to_khmer_month($date->month).' '.to_khmer_number($date->year);
+            //dd($value['dob_kh']);
             $value['name_latin'] = strtoupper($value['name_latin']);
         }
 
@@ -840,6 +842,9 @@ class StudentAnnualController extends Controller
         }
         if(isset($_POST['parent_phone'])){
             array_push($fields,$_POST['parent_phone']);
+        }
+        if(isset($_POST['dob_kh'])){
+            array_push($fields,$_POST['dob_kh']);
         }
 
         array_push($fields,'group_option_priority_1');

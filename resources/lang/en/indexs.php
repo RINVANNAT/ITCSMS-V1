@@ -8,6 +8,7 @@ return [
     'name_latin'=>"Name Latin",
     'name_kh'=>"Name Khmer",
     'dob'=>"Date of Birth",
+    'dob_kh' => "Date of Birth (KH)",
     'photo'=>"Photo",
     'radie'=>"Radie",
     'observation'=>"Observation",
