@@ -98,6 +98,7 @@ return [
             'generate_group' => 'Generate groups',
             'generate_id_card' => 'Generate ID Cards',
             'print_id_card' => 'Print ID Cards',
+            'print_album_photo' => 'Print Album\'s Photo',
             'print_transcript' => 'Print Transcript',
             'print_attestation' => 'Print Attestation',
             'generate_examination_list' => 'Generate examination list'

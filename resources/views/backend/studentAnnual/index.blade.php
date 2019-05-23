@@ -277,6 +277,16 @@
                         'Print ID Card','900','800');
             });
 
+            $('#print_album_photo').on('click',function(e){
+                e.preventDefault();
+                var url = "{{ route('admin.student.request_print_id_card') }}";
+
+                PopupCenterDual(
+                    url
+                    + get_parameters(),
+                    'Print ID Card','900','800');
+            });
+
             $('#print_transcript').on('click',function(e){
                 e.preventDefault();
                 var url = "{{ route('admin.student.request_print_transcript') }}";
