@@ -279,7 +279,7 @@
 
             $('#print_album_photo').on('click',function(e){
                 e.preventDefault();
-                var url = "{{ route('admin.student.request_print_id_card') }}";
+                var url = "{{ route('admin.student.request_print_album_photo') }}";
 
                 PopupCenterDual(
                     url

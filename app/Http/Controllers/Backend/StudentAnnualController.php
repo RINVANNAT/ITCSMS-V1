@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Backend\StudentTrait\PrintExaminationAttendanceListTrait;
+use App\Http\Controllers\Backend\StudentTrait\PrintPhotoAlbumTrait;
 use App\Http\Controllers\Backend\StudentTrait\PrintTranscriptTrait;
 use App\Http\Controllers\Backend\StudentTrait\StudentAnnualTrait;
 use App\Http\Controllers\Backend\StudentTrait\ReportingTrait;
@@ -62,6 +63,7 @@ class StudentAnnualController extends Controller
     use FilteringTrait;
     use PrintTranscriptTrait;
     use PrintExaminationAttendanceListTrait;
+    use PrintPhotoAlbumTrait;
     /**
      * @var StudentAnnualRepositoryContract
      */
