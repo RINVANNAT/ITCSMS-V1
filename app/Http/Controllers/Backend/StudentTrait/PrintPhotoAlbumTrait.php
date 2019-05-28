@@ -23,6 +23,7 @@ trait PrintPhotoAlbumTrait
             'students.name_kh',
             'students.name_latin',
             'departments.code as department',
+            'departmentOptions.code as department_option',
             'students.photo',
             'studentAnnuals.department_id',
             'studentAnnuals.degree_id',

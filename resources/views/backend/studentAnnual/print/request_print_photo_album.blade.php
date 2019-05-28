@@ -47,27 +47,36 @@
             font-family: "khmer_os_muol";
             font-size: 18px;
             text-align: center;
-            line-height: 40px;
+            line-height: 50px;
             margin-bottom: 30px;
         }
+
         .page {
             page-break-inside: avoid !important;
+            page-break-after: always;
         }
-
+        thead {
+            display: table-header-group !important;
+        }
+        tfoot { display: table-row-group !important; }
+        tr {
+            page-break-inside: avoid !important;
+        }
 
     </style>
 </head>
 <body>
     <div class="page">
         <div class="row">
-            <div class="col-xs-12">
-                <div class="title">
-                    និស្សិត{{ $studentAnnuals_front[0]['degree'] }}({{ $studentAnnuals_front[0]['degree_code'] }}{{$studentAnnuals_front[0]['grade_id']}}{{$group !== '' ? '-'.$group : ''}}-{{$studentAnnuals_front[0]['department']}}) ជំនាន់ទី {{to_khmer_number($studentAnnuals_front[0]['promotion_id'])}}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            @foreach($studentAnnuals_front as $student)
+            @foreach($studentAnnuals_front as $key => $student)
+                @if ( $key%18 == 0 )
+                    <br />
+                    <div class="col-xs-12">
+                        <div class="title">
+                            និស្សិត{{ $studentAnnuals_front[0]['degree'] }}({{ $studentAnnuals_front[0]['degree_code'] }}{{$studentAnnuals_front[0]['grade_id']}}{{$group !== '' ? '-'.$group : ''}}-{{$studentAnnuals_front[0]['department']}}{{$studentAnnuals_front[0]['department_option']}}) ជំនាន់ទី {{to_khmer_number($studentAnnuals_front[0]['promotion_id'])}}
+                        </div>
+                    </div>
+                @endif
                 <div class="col-xs-2" style="page-break-inside: avoid">
                     <div class="avatar">
                         <div class="crop" style="text-align: center">
