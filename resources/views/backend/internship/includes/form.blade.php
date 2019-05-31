@@ -2,7 +2,6 @@
     <input type="hidden" name="id" value="{{ $internship->id }}"/>
 @endif
 <div class="row">
-
     <div class="col-md-6">
         @if(isset($internship))
             <div class="form-group">

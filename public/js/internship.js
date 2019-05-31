@@ -51,6 +51,28 @@ function formatRepoEmployee(repo) {
 	}
 }
 
+function formatRepoCompany(company) {
+    var markup = `
+        	<div class='select2-result-repository clearfix'>
+				<div class='select2-result-repository__meta'>
+					<div class='select2-result-repository__title'> ${ company.text } </div>
+					<div class='select2-result-repository__description'>${ company.title }</div>
+					<div class='select2-result-repository__statistics'>
+					<div class='select2-result-repository__forks'><i class='fa fa-bank'></i>${ company.title }</div>
+					<div class='select2-result-repository__stargazers'><i class='fa fa-venus-mars'></i>${ company.title }</div>
+					</div>
+				</div>
+			</div>  
+        `
+    return markup
+}
+
+function formatRepoSelectionCompany (data, container) {
+
+    $('.companies').val(data.id);
+    return data.text || data.name_latin;
+}
+
 $(function () {
 	$('#phone,#hot_line').inputmask('(+999) 99 99 99 99[9]')
 	
@@ -103,7 +125,14 @@ $(function () {
 		placeholder: 'Enter name...',
 		theme: "bootstrap",
 		allowClear: true,
-		tags: true,
+		tags: false,
+        escapeMarkup: function (markup) {
+            return markup;
+        },
+        minimumInputLength: 1,
+        templateResult: formatRepoCompany,
+        templateSelection: formatRepoSelectionCompany,
+        multiple: true
 	}).on('change', function (e) {
 		try {
 			var company = JSON.parse(e.target.value)
