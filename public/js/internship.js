@@ -4,6 +4,7 @@ var base_url = 'http://192.168.51.88:7070/img/profiles'
 function setValues(company) {
 	if (company.hasOwnProperty('address')) {
 		$('#address').val(company.address)
+		$('#title').val(company.title)
 		$('#phone').val(company.phone)
 		$('#hot_line').val(company.hp)
 		$('#e_mail_address').val(company.mail)
@@ -50,28 +51,28 @@ function formatRepoEmployee(repo) {
 		
 	}
 }
-
-function formatRepoCompany(company) {
-    var markup = `
-        	<div class='select2-result-repository clearfix'>
-				<div class='select2-result-repository__meta'>
-					<div class='select2-result-repository__title'> ${ company.text } </div>
-					<div class='select2-result-repository__description'>${ company.title }</div>
-					<div class='select2-result-repository__statistics'>
-					<div class='select2-result-repository__forks'><i class='fa fa-bank'></i>${ company.title }</div>
-					<div class='select2-result-repository__stargazers'><i class='fa fa-venus-mars'></i>${ company.title }</div>
-					</div>
-				</div>
-			</div>  
-        `
-    return markup
-}
-
-function formatRepoSelectionCompany (data, container) {
-
-    $('.companies').val(data.id);
-    return data.text || data.name_latin;
-}
+//
+// function formatRepoCompany(company) {
+//     var markup = `
+//         	<div class='select2-result-repository clearfix'>
+// 				<div class='select2-result-repository__meta'>
+// 					<div class='select2-result-repository__title'> ${ company.text } </div>
+// 					<div class='select2-result-repository__description'>${ company.title }</div>
+// 					<div class='select2-result-repository__statistics'>
+// 					<div class='select2-result-repository__forks'><i class='fa fa-bank'></i>${ company.title }</div>
+// 					<div class='select2-result-repository__stargazers'><i class='fa fa-venus-mars'></i>${ company.title }</div>
+// 					</div>
+// 				</div>
+// 			</div>
+//         `
+//     return markup
+// }
+//
+// function formatRepoSelectionCompany (data, container) {
+//
+//     $('.companies').val(data.id);
+//     return data.text || data.name_latin;
+// }
 
 $(function () {
 	$('#phone,#hot_line').inputmask('(+999) 99 99 99 99[9]')
@@ -124,15 +125,7 @@ $(function () {
 	$(".companies").select2({
 		placeholder: 'Enter name...',
 		theme: "bootstrap",
-		allowClear: true,
-		tags: false,
-        escapeMarkup: function (markup) {
-            return markup;
-        },
-        minimumInputLength: 1,
-        templateResult: formatRepoCompany,
-        templateSelection: formatRepoSelectionCompany,
-        multiple: true
+		allowClear: true
 	}).on('change', function (e) {
 		try {
 			var company = JSON.parse(e.target.value)

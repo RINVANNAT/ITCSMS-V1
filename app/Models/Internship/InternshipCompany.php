@@ -18,9 +18,18 @@ class InternshipCompany extends Model
         'mail',
         'web'
     ];
+
+    protected $appends = [
+        'text'
+    ];
     
     public function internships ()
     {
         return $this->hasMany(Internship::class, 'company_id', 'id');
+    }
+
+    public function getTextAttribute()
+    {
+        return $this->name ." (".$this->title.")";
     }
 }

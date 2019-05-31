@@ -14,6 +14,7 @@ use App\Models\StudentAnnual;
 use App\Traits\PrintInternshipTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Yajra\Datatables\Facades\Datatables;
 
@@ -48,7 +49,7 @@ class InternshipController extends Controller
             $number += count($internships);
         }
         $academic_years = AcademicYear::latest()->get();
-        $companies = InternshipCompany::select('name as text', '*')->orderBy('name', 'asc')->get();
+        $companies = InternshipCompany::select('*')->orderBy('name', 'asc')->get();
         return view('backend.internship.create')->with([
             'academic_years' => $academic_years,
             'number' => $number,
