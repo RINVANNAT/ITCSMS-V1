@@ -22,7 +22,7 @@ class InternshipCompany extends Model
     protected $appends = [
         'text'
     ];
-    
+
     public function internships ()
     {
         return $this->hasMany(Internship::class, 'company_id', 'id');
@@ -30,6 +30,6 @@ class InternshipCompany extends Model
 
     public function getTextAttribute()
     {
-        return $this->name ." (".$this->title.")";
+        return $this->name;
     }
 }

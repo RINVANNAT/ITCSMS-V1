@@ -34,6 +34,16 @@
             border: 1px solid #bfbfbf;
             height: 250px;
         }
+        .select2-container--bootstrap
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: #dddddd !important;
+            color: #0A0A0A;
+        }
+        .company-item-name h3 {
+            font-size: 18px;
+            font-weight: 900;
+            color: #0A0A0A;
+        }
     </style>
 @stop
 
