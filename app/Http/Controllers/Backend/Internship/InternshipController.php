@@ -13,7 +13,9 @@ use App\Models\Student;
 use App\Models\StudentAnnual;
 use App\Traits\PrintInternshipTrait;
 use Carbon\Carbon;
+use Faker\Provider\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Yajra\Datatables\Facades\Datatables;
 
@@ -48,7 +50,7 @@ class InternshipController extends Controller
             $number += count($internships);
         }
         $academic_years = AcademicYear::latest()->get();
-        $companies = InternshipCompany::select('name as text', '*')->orderBy('name', 'asc')->get();
+        $companies = InternshipCompany::select('*')->orderBy('name', 'asc')->get();
         return view('backend.internship.create')->with([
             'academic_years' => $academic_years,
             'number' => $number,
@@ -64,39 +66,43 @@ class InternshipController extends Controller
      */
     public function store(StoreInternshipRequest $request)
     {
-        // dd($request->all());
         $result = array(
             'code' => 1,
             'message' => 'success',
             'data' => []
         );
 
-        $is_name = $request->is_name;
-        isset($is_name) ? $is_name = true : $is_name = false;
+        if (isset($request->is_name)) {
+            $request['is_name'] = true;
+        } else {
+            $request['is_name'] = false;
+        }
+
+        $companyName = null;
+        if (ctype_digit($request->company)) {
+            $company = InternshipCompany::find($request->company);
+            if ($company instanceof InternshipCompany) {
+                $companyName = $company->name;
+            } else {
+                $companyName = $request->company;
+            }
+        } else {
+            $companyName = $request->company;
+        }
 
         try {
-            $company = json_decode($request->company);
-            if (is_null($company)) {
-                $company = InternshipCompany::create([
-                    'name' => $request->company,
-                    'title' => $request->title,
-                    'training_field' => $request->training_field,
-                    'address' => $request->address,
-                    'phone' => $request->phone,
-                    'hp' => $request->hot_line,
-                    'mail' => $request->e_mail_address,
-                    'web' => $request->web
-                ]);
-                $request['company'] = $company->name;
-                $request['company_id'] = $company->id;
-            } else {
-                if (isset($company->id) && isset($company->name)) {
-                    $request['company'] = $company->name;
-                    $request['company_id'] = $company->id;
-                } else {
-                    return message_success("Could not found company!");
-                }
-            }
+            $company = InternshipCompany::firstOrCreate([
+                'name' => $companyName,
+                'title' => $request->title,
+                'training_field' => $request->training_field,
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'hp' => $request->hp,
+                'mail' => $request->mail,
+                'web' => $request->web
+            ]);
+            $request['company_id'] = $company->id;
+            $request['company'] = $companyName;
 
             if (array_key_exists('id', $request->all())) {
                 $internship = Internship::find($request->id);
@@ -332,12 +338,25 @@ class InternshipController extends Controller
 
     public function remoteInternshipCompanies(Request $request)
     {
-        $this->validate($request, ['q' => 'required']);
+        $this->validate($request, [
+            'term' => 'required'
+        ]);
         try {
-            $result = InternshipCompany::where('name', 'ilike', '%' . $request->q . '%')->select('name as text', 'id')->get();
-            return json_encode(['code' => 1, 'status' => 'success', 'results' => $result]);
+            $result = InternshipCompany::where('name', 'ilike', $request->term . '%')
+                ->orderBy('name', 'asc')
+                ->select('*')
+                ->take(10)
+                ->get();
+            return json_encode([
+                'code' => 1,
+                'status' => 'success',
+                'results' => $result
+            ]);
         } catch (\Exception $exception) {
-            return json_encode(['code' => 0, 'message' => $exception->getMessage()]);
+            return json_encode([
+                'code' => 0,
+                'message' => $exception->getMessage()
+            ]);
         }
     }
 }

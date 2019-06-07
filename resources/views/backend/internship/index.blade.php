@@ -14,7 +14,7 @@
 @endsection
 
 @section('content')
-    <div class="box box-success">     
+    <div class="box box-success">
         <div class="box-header with-border">
             <h3 class="box-title">Internship</h3>
             <div class="box-tools pull-right">
@@ -76,6 +76,7 @@
             let oTable = $('#internships').DataTable({
                 processing: true,
                 serverSide: true,
+                saveState: true,
                 ajax: '{{ route('internship.data') }}',
                 columns: [
                     {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},

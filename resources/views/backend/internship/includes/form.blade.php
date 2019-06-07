@@ -48,19 +48,21 @@
         <div class="form-group">
             <label class="col-md-3 control-label required">Company</label>
             <div class="col-md-9">
-                <select class="companies form-control" tabindex="3" name="company">
-                    <option selected disabled></option>
-                    @foreach($companies as $company)
-                        @if(isset($internship))
-                            @if($internship->internship_company->id == $company->id)
-                                <option value="{{ $company }}" selected>{{ $company->text }}</option>
-                            @else
-                                <option value="{{ $company }}">{{ $company->text }}</option>
-                            @endif
-                        @else
-                            <option value="{{ $company }}">{{ $company->text }}</option>
-                        @endif
-                    @endforeach
+                <select class="companies form-control"
+                        tabindex="3"
+                        name="company">
+                    {{--<option selected disabled></option>--}}
+                    {{--@foreach($companies as $company)--}}
+                        {{--@if(isset($internship))--}}
+                            {{--@if($internship->internship_company->id == $company->id)--}}
+                                {{--<option value="{{ $company }}" selected>{{ $company }}</option>--}}
+                            {{--@else--}}
+                                {{--<option value="{{ $company }}">{{ $company }}</option>--}}
+                            {{--@endif--}}
+                        {{--@else--}}
+                            {{--<option value="{{ $company }}">{{ $company }}</option>--}}
+                        {{--@endif--}}
+                    {{--@endforeach--}}
                 </select>
             </div>
         </div>

@@ -1,0 +1,170 @@
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-Italic.ttf") format("truetype");
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-BoldItalic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-Light.ttf") format("truetype");
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-LightItalic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-SemiBoldItalic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-Thin.ttf") format("truetype");
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("../fonts/josefin_sans/JosefinSans-ThinItalic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: "Perpetua";
+  src: url("../fonts/perpetua/perpetua_regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Perpetua";
+  src: url("../fonts/perpetua/perpetua_italic.ttf") format("truetype");
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Perpetua";
+  src: url("../fonts/perpetua/perpetua_bold.ttf") format("truetype");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "Perpetua";
+  src: url("../fonts/perpetua/perpetua_regular.ttf") format("truetype");
+  font-style: italic;
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "Kantumruy";
+  src: url("../fonts/kantumruy/Kantumruy-Regular.ttf");
+  unicode-range: U+1780-17FF;
+}
+
+@font-face {
+  font-family: "Kantumruy";
+  src: url("../fonts/kantumruy/Kantumruy-Light.ttf");
+  font-weight: 300;
+  unicode-range: U+1780-17FF;
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../fonts/helvetica_neue/HelveticaNeueMedium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../fonts/helvetica_neue/HelveticaNeueItalic.ttf") format("truetype");
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../fonts/helvetica_neue/HelveticaNeueBold.ttf") format("truetype");
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../fonts/helvetica_neue/HelveticaNeueBoldItalic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../fonts/helvetica_neue/HelveticaNeueLight.ttf") format("truetype");
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../fonts/helvetica_neue/HelveticaNeueLightItalic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: "Kantumruy";
+  src: url("../fonts/kantumruy/Kantumruy-Bold.ttf");
+  font-weight: bold;
+  unicode-range: U+1780-17FF;
+}
+
+@font-face {
+  font-family: "Khmer Moul";
+  src: url("../fonts/moul/Moul.ttf");
+  unicode-range: U+1780-17FF;
+}
+
+:root {
+  --secondary-font: "Kantumruy", "Helvetica Neue", "Josefin Sans", Arial;
+  --primary-font: "Khmer Moul", "Helvetica Neue", "Perpetua", Arial;
+}
+
+:not([class^=fa]) {
+  font-family: "Kantumruy", "Helvetica Neue", "Josefin Sans", Arial !important;
+}
+
+.font-secondary {
+  font-family: "Kantumruy", "Helvetica Neue", "Josefin Sans", Arial !important;
+}
+
+.font-primary {
+  font-family: "Khmer Moul", "Helvetica Neue", "Perpetua", Arial !important;
+}
+
+h1, h2, h3, h4, h5, h6, p, span {
+  font-family: font-secondary;
+}
