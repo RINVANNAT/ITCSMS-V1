@@ -8,6 +8,7 @@ use App\Models\Score;
 use App\Models\StudentAnnual;
 use App\Models\PercentageScore;
 use App\Models\Percentage;
+use App\Models\Absence;
 
 class DuplicateCourseAnnual extends Seeder
 {
@@ -28,6 +29,7 @@ class DuplicateCourseAnnual extends Seeder
             'degree_id' => 1,
             'grade_id' => 2,
             'semester_id' => 1,
+            'department_option_id' => null
         ])->get();
         DB::beginTransaction();
         try {
@@ -80,19 +82,35 @@ class DuplicateCourseAnnual extends Seeder
                         'grade_id' => 2,
                         'department_option_id' => $departmentOptionId
                     ])->get();
-                    foreach ($scores as $score) {
-                        $newPercentages = [];
-                        $percentageScore = PercentageScore::where('score_id', $score->id)->pluck('percentage_id');
-                        if ($percentageScore instanceof PercentageScore) {
-                            $percentages = Percentage::whereIn('percentage_id', $percentageScore)->get();
-                            foreach ($percentages as $percentage) {
-                                $newPercentage = $percentage->replicate();
-                                $newPercentage->save();
-                                array_push($newPercentages, $newPercentage);
-                            }
+                    // new percentage
+                    $newPercentages = [];
+                    $percentages = Percentage::where('percent', $newCourseAnnual->score_percentage_column_3)
+                        ->orWhere('percent', $newCourseAnnual->score_percentage_column_2)
+                        ->distinct('percent')
+                        ->latest()
+                        ->limit(2)
+                        ->get();
+                    foreach ($percentages as $percentage) {
+                        $tmpPercentage = $percentage->replicate();
+                        $tmpPercentage->save();
+                        array_push($newPercentages, $tmpPercentage);
+                    }
+
+                    foreach ($studentAnnuals as $studentAnnual) {
+                        $tmpAbsence = Absence::where([
+                            'course_annual_id' => $courseAnnual->id,
+                            'student_annual_id' => $studentAnnual->id,
+                        ])->first();
+                        if ($tmpAbsence instanceof Absence) {
+                            Absence::firstOrCreate([
+                                'course_annual_id' => $newCourseAnnual->id,
+                                'student_annual_id' => $studentAnnual->id,
+                                'num_absence' => $tmpAbsence->num_absence,
+                                'notation' => $tmpAbsence->notation,
+                            ]);
                         }
-                        foreach ($studentAnnuals as $studentAnnual) {
-                            if ($score->student_annaul_id == $studentAnnual->id) {
+                        foreach ($scores as $score) {
+                            if ($score->student_annual_id == $studentAnnual->id) {
                                 $newScore = Score::firstOrCreate([
                                     "degree_id" => $score->degree_id,
                                     "grade_id" => $score->grade_id,
@@ -107,23 +125,32 @@ class DuplicateCourseAnnual extends Seeder
                                     "score_type" => $score->score_type,
                                     "score_absence" => $score->score_absence,
                                 ]);
+                                $tmpPercentageScore = PercentageScore::where([
+                                    'score_id' => $score->id
+                                ])->first();
+                                $tmpPercentage = Percentage::find($tmpPercentageScore->percentage_id);
+                                dd($courseAnnual);
                                 foreach ($newPercentages as $percentage) {
-                                    PercentageScore::create([
-                                        'percentage_id' => $percentage->id,
-                                        'score_id' => $newScore->id
-                                    ]);
+                                    dump([$percentage->percent, $tmpPercentage->percent]);
+                                    if ($percentage->percent == $tmpPercentage->percent) {
+                                        PercentageScore::firstOrCreate([
+                                            'percentage_id' => $percentage->id,
+                                            'score_id' => $newScore->id
+                                        ]);
+                                    }
                                 }
                             }
                         }
-
                     }
                 }
+                var_dump($courseAnnual->name_en);
             }
         } catch (\Exception $exception) {
             DB::rollback();
             dump($exception->getMessage());
             dd([]);
         }
+        var_dump('Done!!!');
         DB::commit();
     }
 }

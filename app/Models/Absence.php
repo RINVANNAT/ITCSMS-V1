@@ -24,7 +24,7 @@ class Absence extends Model
         
     ];
 
-	public static $rules = [
+    public static $rules = [
 		"course_annual_id" => "required|numeric",
 		"student_annual_id" => "required|numeric",
 		"num_absence" => "required|numeric"
