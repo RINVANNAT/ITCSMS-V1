@@ -103,7 +103,6 @@ class DuplicateCourseI2 extends Seeder
         }
 
         $absences = Absence::whereIN("course_annual_id",$courseAnnuals->pluck('id'))->get();
-        // Update scores base on new course id
         foreach($absences as $absence) {
             $absence->course_annual_id = $this->getNewCourseId($courseDictionary, $absence->course_annual_id,$studentAnnuals[$absence->student_annual_id]);
             $absence->save();
