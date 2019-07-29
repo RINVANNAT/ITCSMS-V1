@@ -235,7 +235,13 @@
                 </div>
                 <div style="width: 160mm; float: left; margin-left: 15mm; text-align: justify">
                     <p style="font-family: 'Calibri Light'; font-size: 13pt; line-height: 1.5;">
-                        Has successfully passed the English Language Exam equivalent to Level <span style="font-size: 30px !important;">{{$level}}</span> of the Common European Framework of Reference for Language (CEFR) at the time of level exam session taking place at the Institute of Technology of Cambodia on {{ \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start)->format('F, jS Y') }}.
+                        Has successfully passed the English Language Exam equivalent to Level <span style="font-size: 30px !important;">{{$level}}</span> of the Common European Framework of Reference for Language (CEFR) at the time of level exam session taking place at the
+                        @if(config('app.app_branch') === 'PP')
+                            Institute of Technology of Cambodia
+                        @elseif(config('app.app_branch') === 'TK')
+                            Tbong Khum Campus
+                        @endif
+                        on {{ \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start)->format('F, jS Y') }}.
                     </p>
 
                     <div class="pull-right" style="margin-top: 8mm">

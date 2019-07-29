@@ -4,16 +4,12 @@ namespace App\Repositories\Backend\Exam;
 
 
 use App\Exceptions\GeneralException;
-use App\Http\Requests\Backend\Exam\StoreEntranceExamScoreRequest;
 use App\Models\Exam;
 use App\Models\UserLog;
 use Carbon\Carbon;
 use DB;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Response;
-use Object;
-use phpDocumentor\Reflection\Types\Object_;
+//use Object;
 
 /**
  * Class EloquentExamRepository
@@ -28,7 +24,7 @@ class EloquentExamRepository implements ExamRepositoryContract
      */
     public function findOrThrowException($id)
     {
-        if (! is_null(Exam::find($id))) {
+        if (!is_null(Exam::find($id))) {
             return Exam::find($id);
         }
 
@@ -37,8 +33,8 @@ class EloquentExamRepository implements ExamRepositoryContract
 
     /**
      * @param  $per_page
-     * @param  string      $order_by
-     * @param  string      $sort
+     * @param  string $order_by
+     * @param  string $sort
      * @return mixed
      */
     public function getExamsPaginated($per_page, $order_by = 'sort', $sort = 'asc')
@@ -48,8 +44,8 @@ class EloquentExamRepository implements ExamRepositoryContract
     }
 
     /**
-     * @param  string  $order_by
-     * @param  string  $sort
+     * @param  string $order_by
+     * @param  string $sort
      * @return mixed
      */
     public function getAllExams($order_by = 'sort', $sort = 'asc')
@@ -59,8 +55,8 @@ class EloquentExamRepository implements ExamRepositoryContract
     }
 
     /**
-     * @param  string  $order_by
-     * @param  string  $sort
+     * @param  string $order_by
+     * @param  string $sort
      * @return mixed
      */
     public function getEntranceExams($order_by = 'sort', $sort = 'asc')
@@ -70,8 +66,8 @@ class EloquentExamRepository implements ExamRepositoryContract
     }
 
     /**
-     * @param  string  $order_by
-     * @param  string  $sort
+     * @param  string $order_by
+     * @param  string $sort
      * @return mixed
      */
     public function getFinalExams($order_by = 'sort', $sort = 'asc')
@@ -92,19 +88,19 @@ class EloquentExamRepository implements ExamRepositoryContract
         }
 
         // Examination start - end
-        $date_start_end = explode(" - ",$input['date_start_end']);
+        $date_start_end = explode(" - ", $input['date_start_end']);
         $date_start = $date_start_end[0];
         $date_end = $date_start_end[1];
 
         // Success registration start - end
-        $success_registration_date_start_end = explode(" - ",$input['success_registration_date_start_end']);
-        $success_registration_date_start = Carbon::createFromFormat('d/m/Y',$success_registration_date_start_end[0])->format('Y-m-d');
-        $success_registration_date_end = Carbon::createFromFormat('d/m/Y',$success_registration_date_start_end[1])->format('Y-m-d');
+        $success_registration_date_start_end = explode(" - ", $input['success_registration_date_start_end']);
+        $success_registration_date_start = Carbon::createFromFormat('d/m/Y', $success_registration_date_start_end[0])->format('Y-m-d');
+        $success_registration_date_end = Carbon::createFromFormat('d/m/Y', $success_registration_date_start_end[1])->format('Y-m-d');
 
         // Reserve registration start - end
-        $reserve_registration_date_start_end = explode(" - ",$input['reserve_registration_date_start_end']);
-        $reserve_registration_date_start = Carbon::createFromFormat('d/m/Y',$reserve_registration_date_start_end[0])->format('Y-m-d');
-        $reserve_registration_date_end = Carbon::createFromFormat('d/m/Y',$reserve_registration_date_start_end[1])->format('Y-m-d');
+        $reserve_registration_date_start_end = explode(" - ", $input['reserve_registration_date_start_end']);
+        $reserve_registration_date_start = Carbon::createFromFormat('d/m/Y', $reserve_registration_date_start_end[0])->format('Y-m-d');
+        $reserve_registration_date_end = Carbon::createFromFormat('d/m/Y', $reserve_registration_date_start_end[1])->format('Y-m-d');
 
         $exam = new Exam();
 
@@ -127,8 +123,8 @@ class EloquentExamRepository implements ExamRepositoryContract
         if ($exam->save()) {
             UserLog::log([
                 'model' => 'Exam',
-                'action'=> 'Create',
-                'data'  => $exam->id, // if it is create action, store only the new id.
+                'action' => 'Create',
+                'data' => $exam->id, // if it is create action, store only the new id.
             ]);
             return $exam->id;
         }
@@ -147,19 +143,19 @@ class EloquentExamRepository implements ExamRepositoryContract
         $exam = $this->findOrThrowException($id);
         $old_record = json_encode($exam);
 
-        $date_start_end = explode(" - ",$input['date_start_end']);
+        $date_start_end = explode(" - ", $input['date_start_end']);
         $date_start = $date_start_end[0];
         $date_end = $date_start_end[1];
 
         // Success registration start - end
-        $success_registration_date_start_end = explode(" - ",$input['success_registration_date_start_end']);
-        $success_registration_date_start = Carbon::createFromFormat('d/m/Y',$success_registration_date_start_end[0])->format('Y-m-d');
-        $success_registration_date_end = Carbon::createFromFormat('d/m/Y',$success_registration_date_start_end[1])->format('Y-m-d');
+        $success_registration_date_start_end = explode(" - ", $input['success_registration_date_start_end']);
+        $success_registration_date_start = Carbon::createFromFormat('d/m/Y', $success_registration_date_start_end[0])->format('Y-m-d');
+        $success_registration_date_end = Carbon::createFromFormat('d/m/Y', $success_registration_date_start_end[1])->format('Y-m-d');
 
         // Reserve registration start - end
-        $reserve_registration_date_start_end = explode(" - ",$input['reserve_registration_date_start_end']);
-        $reserve_registration_date_start = Carbon::createFromFormat('d/m/Y',$reserve_registration_date_start_end[0])->format('Y-m-d');
-        $reserve_registration_date_end = Carbon::createFromFormat('d/m/Y',$reserve_registration_date_start_end[1])->format('Y-m-d');
+        $reserve_registration_date_start_end = explode(" - ", $input['reserve_registration_date_start_end']);
+        $reserve_registration_date_start = Carbon::createFromFormat('d/m/Y', $reserve_registration_date_start_end[0])->format('Y-m-d');
+        $reserve_registration_date_end = Carbon::createFromFormat('d/m/Y', $reserve_registration_date_start_end[1])->format('Y-m-d');
 
         $exam->name = $input['name'];
         $exam->date_start = $date_start;
@@ -168,7 +164,7 @@ class EloquentExamRepository implements ExamRepositoryContract
         $exam->success_registration_stop = $success_registration_date_end;
         $exam->reserve_registration_start = $reserve_registration_date_start;
         $exam->reserve_registration_stop = $reserve_registration_date_end;
-        $exam->active = isset($input['active'])?true:false;
+        $exam->active = isset($input['active']) ? true : false;
         $exam->description = $input['description'];
         $exam->academic_year_id = $input['academic_year_id'];
         $exam->type_id = $input['type_id'];
@@ -179,8 +175,8 @@ class EloquentExamRepository implements ExamRepositoryContract
         if ($exam->save()) {
             UserLog::log([
                 'model' => 'Exam',
-                'action'=> 'Update',
-                'data'  => $old_record, // store all old record so we can role back
+                'action' => 'Update',
+                'data' => $old_record, // store all old record so we can role back
             ]);
             return true;
         }
@@ -214,8 +210,8 @@ class EloquentExamRepository implements ExamRepositoryContract
         if ($exam->save()) {
             UserLog::log([
                 'model' => 'Exam',
-                'action'=> 'Delete',
-                'data'  => $id, // Store only id because we didn't really delete the record
+                'action' => 'Delete',
+                'data' => $id, // Store only id because we didn't really delete the record
             ]);
             return true;
         }
@@ -223,7 +219,8 @@ class EloquentExamRepository implements ExamRepositoryContract
         throw new GeneralException(trans('exceptions.backend.general.delete_error'));
     }
 
-    public function requestInputScoreForm ($exam_id, $request, $number_correction) {
+    public function requestInputScoreForm($exam_id, $request, $number_correction)
+    {
 
         $candidates = DB::table('candidates')
             ->where([
@@ -231,13 +228,13 @@ class EloquentExamRepository implements ExamRepositoryContract
                 ['candidates.active', '=', true],
                 ['candidates.exam_id', '=', $exam_id]
             ])
-            ->select( 'candidates.id as candidate_id', 'candidates.register_id')
+            ->select('candidates.id as candidate_id', 'candidates.register_id')
             ->orderBy('candidates.register_id', 'ASC')->get();
 
-        $course = DB::table('entranceExamCourses')->where('id',$request->entrance_course_id)->first();
+        $course = DB::table('entranceExamCourses')->where('id', $request->entrance_course_id)->first();
         $result = [];
-        foreach($candidates as $candidate){
-            $result[]= (object)array(
+        foreach ($candidates as $candidate) {
+            $result[] = (object)array(
                 'register_id' => $candidate->register_id,
                 'course_name' => $request->course_name,
                 'total_question' => $course->total_question,
@@ -260,9 +257,10 @@ class EloquentExamRepository implements ExamRepositoryContract
         return $a->candidateProperties->register_id - $b->candidateProperties->register_id;
     }
 
-    public function insertCandidateScore($exam_id, $requestDatas, $correctorName) {
+    public function insertCandidateScore($exam_id, $requestDatas, $correctorName)
+    {
 
-        $check =0;
+        $check = 0;
         $numberCorrection = $requestDatas['sequence'];
         $roomcode = $requestDatas['roomcode'];
         $subjectId = $requestDatas['course_id'];
@@ -272,17 +270,17 @@ class EloquentExamRepository implements ExamRepositoryContract
         $noAns = $requestDatas['score_na'];
 
         //dd($requestDatas);
-        for($i = 0; $i < count($requestDatas['score_c']); $i++) {
-            $insertResult = $this->storeCandidateScore($subjectId, $correctAns[$i], $wrongAns[$i], $noAns[$i], $numberCorrection, $i+1, $correctorName,$roomcode,$exam_id);
-            if($insertResult) {
+        for ($i = 0; $i < count($requestDatas['score_c']); $i++) {
+            $insertResult = $this->storeCandidateScore($subjectId, $correctAns[$i], $wrongAns[$i], $noAns[$i], $numberCorrection, $i + 1, $correctorName, $roomcode, $exam_id);
+            if ($insertResult) {
                 $check++;
             }
         }
 
-        if($check == count($requestDatas['score_c'])) {
-            return ['status'=>true];
+        if ($check == count($requestDatas['score_c'])) {
+            return ['status' => true];
         } else {
-            return ['status'=>false];
+            return ['status' => false];
         }
     }
 
@@ -333,28 +331,29 @@ class EloquentExamRepository implements ExamRepositoryContract
         return ['status'=>false];
     }*/
 
-    private function getCandidateScore($roomcode, $subjectId, $sequence, $orderInRoom, $exam_id) {
+    private function getCandidateScore($roomcode, $subjectId, $sequence, $orderInRoom, $exam_id)
+    {
 
 
-       $CandidateScore =  DB::table('secret_room_score')
-                            ->where([
-                                ['sequence', $sequence],
-                                ['course_id', $subjectId],
-                                ['roomcode', $roomcode],
-                                ['order_in_room', $orderInRoom],
-                                ['exam_id', $exam_id]
-                            ])
-                            ->first();
+        $CandidateScore = DB::table('secret_room_score')
+            ->where([
+                ['sequence', $sequence],
+                ['course_id', $subjectId],
+                ['roomcode', $roomcode],
+                ['order_in_room', $orderInRoom],
+                ['exam_id', $exam_id]
+            ])
+            ->first();
 
         return $CandidateScore;
 
     }
 
-    private function storeCandidateScore($subjectId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom, $correctorName, $roomcode,$exam_id)
+    private function storeCandidateScore($subjectId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom, $correctorName, $roomcode, $exam_id)
     {
 
 
-        if($this->getCandidateScore($roomcode,$subjectId,$numberCorrection,$orderInRoom,$exam_id)){
+        if ($this->getCandidateScore($roomcode, $subjectId, $numberCorrection, $orderInRoom, $exam_id)) {
             return false;
         } else {
             $insertedVal = DB::table('secret_room_score')->insertGetId([
@@ -367,7 +366,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                 'order_in_room' => $orderInRoom,
                 'roomcode' => $roomcode,
                 'exam_id' => $exam_id,
-                'create_uid' =>auth()->id(),
+                'create_uid' => auth()->id(),
                 'created_at' => Carbon::now()
             ]);
             //UserLog
@@ -377,18 +376,20 @@ class EloquentExamRepository implements ExamRepositoryContract
 
     }
 
-    public function getUserLog($data, $model, $action) {
+    public function getUserLog($data, $model, $action)
+    {
         $storeData = json_encode($data);
         UserLog::log([
             'model' => $model,
-            'action'   => $action, // Import, Create, Delete, Update
-            'data'     => $storeData // if it is create action, store only the new id.
+            'action' => $action, // Import, Create, Delete, Update
+            'data' => $storeData // if it is create action, store only the new id.
         ]);
 
     }
 
 
-    private function updateCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom, $correctorName) {
+    private function updateCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom, $correctorName)
+    {
 
         $previousRecord = $this->getCandidateScore($candidateId, $subjectId, $numberCorrection);
 
@@ -396,7 +397,7 @@ class EloquentExamRepository implements ExamRepositoryContract
             ->where([
                 ['entrance_exam_course_id', '=', $subjectId],
                 ['candidate_id', '=', $candidateId],
-                ['sequence', '=', $numberCorrection ]
+                ['sequence', '=', $numberCorrection]
             ])
             ->update(array(
                 'score_c' => (int)$correctAns,
@@ -406,38 +407,40 @@ class EloquentExamRepository implements ExamRepositoryContract
                 'candidate_number_in_room' => $orderInRoom
             ));
 
-        if($updateRecord) {
+        if ($updateRecord) {
             //UserLog
-            $this->getUserLog($previousRecord,$model ='CandidateEntranceExamScores', $action = 'Update');
+            $this->getUserLog($previousRecord, $model = 'CandidateEntranceExamScores', $action = 'Update');
         }
         return $updateRecord;
     }
 
-    public function addNewCorrectionCandidateScore($examId,  $request, $correctorName) {
+    public function addNewCorrectionCandidateScore($examId, $request, $correctorName)
+    {
 
         $requestScore = $request->serializ_data;
 
-        for($index=0; $index < count($requestScore); $index++) {
+        for ($index = 0; $index < count($requestScore); $index++) {
             parse_str($requestScore[$index], $outPut);// convertion of the serialized data to array json
 
-            $this->storeCandidateScore($outPut['course_id'][0], $outPut['score_c'][0], $outPut['score_w'][0], $outPut['score_na'][0], $outPut['sequence'][0], $outPut['order'][0], $correctorName,$outPut['roomcode'][0],$examId);
+            $this->storeCandidateScore($outPut['course_id'][0], $outPut['score_c'][0], $outPut['score_w'][0], $outPut['score_na'][0], $outPut['sequence'][0], $outPut['order'][0], $correctorName, $outPut['roomcode'][0], $examId);
         }
 
         return (['status' => true]);
 
     }
 
-    public function getErrorScore($examID, $courseId){
+    public function getErrorScore($examID, $courseId)
+    {
 
 
         $errorCandidateScores = [];
 
-        $course = DB::table('entranceExamCourses')->where('id',$courseId)->first();
+        $course = DB::table('entranceExamCourses')->where('id', $courseId)->first();
         $total_question = $course->total_question;
 
         $candidateScores = DB::table('secret_room_score')
-            ->where('exam_id',$examID)
-            ->where('course_id',$courseId)
+            ->where('exam_id', $examID)
+            ->where('course_id', $courseId)
             ->select(
                 'roomcode',
                 'id',
@@ -454,36 +457,36 @@ class EloquentExamRepository implements ExamRepositoryContract
 
         $array = array();
 
-        $tempCands =[];
+        $tempCands = [];
 
-        foreach($candidateScores as $candidateScore) {
+        foreach ($candidateScores as $candidateScore) {
 
-            $tempCands[$candidateScore->roomcode.'_'.$candidateScore->order_in_room][] = array(
-                'score_c' =>  $candidateScore->score_c,
-                'score_w'   => $candidateScore->score_w,
-                'score_na'  => $candidateScore->score_na,
+            $tempCands[$candidateScore->roomcode . '_' . $candidateScore->order_in_room][] = array(
+                'score_c' => $candidateScore->score_c,
+                'score_w' => $candidateScore->score_w,
+                'score_na' => $candidateScore->score_na,
                 'sequence' => $candidateScore->sequence
-            ) ;
+            );
         }
 
-        foreach($tempCands as $key => $tempCand){
+        foreach ($tempCands as $key => $tempCand) {
 
-            $statusCorrectScore =0;
-            $statusWrongScore=0;
+            $statusCorrectScore = 0;
+            $statusWrongScore = 0;
 
-            if(count($tempCand) <2){
+            if (count($tempCand) < 2) {
                 //array_push($errorCandidateScores, $tempCand);
-                array_push($errorCandidateScores, (object) array('candidateProperties' => $key, 'scoreErrors' => $tempCand) );
+                array_push($errorCandidateScores, (object)array('candidateProperties' => $key, 'scoreErrors' => $tempCand));
             } else {
-                $length =  count($tempCand);
-                for ($i = 0; $i < $length ; $i++) {
+                $length = count($tempCand);
+                for ($i = 0; $i < $length; $i++) {
                     // Select up down
                     $tmpScoreCorrect = $tempCand[$i]['score_c'];
                     $tmpScoreWrong = $tempCand[$i]['score_w'];
                     $tmpScoreNA = $tempCand[$i]['score_na'];
 
                     // Compare bottom up
-                    for ($j = $length-1; $j > $i ; $j--) {
+                    for ($j = $length - 1; $j > $i; $j--) {
 
                         // Check if there any any error in candidate's score
                         if (($tmpScoreCorrect == $tempCand[$j]['score_c'])
@@ -491,7 +494,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                             && ($tmpScoreNA == $tempCand[$j]['score_na'])) {
 
 
-                            if( ($tempCand[$j]['score_c'] + $tempCand[$j]['score_w'] + $tempCand[$j]['score_na'] == $total_question)
+                            if (($tempCand[$j]['score_c'] + $tempCand[$j]['score_w'] + $tempCand[$j]['score_na'] == $total_question)
                                 || ($tempCand[$j]['score_c'] + $tempCand[$j]['score_w'] + $tempCand[$j]['score_na'] == 0)) {
 
                                 $statusCorrectScore++; // every score is equal and total question is correct
@@ -504,8 +507,8 @@ class EloquentExamRepository implements ExamRepositoryContract
                         }
 
                         // If there is an error, store it to $errorCandidateScores
-                        if( $statusCorrectScore == 0 && $statusWrongScore == ($length*($length-1))/2 ) { //
-                            array_push($errorCandidateScores, (object) array('candidateProperties' => $key, 'scoreErrors' => $tempCand) );
+                        if ($statusCorrectScore == 0 && $statusWrongScore == ($length * ($length - 1)) / 2) { //
+                            array_push($errorCandidateScores, (object)array('candidateProperties' => $key, 'scoreErrors' => $tempCand));
                         }
                     }
                 }
@@ -513,7 +516,7 @@ class EloquentExamRepository implements ExamRepositoryContract
 
         }
 
-        if($errorCandidateScores) {
+        if ($errorCandidateScores) {
 
             $status = true;
             $this->deleteStatusCandidateScores($examID, $courseId);
@@ -527,10 +530,11 @@ class EloquentExamRepository implements ExamRepositoryContract
         return $errorCandidateScores;
     }
 
-    public function reportErrorCandidateExamScores($examId, $courseId) {
+    public function reportErrorCandidateExamScores($examId, $courseId)
+    {
 
         $errorCandidateScores = [];
-        $errors =[];
+        $errors = [];
         $candidateIds = DB::table('candidates')
             ->join('exams', 'exams.id', '=', 'candidates.exam_id')
             ->join('examRooms', 'examRooms.id', '=', 'candidates.room_id')
@@ -543,11 +547,11 @@ class EloquentExamRepository implements ExamRepositoryContract
             ->orderBy('register_id', 'ASC')
             ->get();
 
-        if($candidateIds) {
+        if ($candidateIds) {
             foreach ($candidateIds as &$candidateId) {
 
                 $candidateId->room_code = Crypt::decrypt($candidateId->room_code);
-                $statusCorrectScore = 0 ;
+                $statusCorrectScore = 0;
                 $statusWrongScore = 0;
                 $cadidateScores = DB::table('candidateEntranceExamScores')
                     ->join('entranceExamCourses', 'entranceExamCourses.id', '=', 'candidateEntranceExamScores.entrance_exam_course_id')
@@ -560,7 +564,6 @@ class EloquentExamRepository implements ExamRepositoryContract
                     ->get();
 
 
-
 //            dd($cadidateScores);
 
                 //array_push($errors, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
@@ -568,10 +571,10 @@ class EloquentExamRepository implements ExamRepositoryContract
                 if ($cadidateScores) {
                     $length = count($cadidateScores);
 
-                    if($length <2 ){
-                        array_push($errorCandidateScores, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
+                    if ($length < 2) {
+                        array_push($errorCandidateScores, (object)array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores));
                     } else {
-                        for ($i = 0; $i < $length ; $i++) {
+                        for ($i = 0; $i < $length; $i++) {
                             // Select up down
                             $tmpScoreCorrect = $cadidateScores[$i]->score_c;
                             $tmpScoreWrong = $cadidateScores[$i]->score_w;
@@ -579,14 +582,13 @@ class EloquentExamRepository implements ExamRepositoryContract
                             //$tmpTotalQuestion  = $cadidateScores[$i]->total_question;
 
                             // Compare bottom up
-                            for ($j = $length-1; $j > $i ; $j--) {
+                            for ($j = $length - 1; $j > $i; $j--) {
 
                                 // Check if there any any error in candidate's score
                                 if ($tmpScoreCorrect == $cadidateScores[$j]->score_c && $tmpScoreWrong == $cadidateScores[$j]->score_w && $tmpScoreNA == $cadidateScores[$j]->score_na) {
 
 
-
-                                    if( ($cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == $cadidateScores[$j]->total_question) || ($cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == 0)) {
+                                    if (($cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == $cadidateScores[$j]->total_question) || ($cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == 0)) {
 
 
                                         $statusCorrectScore++; // every score is equal and total question is correct
@@ -594,17 +596,17 @@ class EloquentExamRepository implements ExamRepositoryContract
                                         $previousRecord = $this->getCandidateScore($candidateId->candidate_id, $cadidateScores[$j]->entrance_exam_course_id, $cadidateScores[$j]->sequence);
 
                                         $res = DB::table('candidateEntranceExamScores')
-                                                ->where([
-                                                    ['entrance_exam_course_id', '=', $cadidateScores[$j]->entrance_exam_course_id],
-                                                    ['candidate_id', '=', $candidateId->candidate_id],
-                                                    ['sequence', '=', $cadidateScores[$j]->sequence ]
-                                                ])
-                                                ->update(array(
-                                                    'is_completed' => true
-                                                ));
-                                        if($res) {
+                                            ->where([
+                                                ['entrance_exam_course_id', '=', $cadidateScores[$j]->entrance_exam_course_id],
+                                                ['candidate_id', '=', $candidateId->candidate_id],
+                                                ['sequence', '=', $cadidateScores[$j]->sequence]
+                                            ])
+                                            ->update(array(
+                                                'is_completed' => true
+                                            ));
+                                        if ($res) {
                                             //UserLog
-                                            $this->getUserLog($previousRecord,$model ='CandidateEntranceExamScores', $action = 'Update');
+                                            $this->getUserLog($previousRecord, $model = 'CandidateEntranceExamScores', $action = 'Update');
                                         }
 
                                     } else {
@@ -615,8 +617,8 @@ class EloquentExamRepository implements ExamRepositoryContract
                                 }
 
                                 // If there is an error, store it to $errorCandidateScores
-                                if( $statusCorrectScore == 0 && $statusWrongScore == ($length*($length-1))/2 ) { //
-                                    array_push($errorCandidateScores, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
+                                if ($statusCorrectScore == 0 && $statusWrongScore == ($length * ($length - 1)) / 2) { //
+                                    array_push($errorCandidateScores, (object)array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores));
                                 }
                             }
                         }
@@ -627,7 +629,7 @@ class EloquentExamRepository implements ExamRepositoryContract
             }
 
 
-            if($errorCandidateScores) {
+            if ($errorCandidateScores) {
 
                 $status = true;
                 $this->deleteStatusCandidateScores($examId, $courseId);
@@ -643,16 +645,18 @@ class EloquentExamRepository implements ExamRepositoryContract
     }
 
 
-    private function insertStatusCandidateScores($examId, $courseId, $status) {
+    private function insertStatusCandidateScores($examId, $courseId, $status)
+    {
 
         $res = DB::table('statusCandidateScores')->insert(
-            ['exam_id' => $examId, 'status' => $status, 'entrance_exam_course_id' =>$courseId ]
+            ['exam_id' => $examId, 'status' => $status, 'entrance_exam_course_id' => $courseId]
         );
 
         return $res;
     }
 
-    private function deleteStatusCandidateScores($examId, $courseId) {
+    private function deleteStatusCandidateScores($examId, $courseId)
+    {
 
         DB::table('statusCandidateScores')->where([
             ['entrance_exam_course_id', '=', $courseId],
