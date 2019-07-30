@@ -155,7 +155,7 @@
             </li>
             @endauth
 
-            @permission('view-schedule-management')
+            {{--@permission('view-schedule-management')
             <li class="{{ Active::pattern('admin/schedule*') }} treeview">
                 <a href="#">
                     <i class="fa fa-calendar"></i>
@@ -177,7 +177,7 @@
 
                 </ul>
             </li>
-            @endauth
+            @endauth--}}
 
 
             @permission('view-accounting-management')
