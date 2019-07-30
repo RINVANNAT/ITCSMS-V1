@@ -160,10 +160,10 @@
                         <p><strong>Department:</strong> {{$student_by_group->first()['department_en']}}</p>
                     </div>
                 </div>
-                @if($student_by_group->first()['option_en'] != null)
+                @if((isset($student_by_group[1]) && $student_by_group[1]['option_en'] !== null) || (isset($student_by_group[2]) && $student_by_group[2]['option_en'] !== null))
                 <div class="row">
                     <div class="col-xs-12 no-padding">
-                        <p><strong>Option:</strong> {{$student_by_group->first()['option_en']}}</p>
+                        <p><strong>Option:</strong> {{isset($student_by_group[1]) ? $student_by_group[1]['option_en'] : $student_by_group[2]['option_en']}}</p>
                     </div>
                 </div>
                 @endif

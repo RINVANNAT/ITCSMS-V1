@@ -390,19 +390,19 @@ trait PrintAttestationTrait
             $view = 'backend.studentAnnual.print.attestation';
         }*/
 
-        //return view($view,
-        //    compact(
-        //        'ranking_data',
-        //        'scores',
-        //        'student_by_groups',
-        //        'semester',
-        //        'transcript_type',
-        //        'issued_by',
-        //        'issued_date',
-        //        'issued_number',
-        //        'smis_server'
-        //    )
-        //);
+//        return view($view,
+//            compact(
+//                'ranking_data',
+//                'scores',
+//                'student_by_groups',
+//                'semester',
+//                'transcript_type',
+//                'issued_by',
+//                'issued_date',
+//                'issued_number',
+//                'smis_server'
+//            )
+//        );
 
 
         return SnappyPdf::loadView($view,
