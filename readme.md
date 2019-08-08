@@ -8,7 +8,7 @@ SMIS | ITC
 
 - PHP 7.1
 - Postgres 9
-- npm > 3.10.8
+- npm > 3.10.8 and <= 8
 - node v6.9.1
 
 ### Installation
