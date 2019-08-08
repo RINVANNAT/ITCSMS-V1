@@ -105,7 +105,7 @@
             <div class="pull-right" style="margin-right: 5px;">
                 <input type="text"
                        id="issued_date"
-                       readonly
+                       :readonly="readonly"
                        name="issued_date"
                        v-model="issued_date"
                        class="form-control"
@@ -115,7 +115,10 @@
                 <input type="checkbox" name="photo" placeholder="Photo" value="photo" checked/> Photo
             </div>
             <div class="pull-right" style="margin-right: 5px;">
-                <button class="btn btn-primary btn-sm" @click="showModal()">New Issue Date</button>
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-sm" @click="showModal()">New Issue Date</button>
+                    <button class="btn btn-warning btn-sm" @click="readonly = false">Second Print</button>
+                </div>
             </div>
         </div><!-- /.box-header -->
 
@@ -185,12 +188,14 @@
                     academic_year_id: null,
                     class_modal_toggle: '',
 		            style_css: '',
-		            input_issued_date: null
+		            input_issued_date: null,
+                    readonly: true,
                 }
             },
 
             methods: {
 	            showModal () {
+	                this.readonly = true
 		            this.class_modal_toggle = ' in'
 		            this.style_css = 'display: block; padding-left: 0px;'
 	            },
@@ -491,7 +496,7 @@
             });
 
             $(document.body).on("click", ".btn-print-student-list", function () {
-                
+
                 if ($("#filter_class").select2('data').length !== 1) {
                     alert_error("", "You need to select only one class", null);
                     return;
