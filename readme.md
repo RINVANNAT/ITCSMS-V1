@@ -16,12 +16,13 @@ SMIS | ITC
 - ```git clone git@bitbucket.org:thavorac/itc-school-management-system.git```
 - ```cd project-name```
 - ```composer install```
-- ```npm install``` (you must to install gulp, Click [here](https://laravel.com/docs/5.1/elixir#installation))
+- ```npm install``` (you must to install gulp, Click [here](https://laravel.com/docs/5.1/elixir#installation)) to read full documentation
+- run ```gulp```
 - Create a database and restore existing database
 
 ### wkhtmltopdf
 
-You must to install ```wkhtmltopdf``` environment on your local machine, if you avoid to install you won\'t print document on the system. [The full documentation](https://github.com/barryvdh/laravel-snappy/blob/master/readme.md)
+You must to install ```wkhtmltopdf``` environment on your local machine, if you avoid to install you won\'t print document on the system ([docs](https://github.com/barryvdh/laravel-snappy/blob/master/readme.md)).
 
 ### Migration Command
 
