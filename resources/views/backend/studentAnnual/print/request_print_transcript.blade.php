@@ -109,6 +109,7 @@
                        name="issued_date"
                        v-model="issued_date"
                        class="form-control"
+                       ref="issue_date"
                        placeholder="Issued date"/>
             </div>
             <div class="pull-right" style="margin-right: 5px; margin-top: 6px;">
@@ -117,7 +118,7 @@
             <div class="pull-right" style="margin-right: 5px;">
                 <div class="btn-group">
                     <button class="btn btn-primary btn-sm" @click="showModal()">New Issue Date</button>
-                    <button class="btn btn-warning btn-sm" @click="readonly = false">Second Print</button>
+                    <button class="btn btn-warning btn-sm" @click="onClickSecondPrint">Second Print</button>
                 </div>
             </div>
         </div><!-- /.box-header -->
@@ -177,6 +178,7 @@
     {!! Html::script('plugins/select2/select2.full.min.js') !!}
     <script src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
     <script src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
+    <script src="https://unpkg.com/vue-swal"></script>
 
     <script>
         new Vue({
@@ -244,6 +246,10 @@
 	                this.class_modal_toggle = ''
 	                this.style_css = 'display: hide;'
 	                window.location.reload(true)
+                },
+                onClickSecondPrint () {
+                    this.$swal('Wish to do second printing?', "The current issued date is " + this.issued_date, 'warning')
+                    this.readonly = false
                 }
             },
 
