@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers\Backend\Course;
+<?php
+
+namespace App\Http\Controllers\Backend\Course;
 
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\GenerateStudentTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\ProficencyScoreTrait;
@@ -918,18 +920,18 @@ class CourseAnnualController extends Controller
             ->editColumn('name', function ($courseAnnual) use ($allGroups) {
                 ob_start();
                 ?>
-				<div class="row">
-					<div class="col-md-8">
-						<span style="display: none" class="course_id"><?php echo $courseAnnual->id ?></span>
-						<h4>
+                <div class="row">
+                    <div class="col-md-8">
+                        <span style="display: none" class="course_id"><?php echo $courseAnnual->id ?></span>
+                        <h4>
                             <?php
                             echo $courseAnnual->name;
                             ?>
-						</h4>
-						<span>(C=<?php echo $courseAnnual->time_course ?> | TD=<?php echo $courseAnnual->time_td ?> | TP= <?php echo $courseAnnual->time_tp ?>
-							)</span>
-					</div>
-					<div class="col-md-4">
+                        </h4>
+                        <span>(C=<?php echo $courseAnnual->time_course ?> | TD=<?php echo $courseAnnual->time_td ?> | TP= <?php echo $courseAnnual->time_tp ?>
+                            )</span>
+                    </div>
+                    <div class="col-md-4">
                         <?php
                         echo $courseAnnual->class;
                         if ($courseAnnual->department_option != "") {
@@ -939,7 +941,7 @@ class CourseAnnualController extends Controller
                             echo "<span style='color: darkred;'> (" . $courseAnnual->responsible_department_name . ")</span>";
                         }
                         ?>
-						<br/>
+                        <br/>
                         <?php
                         $a = "";
 
@@ -952,13 +954,13 @@ class CourseAnnualController extends Controller
                         }
                         echo $a;
                         ?>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
                         <?php echo $courseAnnual->semester . " | " . $courseAnnual->academic_year ?>
-					</div>
-				</div>
+                    </div>
+                </div>
                 <?php
                 $html = ob_get_clean();
                 return $html;
