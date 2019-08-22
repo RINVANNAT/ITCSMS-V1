@@ -239,7 +239,7 @@
                         @if(config('app.app_branch') === 'PP')
                             Institute of Technology of Cambodia
                         @elseif(config('app.app_branch') === 'TK')
-                            Tbong Khum Campus
+                            Tbong Khmum Campus
                         @endif
                         on {{ \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start)->format('F, jS Y') }}.
                     </p>
