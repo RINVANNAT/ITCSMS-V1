@@ -60,37 +60,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading"><i class="fa fa-bullhorn"></i> System Supporters</div>
                 <div class="panel-body">
-                    <table class="table table-hover table-striped">
-                        <thead>
-                        <tr>
-                            <th>Line.</th>
-                            {{--<th>Name</th>--}}
-                            <th>Telephone</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>Supporter 01</td>
-                            {{--<td>Mr. KIM YOUNENG</td>--}}
-                            <td><a href="tel:010 73 76 40">010 73 76 40</a></td>
-                        </tr>
-                        <tr>
-                            <td>Supporter 02</td>
-                            {{--<td>Miss. EUT CHANLEAKENA</td>--}}
-                            <td><a href="tel:010 85 51 99">010 85 51 99</a></td>
-                        </tr>
-                        <tr>
-                            <td>Supporter 03</td>
-                            {{--<td>Mr. CHUN THAVORAC</td>--}}
-                            <td><a href="tel:096 60 00 880">096 60 00 880</a></td>
-                        </tr>
-                        <tr>
-                            <td>Supporter 04</td>
-                            {{--<td>Mr. HEL Mab</td>--}}
-                            <td><a href="tel:096 24 49 031">096 24 49 031</a></td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <h3 class="text-uppercase">Supporter: <a href="tel:077542245">077542245</a></h3>
                 </div>
             </div>
         </div>
