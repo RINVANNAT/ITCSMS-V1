@@ -1,5 +1,24 @@
 @extends('frontend.layouts.master')
 
+@section('after-styles-end')
+    <style>
+        .supporter {
+            margin-top: 90px;
+            width: 100%;
+            height: 20vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .supporter-body {
+            /*display: inline;*/
+        }
+        .supporter-image > img{
+            width: 320px;
+        }
+    </style>
+@endsection
+
 @section('content')
 
     <div class="row">
@@ -57,10 +76,16 @@
         </div><!-- col-md-8 -->
 
         <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading"><i class="fa fa-bullhorn"></i> System Supporters</div>
-                <div class="panel-body">
-                    <h3 class="text-uppercase">Supporter: <a href="tel:077542245">077542245</a></h3>
+            <div class="supporter">
+                <div class="supporter-body">
+                    <div class="supporter-image">
+                        <img src="/img/undraw_calling_kpbp.svg"/>
+                    </div>
+                    <div class="supporter-tel text-center">
+                        <a href="tel:077542245">
+                            <h3>Tel: 077542245</h3>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
