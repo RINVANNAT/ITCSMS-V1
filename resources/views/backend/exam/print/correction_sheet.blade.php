@@ -87,9 +87,9 @@
                         </div>
                     </div>
 
-                   <div class="pull-right">
-                       Nom du correcteur: .................................
-                   </div>
+                    <div class="pull-right">
+                        Nom du correcteur: .................................
+                    </div>
 
                     <table class="table table-bordered" width="100%" style="table-layout: fixed;height: 100%">
                         <tr>
@@ -113,7 +113,7 @@
                     </table>
                     <div class="footer">
 
-                        <span>Attention: Nombre des étudiants peut être 27 ou 28 (Année {{ $academic_year->id - 1 }})</span>
+                        <span>Attention: Nombre des étudiants peut être 26 ou 27 (Année {{ $academic_year->id - 1 }})</span>
 
                     </div>
                 </div>
