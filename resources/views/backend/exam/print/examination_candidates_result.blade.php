@@ -142,10 +142,10 @@
 
                             <div class="col-sm-6 no-padding pull-right" style="font-size: 10pt;">
                                 <div class="col-sm-12 no-padding text-center">
-                                    ថ្ងៃសៅរ៍ ៧កើត ខែអស្សុជ ឆ្នាំកុរ ឯកស័ក ព.ស. ២៥៦៣
+                                    ថ្ងៃសុក្រ ៦កើត ខែអស្សុជ ឆ្នាំកុរ ឯកស័ក ព.ស.២៥៦៣
                                 </div>
                                 <div class="col-sm-12 no-padding text-center">
-                                    រាជធានីភ្នំពេញ ថ្ងៃទី០៥ ខែតុលា ឆ្នាំ២០១៩
+                                    រាជធានីភ្នំពេញ ថ្ងៃទី០៤ ខែតុលា ឆ្នាំ២០១៩
                                 </div>
                                 <div class="col-sm-12 no-padding text-center">
                                     នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
@@ -178,10 +178,10 @@
 
                         <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                             <div class="col-sm-12 no-padding text-center">
-                                ថ្ងៃសៅរ៍ ៧កើត ខែអស្សុជ ឆ្នាំកុរ ឯកស័ក ព.ស. ២៥៦៣
+                                ថ្ងៃសុក្រ ៦កើត ខែអស្សុជ ឆ្នាំកុរ ឯកស័ក ព.ស.២៥៦៣
                             </div>
                             <div class="col-sm-12 no-padding text-center">
-                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី០៥ ខែតុលា ឆ្នាំ២០១៩
+                                ធរាជធានីភ្នំពេញ ថ្ងៃទី០៤ ខែតុលា ឆ្នាំ២០១៩
                             </div>
                             <div class="col-sm-12 no-padding text-center">
                                 នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
