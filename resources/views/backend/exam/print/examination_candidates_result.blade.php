@@ -132,7 +132,7 @@
 
                     @if($page_number == $total_page)
 
-                        <div class ="col-sm-12 no-padding" style="font-size: 10pt;margin-top: 20px;">
+                        <div class ="col-sm-12 no-padding" style="font-size: 9pt;margin-top: -15px;">
                             បញ្ឈប់បញ្ជីត្រឹម {{$index}} នាក់ ក្នុងនោះមានស្រី {{$female}} នាក់ ។
                         </div>
                         <div class="col-sm-12 no-padding">
@@ -140,7 +140,7 @@
 
                             </div>
 
-                            <div class="col-sm-6 no-padding pull-right" style="font-size: 10pt;">
+                            <div class="col-sm-6 no-padding pull-right" style="font-size: 9pt; margin-top: -25px">
                                 <div class="col-sm-12 no-padding text-center">
                                     ថ្ងៃសុក្រ ៦កើត ខែអស្សុជ ឆ្នាំកុរ ឯកស័ក ព.ស.២៥៦៣
                                 </div>
@@ -167,15 +167,12 @@
             @if($check==true)
 
                 <div class="page">
-
                     <div class ="col-sm-12 no-padding" style="font-size: 10pt;margin-top: 20px">
                         បញ្ឈប់បញ្ជីត្រឹម {{$index}} នាក់ ក្នុងនោះមានស្រី {{$female}} នាក់ ។
                     </div>
                     <div class="col-sm-12 no-padding">
                         <div class="col-sm-6">
-
                         </div>
-
                         <div class="col-sm-6 no-padding pull-right" style="font-size: 10pt;">
                             <div class="col-sm-12 no-padding text-center">
                                 ថ្ងៃសុក្រ ៦កើត ខែអស្សុជ ឆ្នាំកុរ ឯកស័ក ព.ស.២៥៦៣
