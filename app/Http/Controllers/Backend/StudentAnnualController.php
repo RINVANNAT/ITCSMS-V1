@@ -487,18 +487,18 @@ class StudentAnnualController extends Controller
                                         ]
                                     );
                                 } else {
-                                    // check if this student redouble of this current year is inputted in DB (student might have many redouble in difference grade)
-                                    if (!isset($redoubleStudent[$redouble->id])) {
-                                        // if there is not this redouble then create one
-                                        DB::table('redouble_student')->insert(
-                                            [
-                                                'redouble_id' => $redouble->id,
-                                                'student_id'  => $student_id,
-                                                'academic_year_id' => $studentAnnual->academic_year_id
-                                            ]
-                                        );
-
-                                    }
+//                                    // check if this student redouble of this current year is inputted in DB (student might have many redouble in difference grade)
+//                                    if (!isset($redoubleStudent[$redouble->id])) {
+//                                        // if there is not this redouble then create one
+//                                        DB::table('redouble_student')->insert(
+//                                            [
+//                                                'redouble_id' => $redouble->id,
+//                                                'student_id'  => $student_id,
+//                                                'academic_year_id' => $studentAnnual->academic_year_id
+//                                            ]
+//                                        );
+//
+//                                    }
                                 }
                             }
                         });
