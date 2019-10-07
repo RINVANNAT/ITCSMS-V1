@@ -2503,89 +2503,155 @@ class ExamController extends Controller
     {
 
         $exam = Exam::where('id', $exam_id)->first();
+        $genders = collect(DB::table('genders')->select('*')->get())->keyBy('id');
+        $studentBac2sFromMinistry = DB::table('studentBac2s')
+            ->where('bac_year', '=', ($exam->academic_year_id-1))
+            ->where('status', '=', 'Ministry')
+            ->orderBy('can_id')
+            ->select('*');
 
-        $cands = DB::table('candidates')
-            ->join('studentBac2s', 'studentBac2s.id', '=', 'candidates.studentBac2_id')
-            ->where('candidates.exam_id', $exam_id)
-            ->where('result', "Pass")
-            ->select(
-                'studentBac2s.can_id',
-                'candidates.result',
-                'candidates.total_score',
-                'candidates.can_id'
-            )
+        $highSchoolIds = $studentBac2sFromMinistry->pluck('highschool_id');
+        $originIds = $studentBac2sFromMinistry->pluck('pob');
+        $origins = collect( DB::table('origins')->whereIN('id', $originIds)->get())->keyBy('id');
+        $highSchools = collect( DB::table('highSchools')->whereIN('id', $highSchoolIds)->get())->keyBy('id');
+        $grades = collect( DB::table('gdeGrades')->get())->keyBy('id');
+        $studentBac2sIds = $studentBac2sFromMinistry->pluck('id');
+        $studentBac2sFromMinistry = collect($studentBac2sFromMinistry->get())->keyBy('id');
+
+        $ministryCandidates = DB::table('candidates')
+            ->where('exam_id', $exam_id)
+            ->where('degree_id', '=', 1)
+            ->whereIN('studentBac2_id', $studentBac2sIds)
+            ->select('*')
             ->orderBy('candidates.total_score', 'DESC')
             ->get();
+        $ministryCandidates = collect($ministryCandidates)->groupBy('result');
+        $passedCandidates = $ministryCandidates['Pass']->keyBy('studentBac2_id');
+        $reservedCandidates = $ministryCandidates['Reserve']->keyBy('studentBac2_id');
+        $failCandidates = $ministryCandidates['Fail']->keyBy('studentBac2_id');
+        $rejectedCandidates = $ministryCandidates['Reject']->keyBy('studentBac2_id');
 
-        $candidateByRank = [];
-        $index = 1;
+        $count_pass = 0;
+        $count_reserve = 0;
+        $count_fail = 0;
+        $count_reject = 0;
+        $selectedStudents = [];
+        $rec_pass = $passedCandidates->map(function ($item, $key) use(&$selectedStudents, &$studentBac2sFromMinistry, $genders, $origins, $highSchools, &$count_pass) {
+            $count_pass++;
+            $rec = [
+                'can_id'            => $studentBac2sFromMinistry[$key]->can_id,
+                'name_kh'           => $item->name_kh,
+                'gender'            => $genders[$item->gender_id]->name_kh,
+                'date_of_birth'     => $item->dob,
+                'highSchool_name'   => $highSchools[$item->highschool_id]->name_kh,
+                'origin'            => $origins[$item->pob]->name_en,
+                'bac_math_grade'    => $item->bac_math_grade,
+                'bac_phys_grade'    => $item->bac_phys_grade,
+                'bac_chem_grade'    => $item->bac_chem_grade,
+                'result'            => 'ជាប់',
+                'rank'              => $count_pass,
+                'total_score'       => $item->total_score
+            ];
+            $selectedStudents[] = $key;
+//            unset($studentBac2sFromMinistry[$key]);// removed student that took entrance exam at itc (both pass and fail)
+            return $rec;
+        });
 
-        $last = null;
-        $same_index = 0;
-        foreach ($cands as $cand) {
-            if ($last != null && ($cand->total_score == $last->total_score)) { // the last one and this one have the same score, so he must have the same range
-                $candidateByRank[$cand->can_id] = $index - 1;
-                $same_index++;
-            } else {
-                if ($same_index > 0) {
-                    $index = $index + $same_index;
-                    $same_index = 0;
-                }
-                $candidateByRank[$cand->can_id] = $index;
-                $index++;
-            }
-            $last = $cand;
-        }
+        $rec_reserve = $reservedCandidates->map(function ($item, $key) use(&$selectedStudents, &$studentBac2sFromMinistry, $genders, $origins, $highSchools, &$count_reserve) {
+            $count_reserve++;
+            $rec = [
+                'can_id'            => $studentBac2sFromMinistry[$key]->can_id,
+                'name_kh'           => $item->name_kh,
+                'gender'            => $genders[$item->gender_id]->name_kh,
+                'date_of_birth'     => $item->dob,
+                'highSchool_name'   => $highSchools[$item->highschool_id]->name_kh,
+                'origin'            => $origins[$item->pob]->name_en,
+                'bac_math_grade'    => $item->bac_math_grade,
+                'bac_phys_grade'    => $item->bac_phys_grade,
+                'bac_chem_grade'    => $item->bac_chem_grade,
+                'result'            => 'ជាប់បំរុង',
+                'rank'              => $count_reserve,
+                'total_score'       => $item->total_score
+            ];
+            $selectedStudents[] = $key;
+            return $rec;
+        });
 
-        dd($cands);
+        $rec_fail = $failCandidates->map(function ($item, $key) use(&$selectedStudents, &$studentBac2sFromMinistry, $genders, $origins, $highSchools, &$count_fail) {
+            $count_fail++;
+            $rec = [
+                'can_id'            => $studentBac2sFromMinistry[$key]->can_id,
+                'name_kh'           => $item->name_kh,
+                'gender'            => $genders[$item->gender_id]->name_kh,
+                'date_of_birth'     => $item->dob,
+                'highSchool_name'   => $highSchools[$item->highschool_id]->name_kh,
+                'origin'            => $origins[$item->pob]->name_en,
+                'bac_math_grade'    => $item->bac_math_grade,
+                'bac_phys_grade'    => $item->bac_phys_grade,
+                'bac_chem_grade'    => $item->bac_chem_grade,
+                'result'            => 'ធ្លាក់',
+                'rank'              => $count_fail,
+                'total_score'       => $item->total_score
+            ];
+            $selectedStudents[] = $key;
+            return $rec;
+        });
 
-        // Lists candidates who have register to ITC
-        $candsRegister = DB::table('candidatesFromMoeys')
-            ->join("studentBac2s", "studentBac2s.can_id", '=', "candidatesFromMoeys.can_id")
-            ->join("candidates", "candidates.studentBac2_id", '=', "studentBac2s.id")
-            ->where('candidatesFromMoeys.bac_year', $exam->academic_year_id - 1)
-            ->where('candidates.exam_id', $exam_id)
-            ->lists('candidatesFromMoeys.id');
+        $rec_reject = $rejectedCandidates->map(function ($item, $key) use(&$selectedStudents, &$studentBac2sFromMinistry, $genders, $origins, $highSchools, &$count_reject) {
+            $count_reject++;
+            $rec = [
+                'can_id'            => $studentBac2sFromMinistry[$key]->can_id,
+                'name_kh'           => $item->name_kh,
+                'gender'            => $genders[$item->gender_id]->name_kh,
+                'date_of_birth'     => $item->dob,
+                'highSchool_name'   => $highSchools[$item->highschool_id]->name_kh,
+                'origin'            => $origins[$item->pob]->name_en,
+                'bac_math_grade'    => $item->bac_math_grade,
+                'bac_phys_grade'    => $item->bac_phys_grade,
+                'bac_chem_grade'    => $item->bac_chem_grade,
+                'result'            => 'ធ្លាក់',
+                'rank'              => $count_reject,
+                'total_score'       => $item->total_score
+            ];
+            $selectedStudents[] = $key;
+            return $rec;
+        });
 
-        $candidates_moeys = DB::table('candidatesFromMoeys')
-            ->join('studentBac2s', 'studentBac2s.can_id', '=', 'candidatesFromMoeys.can_id')
-            ->join('genders', 'studentBac2s.gender_id', '=', 'genders.id')
-            ->join('highSchools', 'studentBac2s.highschool_id', '=', 'highSchools.id')
-            ->join('origins', 'studentBac2s.province_id', '=', 'origins.id')
-            ->leftJoin('gdeGrades as math', 'studentBac2s.bac_math_grade', '=', 'math.id')
-            ->leftJoin('gdeGrades as phys', 'studentBac2s.bac_phys_grade', '=', 'phys.id')
-            ->leftJoin('gdeGrades as chem', 'studentBac2s.bac_chem_grade', '=', 'chem.id')
-            ->select(
-                'candidatesFromMoeys.id',
-                'candidatesFromMoeys.can_id',
-                'studentBac2s.name_kh',
-                'highSchools.name_kh as highschool',
-                'genders.code as gender',
-                'studentBac2s.dob',
-                'origins.name_kh as origin',
-                'studentBac2s.bac_year',
-                'math.name_en as math_grade',
-                'phys.name_en as phys_grade',
-                'chem.name_en as chem_grade'
-            )
-            ->orderBy('candidatesFromMoeys.can_id')
-            ->get();
+//        $cands = DB::table('candidates')
+//            ->join('studentBac2s', 'studentBac2s.id', '=', 'candidates.studentBac2_id')
+//            ->where('candidates.exam_id', $exam_id)
+//            ->where('result', "Pass")
+//            ->select(
+//                'studentBac2s.can_id',
+//                'candidates.result',
+//                'candidates.total_score',
+//                'candidates.can_id'
+//            )
+//            ->orderBy('candidates.total_score', 'DESC')
+//            ->get();
+//
+//        $candidateByRank = [];
+//        $index = 1;
+//
+//        $last = null;
+//        $same_index = 0;
+//        foreach ($cands as $cand) {
+//            if ($last != null && ($cand->total_score == $last->total_score)) { // the last one and this one have the same score, so he must have the same range
+//                $candidateByRank[$cand->can_id] = $index - 1;
+//                $same_index++;
+//            } else {
+//                if ($same_index > 0) {
+//                    $index = $index + $same_index;
+//                    $same_index = 0;
+//                }
+//                $candidateByRank[$cand->can_id] = $index;
+//                $index++;
+//            }
+//            $last = $cand;
+//        }
 
 
-        foreach ($candidates_moeys as &$candidate) {
-            if (isset($candidateByRank[$candidate->can_id])) {
-                $candidate->result = $candidateByRank[$candidate->can_id];
-            } else {
-                if (in_array($candidate->id, $candsRegister)) { // This student registered to ITC, but fail
-                    $candidate->result = "Fail"; // This including Fail and absence during exam
-                } else {
-                    $candidate->result = "NA";
-                }
-
-            }
-        }
-
-        Excel::create('Student Result To Send to DHE', function ($excel) use ($candidates_moeys) {
+        Excel::create('Student Result To Send to DHE', function ($excel) use ($rec_pass, $rec_reserve, $rec_fail, $rec_reject,$studentBac2sFromMinistry, $selectedStudents, $genders, $highSchools, $origins, $grades ) {
 
             // Set the title
             $excel->setTitle('លទ្ធផលសំរាប់បញ្ជូនទៅគ្រឹះស្ថានឧត្តមសិក្សា');
@@ -2594,17 +2660,9 @@ class ExamController extends Controller
             $excel->setCreator('Institute of Technology of Cambodia')
                 ->setCompany('Institute of Technology of Cambodia');
 
-            $excel->sheet('បញ្ជីនិស្សិត្រ', function ($sheet) use ($candidates_moeys) {
+            $excel->sheet('បញ្ជីនិស្សិត្រ', function ($sheet) use ($rec_pass, $rec_reserve, $rec_fail, $rec_reject,$studentBac2sFromMinistry, $selectedStudents, $genders, $highSchools, $origins, $grades ) {
 
-                $header = array('ល.រ', "គោត្តនាមនិងនាម", "ភេទ", "ថ្ងៃខែឆ្នាំកំណើត", "មកពីវិទ្យាល័យ", "ខេត្តក្រុង", "ឆ្នាំជាប់ទុតិយភូមិ", "គណិតវិទ្យា", "រូបវិទ្យា", "គីមីវិទ្យា", "ចំណាត់ថ្នាក់");
-                $sheet->setOrientation('portrait');
-                // Set top, right, bottom, left
-                $sheet->setPageMargin(array(
-                    0.25, 0.30, 0.25, 0.30
-                ));
-
-                // Set all margins
-                $sheet->setPageMargin(0.25);
+                $header = array('ល.រ',"can_id", "គោត្តនាមនិងនាម", "ភេទ", "ថ្ងៃខែឆ្នាំកំណើត", "មកពីវិទ្យាល័យ", "ខេត្តក្រុង", "គណិតវិទ្យា", "រូបវិទ្យា", "គីមីវិទ្យា", "result", "ចំណាត់ថ្នាក់", "score");
 
                 $sheet->rows(
                     array($header)
@@ -2612,23 +2670,96 @@ class ExamController extends Controller
 
                 $index = 1;
 
-                foreach ($candidates_moeys as $candidate) {
+                foreach ($studentBac2sFromMinistry as $key => $candidate) {
+                    $row = [
+                        $index,
+                        $candidate->can_id,
+                        $candidate->name_kh,
+                        $genders[$candidate->gender_id]->code,
+                        Carbon::createFromFormat('Y-m-d H:i:s', $candidate->dob)->format("d/m/Y"),
+                        $highSchools[$candidate->highschool_id]->name_kh,
+                        $origins[$candidate->pob]->name_kh,
+                        isset($grades[$candidate->bac_math_grade])?$grades[$candidate->bac_math_grade]->name_en:"N/A",
+                        isset($grades[$candidate->bac_phys_grade])?$grades[$candidate->bac_phys_grade]->name_en:"N/A",
+                        isset($grades[$candidate->bac_chem_grade])?$grades[$candidate->bac_chem_grade]->name_en:"N/A",
+                        "N/A",
+                        "N/A",
+                        "N/A"
+                    ];
 
-                    if ($candidate->result == "Fail") {
-                        $result = "ធ្លាក់";
-                    } else if ($candidate->result == "Pass") {
-                        $result = "ជាប់";
-                    } else if ($candidate->result == "NA") {
-                        $result = "NA";
-                    } else {
-                        $result = $candidate->result;
+                    if(isset($rec_pass[$key])) {
+                        $rec1 = $rec_pass[$key];
+                        $row = [
+                            $index,
+                            $rec1['can_id'],
+                            $rec1['name_kh'],
+                            $rec1['gender'],
+                            Carbon::createFromFormat('Y-m-d H:i:s', $rec1['date_of_birth'])->format("d/m/Y"),
+                            $rec1['highSchool_name'],
+                            $rec1['origin'],
+                            isset($grades[$rec1['bac_math_grade']])?$grades[$rec1['bac_math_grade']]->name_en:"N/A",
+                            isset( $grades[$rec1['bac_phys_grade']])?$grades[$rec1['bac_phys_grade']]->name_en:"N/A",
+                            isset($grades[$rec1['bac_chem_grade']])?$grades[$rec1['bac_chem_grade']]->name_en:"N/A",
+                            $rec1['result'],
+                            $rec1['rank'],
+                            $rec1['total_score']
+                        ];
                     }
-                    $row = array($index, $candidate->name_kh, $candidate->gender,
-                        Carbon::createFromFormat('Y-m-d H:i:s', $candidate->dob)->format("d/m/Y"), $candidate->highschool,
-                        $candidate->origin, $candidate->bac_year,
-                        $candidate->math_grade, $candidate->phys_grade, $candidate->chem_grade,
-                        $result
-                    );
+                    if (isset($rec_reserve[$key])){
+                        $rec1 = $rec_reserve[$key];
+                        $row = [
+                            $index,
+                            $rec1['can_id'],
+                            $rec1['name_kh'],
+                            $rec1['gender'],
+                            Carbon::createFromFormat('Y-m-d H:i:s', $rec1['date_of_birth'])->format("d/m/Y"),
+                            $rec1['highSchool_name'],
+                            $rec1['origin'],
+                            isset($grades[$rec1['bac_math_grade']])?$grades[$rec1['bac_math_grade']]->name_en:"N/A",
+                            isset( $grades[$rec1['bac_phys_grade']])?$grades[$rec1['bac_phys_grade']]->name_en:"N/A",
+                            isset($grades[$rec1['bac_chem_grade']])?$grades[$rec1['bac_chem_grade']]->name_en:"N/A",
+                            $rec1['result'],
+                            $rec1['rank'],
+                            $rec1['total_score']
+                        ];
+
+                    }
+                    if (isset($rec_fail[$key])){
+                        $rec1 = $rec_fail[$key];
+                        $row = [
+                            $index,
+                            $rec1['can_id'],
+                            $rec1['name_kh'],
+                            $rec1['gender'],
+                            Carbon::createFromFormat('Y-m-d H:i:s', $rec1['date_of_birth'])->format("d/m/Y"),
+                            $rec1['highSchool_name'],
+                            $rec1['origin'],
+                            isset($grades[$rec1['bac_math_grade']])?$grades[$rec1['bac_math_grade']]->name_en:"N/A",
+                            isset( $grades[$rec1['bac_phys_grade']])?$grades[$rec1['bac_phys_grade']]->name_en:"N/A",
+                            isset($grades[$rec1['bac_chem_grade']])?$grades[$rec1['bac_chem_grade']]->name_en:"N/A",
+                            $rec1['result'],
+                            $rec1['rank'],
+                            $rec1['total_score']
+                        ];
+                    }
+                    if (isset($rec_reject[$key])){
+                        $rec1 = $rec_reject[$key];
+                        $row = [
+                            $index,
+                            $rec1['can_id'],
+                            $rec1['name_kh'],
+                            $rec1['gender'],
+                            Carbon::createFromFormat('Y-m-d H:i:s', $rec1['date_of_birth'])->format("d/m/Y"),
+                            $rec1['highSchool_name'],
+                            $rec1['origin'],
+                            isset($grades[$rec1['bac_math_grade']])?$grades[$rec1['bac_math_grade']]->name_en:"N/A",
+                            isset( $grades[$rec1['bac_phys_grade']])?$grades[$rec1['bac_phys_grade']]->name_en:"N/A",
+                            isset($grades[$rec1['bac_chem_grade']])?$grades[$rec1['bac_chem_grade']]->name_en:"N/A",
+                            $rec1['result'],
+                            $rec1['rank'],
+                            $rec1['total_score']
+                        ];
+                    }
 
                     $sheet->appendRow(
                         $row

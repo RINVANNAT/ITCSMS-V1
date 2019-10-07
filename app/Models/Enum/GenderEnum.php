@@ -13,5 +13,7 @@ class GenderEnum
 
     const F_ID = 2;
     const M_ID = 1;
+    const ENGINEER_DEGREE = 1;
+    const DUT_DEGREE = 2;
 
 }
