@@ -891,8 +891,6 @@ class ExamController extends Controller
 
     public function download_candidate_list_dut(DownloadExaminationDocumentsRequest $request, $exam_id)
     {
-
-
         $candidates = Candidate::where('exam_id', $exam_id)
             ->leftJoin('genders', 'candidates.gender_id', '=', 'genders.id')
             ->leftJoin('origins', 'candidates.province_id', '=', 'origins.id')
@@ -934,12 +932,13 @@ class ExamController extends Controller
                 ->get();
             $candidate["departments"] = $department_choices;
         }
-
         $chunk_candidates = array_chunk($candidates, 25);
-
         $departments = Department::where('is_specialist', true)->where('parent_id', 11)->orderBy('code')->get();
-
-
+        $departments = collect($departments)->filter(function($item, $key) {
+            if ($item->code != 'GIC' && $item->code != 'GTR' && $item->code != 'OAC' && $item->code != 'GS') {
+                return $item;
+            }
+        });
         return view('backend.exam.print.candidate_list_dut', compact('chunk_candidates', 'departments'));
     }
 
