@@ -16,4 +16,5 @@
         Route::delete('candidate/clear_department/{id}', 'CandidateController@clear_department')->name('admin.candidate.clear_department');
         Route::post('candidate/store_candidate_department', 'CandidateController@store_candidate_department')->name('admin.candidate.store_candidate_department');
         Route::get('candidate/export_chosen_departments', 'CandidateController@export_chosen_departments')->name('admin.candidate.export_chosen_departments');
+        Route::get('candidate/export_detail_chosen_department', 'CandidateController@exportDetailChosenDepartment')->name('admin.candidate.export_detail_chosen_department');
     });

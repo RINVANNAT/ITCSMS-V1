@@ -167,6 +167,11 @@
                 </table>
             </div>
             <div class="clearfix"></div>
+            <a href="{{route('admin.candidate.export_detail_chosen_department')}}?exam_id={{$exam->id}}">
+                <button type="button" id="btn-export-detail-chosen-department" class="btn btn-warning"><i
+                            class="fa fa-download"></i> Export-Detail-List
+                </button>
+            </a>
             <a href="{{route('admin.candidate.export_chosen_departments')}}?exam_id={{$exam->id}}">
                 <button type="button" id="btn-export-candidate" class="btn btn-primary"><i
                             class="fa fa-file-excel-o"></i> Export

@@ -19,8 +19,9 @@
 
         /* -------------------- IMPORT -----------------------*/
         Route::get('student-request-import', 'StudentAnnualController@request_import')->name('admin.student.request_import');
-//        Route::post('student-import', 'StudentAnnualController@import')->name('admin.student.import');
-        Route::post('student-import', 'StudentAnnualController@importUpgradedStudent')->name('admin.student.import');
+        Route::post('student-import', 'StudentAnnualController@import')->name('admin.student.import');
+        Route::get('student-request-import-upgrade-student', 'StudentAnnualController@request_import_upgrade_student')->name('admin.student.request_import_upgrade_student');
+        Route::post('student-import-upgrade-student', 'StudentAnnualController@importUpgradedStudent')->name('admin.student.import_upgrade_student');
 
         /* -------------------- EXPORT -----------------------*/
         // Request export form

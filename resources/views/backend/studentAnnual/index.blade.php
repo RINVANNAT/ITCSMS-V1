@@ -56,6 +56,7 @@
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="{!! route('admin.student.request_import') !!}">Import</a></li>
+                        <li><a href="{!! route('admin.student.request_import_upgrade_student') !!}">Import Upgrade Student</a></li>
                     </ul>
                 </div>
                 @endauth

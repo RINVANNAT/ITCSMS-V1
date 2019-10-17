@@ -3404,6 +3404,62 @@ class ExamController extends Controller
             return view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept', 'candidateDUTs', 'examId'));
         }
     }
+    private function getAllDUTCandidates($examId) {
+
+        $dUTCandidates = DB::table('candidates')
+            ->select('candidates.id as candidate_id', 'candidates.bac_percentile', 'candidates.name_latin')
+            ->where('candidates.exam_id', '=', $examId)
+            ->orderBy('bac_percentile', 'DESC')
+            ->get();
+
+        return $dUTCandidates;
+    }
+
+    private function resetCandidateDUTResult() { // set the field is_success to false
+
+        $res = DB::table('candidate_department')
+
+            ->update(array(
+                'is_success' => null
+            ));
+    }
+
+    private function getCandidateDept($candidateId) {
+
+        $candidateDept = DB::table('candidate_department')
+            ->where('candidate_department.candidate_id', '=', $candidateId)
+            ->select('candidate_department.department_id', 'candidate_department.rank')
+            ->orderBy('rank', 'ASC')
+            ->get();
+
+        return $candidateDept;
+    }
+
+    private function updateCandiateDepartment($candidate_id, $department_id, $rank, $result) {
+
+        $res = DB::table('candidate_department')
+            ->where([
+                ['candidate_id', '=', $candidate_id],
+                ['department_id', '=', $department_id],
+                ['rank', '=', $rank ]
+            ])
+            ->update(array(
+                'is_success' => $result
+            ));
+        return $res;
+    }
+
+    private function updateDutCandResult($examId, $candidateId, $canResult) {
+        $res = DB::table('candidates')
+            ->where([
+                ['id', '=', $candidateId],
+                ['exam_id', '=', $examId ]
+            ])
+            ->update(array(
+                'result' => $canResult
+            ));
+        return $res;
+    }
 
     private function getSucceedCandidateDUTFromDB($examId, $is_success)
     {

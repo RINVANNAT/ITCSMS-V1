@@ -403,7 +403,11 @@ class StudentAnnualController extends Controller
     {
 
         return view('backend.studentAnnual.import');
+    }
 
+    public function request_import_upgrade_student(Request $request) {
+
+        return view('backend.studentAnnual.import_upgrade_student');
     }
 
     public function importUpgradedStudent(Request $request)
