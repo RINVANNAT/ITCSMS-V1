@@ -991,7 +991,7 @@ class ExamController extends Controller
                 'GCI' => $candidateOptions['GCI'],
                 'GEE' => $candidateOptions['GEE'],
                 'GGG' => $candidateOptions['GGG'],
-                'GIC' => $candidateOptions['GIC'],
+//                'GIC' => $candidateOptions['GIC'],
                 'GIM' => $candidateOptions['GIM'],
                 'GRU' => $candidateOptions['GRU'],
                 'Pass' => $pass,
@@ -1098,6 +1098,7 @@ class ExamController extends Controller
                 ->orderBy('departments.code')
                 ->get();
 
+
             $candidateOptions = [];
             foreach ($department_choices as $choice) {
                 $candidateOptions[$choice->code] = $choice->rank;
@@ -1120,7 +1121,7 @@ class ExamController extends Controller
                 'GCI' => $candidateOptions['GCI'],
                 'GEE' => $candidateOptions['GEE'],
                 'GGG' => $candidateOptions['GGG'],
-                'GIC' => $candidateOptions['GIC'],
+//                'GIC' => $candidateOptions['GIC'],
                 'GIM' => $candidateOptions['GIM'],
                 'GRU' => $candidateOptions['GRU'],
             );
@@ -3510,20 +3511,21 @@ class ExamController extends Controller
     {
 
         $resultType = $request->status;
-
+        $exam = Exam::where('id', '=', $examId)->first();
+        $academicYear = AcademicYear::where('id', '=', $exam->academic_year_id)->first();
         if ($resultType == 'Pass') {
             $title = "បញ្ជីបេក្ខជន<span style='font-size: 150%'>ជាប់ស្ថាពរ</span>";
             $allStudentByDept = [];
             $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success = 'Pass');
             //$candidateDUTs = array_chunk($candidateDUTs, 27);
-            return view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
+            return view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'academicYear'));
 
         } else if ($resultType == 'Reserve') {
-            $title = "បញ្ជីបេក្ខជន<span style='font-size: 150%'>ជាប់បំរុង</span>";
+            $title = "បញ្ជីបេក្ខជន<span style='font-size: 150%'>ជាប់បម្រុង</span>";
             $allStudentByDept = [];
             $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success = 'Reserve');
             //$candidateDUTs = array_chunk($candidateDUTs, 27);
-            return view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
+            return view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'academicYear'));
 
 
         } else if ($resultType == 'pass_by_dept') {
@@ -3535,15 +3537,15 @@ class ExamController extends Controller
             $allDepts = $studentByDept[0];
             $allStudentByDept = $studentByDept[1];
 
-            return view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'allDepts'));
+            return view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'allDepts', 'academicYear'));
 
         } else {
-            $title = 'បញ្ជីបេក្ខជនជាប់បំរុង';
+            $title = 'បញ្ជីបេក្ខជនជាប់បម្រុង';
             $candidateDUTs = [];
             $studentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success = 'Reserve');
             $allDepts = $studentByDept[0];
             $allStudentByDept = $studentByDept[1];
-            return view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'allDepts'));
+            return view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'allDepts', 'academicYear'));
         }
     }
 

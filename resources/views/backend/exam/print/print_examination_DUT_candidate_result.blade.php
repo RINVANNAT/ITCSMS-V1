@@ -25,6 +25,7 @@
     @if($candidateDUTs)
         <?php
         $page_number = 1;
+        $onlyOne=1;
 
         $first_chunk = array_slice($candidateDUTs,0,27);
         $remaining_chunk = array_slice($candidateDUTs,27);
@@ -38,7 +39,6 @@
         $i =0;
         $female=0;
         ?>
-
         @foreach($candidateDUTs as $candidatesResult)
             <?php $check =0;?>
             <div class="page">
@@ -46,19 +46,19 @@
                 @if($page_number ==1)
                     <div class="col-sm-12" style="text-align: center; margin-bottom: 15px">
                         <h2>{!! $title !!}</h2>
-                        <h4>ការជ្រើសរើសចូលរៀនឆ្នាំទី១​​​​​ ផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម</h4>
-                        <h3>ឆ្នាំសិក្សា: ២០១៨ - ២០១៩ @foreach($candidatesResult as $result)  @if($check==0) <?php $check++;?> @endif @endforeach </h3>
+                        <h4>ការជ្រើសរើសចូលរៀនឆ្នាំទី១​​​​​ ផ្នែកបរិញ្ញាបត្ររងវិស្វកម្មនៅ វបក</h4>
+                        <h3>ឆ្នាំសិក្សា {{$academicYear->name_kh}} @foreach($candidatesResult as $result)  @if($check==0) <?php $check++;?> @endif @endforeach </h3>
                     </div>
                 @endif
 
                 <table class="" width="100%">
                     <tr>
                         <th>ល.រ</th>
-                        <th>អត្តលេខ</th>
+                        <th>លេខបង្កាន់ដៃ</th>
                         <th>ឈ្មោះខ្មែរ</th>
                         <th>ឈ្មោះឡាតាំង</th>
                         <th>ភេទ</th>
-                        <th>ថ្ងៃខែឆ្នាំកំនើត</th>
+                        <th>ថ្ងៃខែឆ្នាំកំណើត</th>
                         <th>ប្រភពសិក្សា</th>
                         <th>ដេប៉ាតឺម៉ង់</th>
 
@@ -105,7 +105,7 @@
 
                             <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                                 <div class="col-sm-12 no-padding text-center">
-                                    ធ្វើនៅភ្នំពេញ ថ្ងៃទី ....... ខែ ............ ឆ្នាំ ២០
+                                    រាជធានីភ្នំពេញ ថ្ងៃទី ....... ខែ ............ ឆ្នាំ២០
                                 </div>
                                 <div class="col-sm-12 no-padding text-center">
                                     នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
@@ -147,7 +147,7 @@
 
                     <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                         <div class="col-sm-12 no-padding text-center">
-                            ធ្វើនៅភ្នំពេញ ថ្ងៃទី ....... ខែ ............ ឆ្នាំ ២០
+                            រាជធានីភ្នំពេញ ថ្ងៃទី ....... ខែ ............ ឆ្នាំ២០
                         </div>
                         <div class="col-sm-12 no-padding text-center">
                             នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
@@ -161,7 +161,6 @@
                     <span class="pull-right">Page {{$page_number}} of {{$total_page+1}}</span>
                 </div>
             </div>
-
         @endif
 
     @endif
@@ -185,18 +184,18 @@
                 <div class="page">
                     <div class="col-sm-12" style="text-align: center; margin-bottom: 15px">
                         <h2>{{$title}}</h2>
-                        <h4>ការជ្រើសរើសចូលរៀនឆ្នាំទី១​​​​​ ផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម</h4>
+                        <h4>ការជ្រើសរើសចូលរៀនឆ្នាំទី១​​​​​ ផ្នែកបរិញ្ញាបត្ររងវិស្វកម្មនៅ វបក</h4>
                         <h3>ដេប៉ាតឺម៉ង់: <strong>{{$dept}} </strong> ឆ្នាំសិក្សា:   @foreach($candidatesResult as $result)  @if($check==0) {{$result->academic_year}} <?php $check++;?> @endif @endforeach </h3>
                     </div>
 
                     <table class="" width="100%">
                         <tr>
                             <th>ល.រ</th>
-                            <th>អត្តលេខ</th>
+                            <th>លេខបង្កាន់ដៃ</th>
                             <th>ឈ្មោះខ្មែរ</th>
                             <th>ឈ្មោះឡាតាំង</th>
                             <th>ភេទ</th>
-                            <th>ថ្ងៃខែឆ្នាំកំនើត</th>
+                            <th>ថ្ងៃខែឆ្នាំកំណើត</th>
                             <th>ផ្សេងៗ</th>
                         </tr>
                         <?php $i =0;?>
@@ -222,12 +221,7 @@
                 <?php $page_number++; ?>
             @endforeach
         @endforeach
-
-
     @endif
-
-
-
 
 @endsection
 
