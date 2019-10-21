@@ -173,7 +173,7 @@
                 </button>
             </a>
             <a href="{{route('admin.candidate.export_chosen_departments')}}?exam_id={{$exam->id}}">
-                <button type="button" id="btn-export-candidate" class="btn btn-primary"><i
+                <button type="button" id="btn-export-candidate" class="btn btn-success"><i
                             class="fa fa-file-excel-o"></i> Export-Result
                 </button>
             </a>
