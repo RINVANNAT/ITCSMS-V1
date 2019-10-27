@@ -4,6 +4,7 @@
         /* -------------------- Resource -----------------------*/
         Route::resource('studentAnnuals', 'StudentAnnualController');
         Route::post('student-data', 'StudentAnnualController@data')->name('admin.student.data');
+        Route::post('student-scholarship', 'StudentAnnualController@updateScholarship')->name('admin.studentAnnuals.update_scholarship');
 
         /* -------------------- Actions -----------------------*/
         Route::get('student-generate-group', 'StudentAnnualController@generate_group')->name('admin.student.generate_group');
@@ -21,7 +22,9 @@
         Route::get('student-request-import', 'StudentAnnualController@request_import')->name('admin.student.request_import');
         Route::post('student-import', 'StudentAnnualController@import')->name('admin.student.import');
         Route::get('student-request-import-upgrade-student', 'StudentAnnualController@request_import_upgrade_student')->name('admin.student.request_import_upgrade_student');
+        Route::get('student-request-import-upgrade-t2toi3', 'StudentAnnualController@request_import_upgrade_T2_to_I3')->name('admin.student.request_import_upgrade_T2_to_I3_student');
         Route::post('student-import-upgrade-student', 'StudentAnnualController@importUpgradedStudent')->name('admin.student.import_upgrade_student');
+        Route::post('student-import-upgrade-t2toi3', 'StudentAnnualController@importT2ToI3Student')->name('admin.student.import_T2_to_I3_student');
 
         /* -------------------- EXPORT -----------------------*/
         // Request export form
