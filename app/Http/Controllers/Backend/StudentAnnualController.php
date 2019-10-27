@@ -11,6 +11,7 @@ use App\Http\Requests\Backend\Student\CreateStudentRequest;
 use App\Http\Requests\Backend\Student\DeleteStudentRequest;
 use App\Http\Requests\Backend\Student\EditStudentRequest;
 use App\Http\Requests\Backend\Student\ImportStudentRequest;
+use App\Http\Requests\Backend\Student\ImportStudentT2ToI3Request;
 use App\Http\Requests\Backend\Student\PrintStudentIDCardRequest;
 use App\Http\Requests\Backend\Student\PrintTranscriptRequest;
 use App\Http\Requests\Backend\Student\RequestImportStudentRequest;
@@ -25,7 +26,9 @@ use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Employee;
+use App\Models\Enum\DegreeEnum;
 use App\Models\Enum\GenderEnum;
+use App\Models\Enum\ProficencyEnum;
 use App\Models\Enum\ScoreEnum;
 use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
@@ -408,6 +411,119 @@ class StudentAnnualController extends Controller
     public function request_import_upgrade_student(Request $request) {
 
         return view('backend.studentAnnual.import_upgrade_student');
+    }
+
+    public function request_import_upgrade_T2_to_I3(Request $request) {
+
+        return view('backend.studentAnnual.import_T2_to_I3_student');
+    }
+
+    public function updateScholarship (Request $request)
+    {
+        $scholarships = collect(DB::table('scholarships')->get())->keyBy('code');
+        $studentAnnuals = StudentAnnual::where('academic_year_id', '=', $request->academic_year_id)
+            ->where('degree_id', '=', DegreeEnum::ENGINEER_DEGREE);
+        $studentAnnualIds = $studentAnnuals->pluck('id');
+        $studentAnnuals = $studentAnnuals->get();
+        $studentScholarships = DB::table('scholarship_student_annual')
+            ->whereIN('student_annual_id', $studentAnnualIds)
+            ->get();
+        $studentScholarships = collect($studentScholarships)->keyBy('student_annual_id');
+        foreach ($studentAnnuals as $studentAnnual) {
+            if ($studentAnnual->general_remark != null){
+                if (isset($scholarships[$studentAnnual->general_remark])){
+                    $scholarship = $scholarships[$studentAnnual->general_remark];
+                    if (!isset($studentScholarships[$studentAnnual->id])){
+                        // create new scholarship student annual here
+                        $rec = [
+                            'student_annual_id'    => $studentAnnual->id,
+                            'scholarship_id'       => $scholarship->id
+                        ];
+                        DB::table('scholarship_student_annual')->insert($rec);
+                    }
+                }
+            }
+        }
+        return response(\GuzzleHttp\json_encode(['status' => true, 'message' => 'updated!']));
+    }
+
+    public function importT2ToI3Student(ImportStudentT2ToI3Request $request)
+    {
+        $this->updateScholarshipStudent();
+        $now = Carbon::now()->format('Y_m_d_H');
+        if ($request->file('import') != null) {
+            $import = $now . '.' . $request->file('import')->getClientOriginalExtension();
+            $request->file('import')->move(base_path() . '/public/assets/uploaded_file/temp/', $import);
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/' . $import;
+            DB::beginTransaction();
+            try {
+                Excel::filter('chunk')->load($storage_path)->chunk(1000, function ($results) {
+                    $keyDegree = '';
+                    $keyYear = '';
+                    $keySemester = '';
+                    $results = $results->filter(function ($item, $key) {
+                        return $item->id_card != null;
+                    });
+                    $studentIdCards = $results->map(function ($value, $key) use (&$keyDegree, &$keyYear, &$keySemester) {
+                        $keyDegree = '' . $value->degree_id;
+                        $keyYear = '' . ($value->academic_year_id - 1);
+                        $keySemester = '' . ($value->semester_id);
+                        return $value->id_card;
+                    });
+                    $students = DB::table('students')->whereIN('id_card', $studentIdCards->toArray());
+                    $student_ids = $students->pluck('id');
+
+                    $redoubles = collect(DB::table('redoubles')->get())->keyBy('name_en');
+                    $redoubleStudents = collect(DB::table('redouble_student')->whereIN('student_id', $student_ids)->get())
+                        ->keyBy('student_id')
+                        ->map(function ($newItem, $newKey) {
+                            return [$newItem->redouble_id => $newItem];
+                        });
+                    $groups = collect(DB::table('groups')->get())->keyBy('code');
+                    $departments = collect(DB::table('departments')->get())->keyBy('code');
+                    $options = collect(DB::table('departmentOptions')->get())->keyBy(function ($item, $key) {
+                        return strtolower($item->code);
+                    })->toArray();
+                    $studentWithKeyIdCards = $students->pluck('id', 'id_card');
+                    if (count($results) == count($studentWithKeyIdCards)) {
+                        // there are no missing student annual from the imported File by BE
+                        $results->each(function ($row) use ($studentWithKeyIdCards, $groups, $departments, $options, $redoubles, $redoubleStudents) {
+                            // Clone an object for running query in studentAnnual
+                            $student_id = $studentWithKeyIdCards[$row->id_card];
+                            $rec = [
+                                'student_id' => $student_id,
+                                'academic_year_id' => ($row->academic_year_id),
+                                'degree_id' => $row->degree_id,
+                                'department_id' => $departments[$row->department_id]->id,
+                                'department_option_id' => (isset($row->department_option_id) && $row->department_option_id != '') ? $options[strtolower($row->department_option_id)]->id : null,
+                                'promotion_id' => $row->promotion_id,
+                                'grade_id' => $row->grade_id,
+                                'general_remark' => $row->general_remark,
+                                'created_at' => Carbon::now(),
+                                'active' => true,
+                                'create_uid' => 1 //admin
+                            ];
+                            $saveStudentAnnual = StudentAnnual::create($rec);
+                            if (isset($row->group_code) && $row->group_code != "" && $row->group_code != " ") {
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 1]);
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 2]);
+                            }
+                        });
+                    } else {
+                        // there are some missing students but we still import student with report missing student
+                        $results->each(function ($row) use ($studentWithKeyIdCards, $groups) {
+                            dd('there are some missing students!! Please Check before uploaded file');
+                        });
+                    }
+                });
+
+            } catch (Exception $e) {
+                DB::rollback();
+            }
+            DB::commit();
+            return redirect(route('admin.studentAnnuals.index'));
+        }
+
     }
 
     public function importUpgradedStudent(Request $request)

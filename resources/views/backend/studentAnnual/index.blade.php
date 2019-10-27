@@ -54,9 +54,18 @@
                         <span class="caret"></span>
                         <span class="sr-only">Toggle Dropdown</span>
                     </button>
+                    @permission('view-access-management')
+                    <a class="btn btn-warning btn-sm" id="update_scholarship_student_btn" href="{!! route('admin.studentAnnuals.update_scholarship') !!}" style="margin-left: 5px">
+                        <i class="fa fa-bolt"></i> Update-Scholarship-Student
+                    </a>
+                    @endauth
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="{!! route('admin.student.request_import') !!}">Import</a></li>
-                        <li><a href="{!! route('admin.student.request_import_upgrade_student') !!}">Import Upgrade Student</a></li>
+                        @permission('view-access-management')  {{-- this permission is for addmin but i just use it instead of creat the new one and also forget how to create new permission in smis--}}
+                        <li><a href="{!! route('admin.student.request_import_upgrade_T2_to_I3_student') !!}"> Import Upgrade T2 to I3 </a></li>
+                        <li><a href="{!! route('admin.student.request_import_upgrade_student') !!}"> Import Upgrade Student </a></li>
+                        @endauth
+
                     </ul>
                 </div>
                 @endauth
@@ -372,6 +381,38 @@
                          + '&department_id='+department
                          + '&department_name='+department_name,*/
                         'Generate Group','900','550');
+            });
+
+            $('#update_scholarship_student_btn').on('click', function(e){
+                e.preventDefault();
+                var url = $(this).attr('href');
+                swal({
+                    title: "Attention",
+                    text: "Update scholarship in student annual base on academic year selection!!",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Generate?",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            data: {'academic_year_id': $('#filter_academic_year').val()},
+                            dataType:"json",
+                            success: function(resultData) {
+
+                                if(resultData.status == true) {
+                                    notify("success","info", resultData.message);
+                                } else {
+                                    notify("error","info", resultData.message);
+                                }
+                            }
+                        });
+
+                    }
+                });
             });
         });
     </script>

@@ -24,6 +24,7 @@ class StudentAnnual extends Model
         "create_uid",
         "write_uid",
         "department_option_id",
+        "general_remark",
         "is_suspend"
 	];
     //LATER do this latter
