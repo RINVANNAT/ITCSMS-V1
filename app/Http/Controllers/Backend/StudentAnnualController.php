@@ -449,7 +449,6 @@ class StudentAnnualController extends Controller
 
     public function importT2ToI3Student(ImportStudentT2ToI3Request $request)
     {
-        $this->updateScholarshipStudent();
         $now = Carbon::now()->format('Y_m_d_H');
         if ($request->file('import') != null) {
             $import = $now . '.' . $request->file('import')->getClientOriginalExtension();
