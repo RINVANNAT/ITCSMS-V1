@@ -33,6 +33,7 @@ class Student extends Model
 		'origin_id',
 		'candidate_id',
 		"create_uid",
+		"created_at",
 		"write_uid",
         "full_name_latin"
 	];
@@ -56,6 +57,7 @@ class Student extends Model
 
     public function setDobAttribute($value)
     {
+
         $date = Carbon::createFromFormat('d/m/Y', $value);
         $this->attributes['dob'] = $date->format('Y/m/d');
     }

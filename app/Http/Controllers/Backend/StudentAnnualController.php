@@ -413,9 +413,177 @@ class StudentAnnualController extends Controller
         return view('backend.studentAnnual.import_upgrade_student');
     }
 
+    public function request_import_custom_I1_student(Request $request) {
+
+        return view('backend.studentAnnual.import_custom_I1_student');
+    }
+
     public function request_import_upgrade_T2_to_I3(Request $request) {
 
         return view('backend.studentAnnual.import_T2_to_I3_student');
+    }
+
+    public function importCustomI1Student( Request $request)
+    {
+        $now = Carbon::now()->format('Y_m_d_H');
+        if ($request->file('import') != null) {
+            $import = $now . '.' . $request->file('import')->getClientOriginalExtension();
+            $request->file('import')->move(base_path() . '/public/assets/uploaded_file/temp/', $import);
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/' . $import;
+            DB::beginTransaction();
+            try {
+                Excel::filter('chunk')->load($storage_path)->chunk(1500, function ($results) {
+                    $keyDegree = '';
+                    $keyYear = '';
+                    $studentWithRedouble = [];
+                    $departments = collect(DB::table('departments')->get())->keyBy('code');
+                    $options = collect(DB::table('departmentOptions')->get())->keyBy(function ($item, $key) {
+                        return strtolower($item->code);
+                    })->toArray();
+                    $groups = collect(DB::table('groups')->get())->keyBy('code');
+                    $results = $results->filter(function ($item, $key) use(&$studentWithRedouble) {
+                        if ($item->register_id == null) {
+                            $studentWithRedouble[] = $item->toArray();
+                        }
+                        return $item->register_id != null;
+                    });
+                    $register_ids = $results->map(function ($value, $key) use (&$keyDegree, &$keyYear) {
+                        $keyDegree = '' . $value->degree_id;
+                        $keyYear = '' . ($value->academic_year_id);
+                        return $value->register_id;
+                    });
+                    $candidates = DB::table('candidates')
+                        ->whereIN('register_id', $register_ids)
+                        ->where('academic_year_id', '=', $keyYear)
+                        ->where('degree_id', '=', $keyDegree)
+                        ->get();
+
+                    $candidates = collect($candidates)->keyBy('register_id');
+                    // --- when the candidate are not equal the uploaded file ---
+//                    $register_ids_by_cand = collect($candidates)->pluck('register_id')->toArray();
+//                    $results = $results->filter(function ($item, $key) use($register_ids_by_cand){
+//                       return (in_array($item->register_id, $register_ids_by_cand))?$item:null;
+//                    });
+
+                    // --- register candidate to student ---
+                    if (count($candidates) == count($results)) {
+                        // there are no missing candidate from the imported File by BE
+                        $results->each(function ($row) use ($candidates, $departments, $options, $groups) {
+                            $candidate = $candidates[$row->register_id];
+                            $dateSplit = explode(' ', $candidate->dob);
+                            $dob = $dateSplit[0];
+                            $splitDob = explode('-', $dob);
+                            $year = $splitDob[0];
+                            $month = $splitDob[1];
+                            $day = $splitDob[2];
+                            $rec = [
+                                'id_card' => $row->id_card,
+                                'name_latin' => $candidate->name_latin,
+                                'name_kh' => $candidate->name_kh,
+                                'dob' => $day.'/'.$month.'/'.$year ,
+                                'pob' => $candidate->pob,
+                                'gender_id' => $candidate->gender_id,
+                                'origin_id' => $candidate->province_id,
+                                'can_id' => $candidate->id,
+                                'created_at' => date("Y-m-d"),
+                                'active' => true,
+                                'create_uid' => 1 //admin
+                            ];
+                            $saveStudent = Student::create($rec);
+                            // --- create student annual Record --
+                            $recStudentAnnual = [
+                                'student_id' => $saveStudent->id,
+                                'academic_year_id' => ($row->academic_year_id),
+                                'degree_id' => $row->degree_id,
+                                'department_id' => $departments[$row->department_code]->id,
+                                'department_option_id' => (isset($row->department_option_code) && $row->department_option_code != '') ? $options[strtolower($row->department_option_code)]->id : null,
+                                'promotion_id' => $row->promotion_id,
+                                'grade_id' => $row->grade_id,
+                                'general_remark' => $row->general_remark,
+                                'created_at' => Carbon::now(),
+                                'active' => true,
+                                'create_uid' => 1 //admin
+                            ];
+                            $saveStudentAnnual = StudentAnnual::create($recStudentAnnual);
+                            if (isset($row->group_code) && $row->group_code != "" && $row->group_code != " ") {
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 1]);
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 2]);
+                            }
+                        });
+                    } else {
+                        dd('The record in file are not matched with database. Please Contact Administrator!');
+                    }
+
+                    if ($studentWithRedouble){
+                        $lastYear = '';
+                        $student_id_cards = collect($studentWithRedouble)->map(function ($item, $key) use(&$lastYear) {
+                            $lastYear = ''.($item['academic_year_id']-1);
+                           return $item['id_card'];
+                        });
+                        $existingStudents = DB::table('students')->whereIN('id_card', $student_id_cards);
+                        $studentWithKeyIdCards = $existingStudents->pluck('id', 'id_card');
+                        $student_ids = $existingStudents->pluck('id');
+                        $studentAnnuals = DB::table('studentAnnuals')
+                            ->whereIN('student_id', $student_ids)
+                            ->where('academic_year_id', '=', $lastYear)
+                            ->where('degree_id', '=', $keyDegree)
+                            ->get();
+                        $studentAnnuals = collect($studentAnnuals)->keyBy('student_id');
+                        $redoubles = collect(DB::table('redoubles')->get())->keyBy('name_en');
+                        $redoubleStudents = collect(DB::table('redouble_student')->whereIN('student_id', $student_ids)->get())
+                            ->keyBy('student_id')
+                            ->map(function ($newItem, $newKey) {
+                                return [$newItem->redouble_id => $newItem];
+                            });
+
+                        if (count($studentWithRedouble) == count($studentAnnuals)){
+                            collect($studentWithRedouble)->each(function ($row) use($redoubleStudents,$redoubles,$studentWithKeyIdCards, $studentAnnuals, $departments, $options, $groups){
+                                $student_id = $studentWithKeyIdCards[$row['id_card']];
+                                $studentAnnual = $studentAnnuals[$student_id];
+                                $rec = [
+                                    'student_id' => $student_id,
+                                    'academic_year_id' => ($studentAnnual->academic_year_id + 1),
+                                    'degree_id' => $studentAnnual->degree_id,
+                                    'department_id' => $departments[$row['department_code']]->id,
+                                    'department_option_id' => (isset($row['department_option_code']) && $row['department_option_code'] != '') ? $options[strtolower($row['department_option_code'])]->id : null,
+                                    'promotion_id' => $studentAnnual->promotion_id,
+                                    'grade_id' => $row['grade_id'],
+                                    'general_remark' => $row['general_remark'],
+                                    'created_at' => Carbon::now(),
+                                    'active' => true,
+                                    'create_uid' => 1 //admin
+                                ];
+                                $saveStudentAnnual = StudentAnnual::create($rec);
+                                if (isset($row['group_code']) && $row['group_code'] != "" && $row['group_code'] != " ") {
+                                    $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row['group_code']]->id],['semester_id' => 1]);
+                                    $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row['group_code']]->id],['semester_id' => 2]);
+                                }
+                                // check if the record have redouble for specific student
+                                if (isset($redoubles[$row['general_remark']])) {
+                                    $redouble = $redoubles[$row['general_remark']];
+                                    // check if this student redouble is already inputted in the DB
+                                    if (!isset($redoubleStudents[$student_id])) {
+                                        // no redouble record then create new one
+                                        DB::table('redouble_student')->insert(
+                                            [
+                                                'redouble_id' => $redouble->id,
+                                                'student_id' => $student_id,
+                                                'academic_year_id' => $studentAnnual->academic_year_id
+                                            ]
+                                        );
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+
+            } catch (Exception $e) {
+                DB::rollback();
+            }
+            DB::commit();
+            return redirect(route('admin.studentAnnuals.index'));
+        }
     }
 
     public function updateScholarship (Request $request)

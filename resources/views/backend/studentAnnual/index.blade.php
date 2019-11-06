@@ -62,6 +62,7 @@
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="{!! route('admin.student.request_import') !!}">Import</a></li>
                         @permission('view-access-management')  {{-- this permission is for addmin but i just use it instead of creat the new one and also forget how to create new permission in smis--}}
+                        <li><a href="{!! route('admin.student.request_import_custom_I1_student') !!}"> Import-Custom I1&T1 </a></li>
                         <li><a href="{!! route('admin.student.request_import_upgrade_T2_to_I3_student') !!}"> Import Upgrade T2 to I3 </a></li>
                         <li><a href="{!! route('admin.student.request_import_upgrade_student') !!}"> Import Upgrade Student </a></li>
                         @endauth
