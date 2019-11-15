@@ -485,6 +485,7 @@ class StudentAnnualController extends Controller
                                 'gender_id' => $candidate->gender_id,
                                 'origin_id' => $candidate->province_id,
                                 'can_id' => $candidate->id,
+                                'photo' => $row->id_card.'.jpg',
                                 'created_at' => date("Y-m-d"),
                                 'active' => true,
                                 'create_uid' => 1 //admin
