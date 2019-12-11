@@ -24,6 +24,9 @@
         Route::get('student-request-import-upgrade-student', 'StudentAnnualController@request_import_upgrade_student')->name('admin.student.request_import_upgrade_student');
         Route::get('student-request-import-custom-i1', 'StudentAnnualController@request_import_custom_I1_student')->name('admin.student.request_import_custom_I1_student');
         Route::get('student-request-import-upgrade-t2toi3', 'StudentAnnualController@request_import_upgrade_T2_to_I3')->name('admin.student.request_import_upgrade_T2_to_I3_student');
+        Route::get('student-request-import-update-scholarship-student', 'StudentAnnualController@request_import_update_scholarship_student')->name('admin.student.import_update_scholarship_student');
+        Route::post('student-request-import-update-scholarship-student', 'StudentAnnualController@importUpdateScholarshipStudent')->name('admin.student.import_update_scholarship_student');
+
         Route::post('student-import-upgrade-student', 'StudentAnnualController@importUpgradedStudent')->name('admin.student.import_upgrade_student');
         Route::post('student-import-custom-i1', 'StudentAnnualController@importCustomI1Student')->name('admin.student.import_custom_I1_student');
         Route::post('student-import-upgrade-t2toi3', 'StudentAnnualController@importT2ToI3Student')->name('admin.student.import_T2_to_I3_student');

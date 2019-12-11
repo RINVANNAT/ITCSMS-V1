@@ -423,6 +423,11 @@ class StudentAnnualController extends Controller
         return view('backend.studentAnnual.import_T2_to_I3_student');
     }
 
+    public function request_import_update_scholarship_student(Request $request) {
+
+        return view('backend.studentAnnual.import_T2_to_I3_student');
+    }
+
     public function importCustomI1Student( Request $request)
     {
         $now = Carbon::now()->format('Y_m_d_H');
