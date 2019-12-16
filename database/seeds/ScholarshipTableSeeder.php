@@ -176,6 +176,42 @@ class ScholarshipTableSeeder extends Seeder
                 'created_at' => Carbon\Carbon::now(),
                 'updated_at' => Carbon\Carbon::now()
             ),
+            array(
+                'code' => 'Boursier P ITC 70%',
+                'isDroppedUponFail'=> true,
+                'duration'=>'4 years',
+                'founder'=>'Institute of Technology of Cambodia',
+                'create_uid' => 1,
+                'created_at' => Carbon\Carbon::now(),
+                'updated_at' => Carbon\Carbon::now()
+            ),
+            array(
+                'code' => 'Boursier P ITC 100%',
+                'isDroppedUponFail'=> true,
+                'duration'=>'4 years',
+                'founder'=>'Institute of Technology of Cambodia',
+                'create_uid' => 1,
+                'created_at' => Carbon\Carbon::now(),
+                'updated_at' => Carbon\Carbon::now()
+            ),
+            array(
+                'code' => 'Boursier P ITC 50%',
+                'isDroppedUponFail'=> true,
+                'duration'=>'4 years',
+                'founder'=>'Institute of Technology of Cambodia',
+                'create_uid' => 1,
+                'created_at' => Carbon\Carbon::now(),
+                'updated_at' => Carbon\Carbon::now()
+            ),
+            array(
+                'code' => 'Boursier P ITC PK',
+                'isDroppedUponFail'=> true,
+                'duration'=>'4 years',
+                'founder'=>'Institute of Technology of Cambodia អាហារូបករណ៍ អាទិភាព ITC',
+                'create_uid' => 1,
+                'created_at' => Carbon\Carbon::now(),
+                'updated_at' => Carbon\Carbon::now()
+            ),
         );
         foreach ($scholarships as $scholarship) {
             DB::table('scholarships')->insert($scholarship);

@@ -156,7 +156,7 @@ class StudentAnnualController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  StoreStudentRequest $request
+     * @param StoreStudentRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreStudentRequest $request)
@@ -168,7 +168,7 @@ class StudentAnnualController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -204,7 +204,7 @@ class StudentAnnualController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param EditStudentRequest $request
-     * @param  int $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit(EditStudentRequest $request, $id)
@@ -241,8 +241,8 @@ class StudentAnnualController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateStudentRequest $request
-     * @param  int $id
+     * @param UpdateStudentRequest $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateStudentRequest $request, $id)
@@ -255,7 +255,7 @@ class StudentAnnualController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeleteStudentRequest $request, $id)
@@ -408,27 +408,94 @@ class StudentAnnualController extends Controller
         return view('backend.studentAnnual.import');
     }
 
-    public function request_import_upgrade_student(Request $request) {
+    public function request_import_upgrade_student(Request $request)
+    {
 
         return view('backend.studentAnnual.import_upgrade_student');
     }
 
-    public function request_import_custom_I1_student(Request $request) {
+    public function request_import_custom_I1_student(Request $request)
+    {
 
         return view('backend.studentAnnual.import_custom_I1_student');
     }
 
-    public function request_import_upgrade_T2_to_I3(Request $request) {
+    public function request_import_upgrade_T2_to_I3(Request $request)
+    {
 
         return view('backend.studentAnnual.import_T2_to_I3_student');
     }
 
-    public function request_import_update_scholarship_student(Request $request) {
+    public function request_import_update_scholarship_student(Request $request)
+    {
 
-        return view('backend.studentAnnual.import_T2_to_I3_student');
+        return view('backend.studentAnnual.import_update_scholarship_student');
     }
 
-    public function importCustomI1Student( Request $request)
+    public function importUpdateScholarshipStudentAnnual(Request $request)
+    {
+
+        $academic_year_id = $request->academic_year_id;
+        $grade_id = $request->grade_id;
+        $now = Carbon::now()->format('Y_m_d_H');
+        if ($request->file('import') != null) {
+            $import = $now . '.' . $request->file('import')->getClientOriginalExtension();
+            $request->file('import')->move(base_path() . '/public/assets/uploaded_file/temp/', $import);
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/' . $import;
+            DB::beginTransaction();
+            try {
+                Excel::filter('chunk')->load($storage_path)->chunk(1000, function ($results) use ($academic_year_id, $grade_id) {
+
+                    $results = $results->filter(function ($item, $key) {
+                        return $item->id_card != null;
+                    });
+                    $studentIdCards = $results->map(function ($value, $key) {
+                        return $value->id_card;
+                    });
+                    $students = DB::table('students')->whereIN('id_card', $studentIdCards->toArray());
+                    $student_ids = $students->pluck('id');
+                    $studentWithKeyIdCards = $students->pluck('id', 'id_card');
+                    $scholarships = collect(DB::table('scholarships')->get())->keyBy('code');
+
+                    $studentAnnuals = StudentAnnual::where('academic_year_id', '=', $academic_year_id)
+                        ->where('degree_id', '=', DegreeEnum::ENGINEER_DEGREE)
+                        ->where('grade_id', '=', $grade_id)
+                        ->whereIN('student_id', $student_ids);
+                    $studentAnnualKeyByStudent = $studentAnnuals->pluck('id', 'student_id');
+
+                    if (count($results) == count($studentAnnuals->get())) {
+                        // there are no missing student annual from the imported File by BE
+                        $results->each(function ($row) use ($scholarships, $studentWithKeyIdCards, $studentAnnualKeyByStudent) {
+                            if (isset($scholarships[$row->scholarship_code])) {
+                                $scholarship = $scholarships[$row->scholarship_code];
+                                $student_id = $studentWithKeyIdCards[$row->id_card];
+                                $studentAnnualID = $studentAnnualKeyByStudent[$student_id];
+                                $rec = [
+                                    'student_annual_id' => $studentAnnualID,
+                                    'scholarship_id' => $scholarship->id
+                                ];
+                                DB::table('scholarship_student_annual')->insert($rec);
+                            } else {
+                                dd('New Scholarship Record: '.$row->scholarship_code);
+                            }
+                        });
+                    } else {
+                        // there are some missing students but we still import student with report missing student
+                        $results->each(function ($row) use ($studentAnnuals) {
+                            dd('there are some missing students!! Please Check before uploaded file');
+                        });
+                    }
+                });
+
+            } catch (Exception $e) {
+                DB::rollback();
+            }
+            DB::commit();
+            return redirect(route('admin.studentAnnuals.index'));
+        }
+    }
+
+    public function importCustomI1Student(Request $request)
     {
         $now = Carbon::now()->format('Y_m_d_H');
         if ($request->file('import') != null) {
@@ -446,7 +513,7 @@ class StudentAnnualController extends Controller
                         return strtolower($item->code);
                     })->toArray();
                     $groups = collect(DB::table('groups')->get())->keyBy('code');
-                    $results = $results->filter(function ($item, $key) use(&$studentWithRedouble) {
+                    $results = $results->filter(function ($item, $key) use (&$studentWithRedouble) {
                         if ($item->register_id == null) {
                             $studentWithRedouble[] = $item->toArray();
                         }
@@ -485,12 +552,12 @@ class StudentAnnualController extends Controller
                                 'id_card' => $row->id_card,
                                 'name_latin' => $candidate->name_latin,
                                 'name_kh' => $candidate->name_kh,
-                                'dob' => $day.'/'.$month.'/'.$year ,
+                                'dob' => $day . '/' . $month . '/' . $year,
                                 'pob' => $candidate->pob,
                                 'gender_id' => $candidate->gender_id,
                                 'origin_id' => $candidate->province_id,
                                 'can_id' => $candidate->id,
-                                'photo' => $row->id_card.'.jpg',
+                                'photo' => $row->id_card . '.jpg',
                                 'created_at' => date("Y-m-d"),
                                 'active' => true,
                                 'create_uid' => 1 //admin
@@ -512,19 +579,19 @@ class StudentAnnualController extends Controller
                             ];
                             $saveStudentAnnual = StudentAnnual::create($recStudentAnnual);
                             if (isset($row->group_code) && $row->group_code != "" && $row->group_code != " ") {
-                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 1]);
-                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 2]);
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id], ['semester_id' => 1]);
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id], ['semester_id' => 2]);
                             }
                         });
                     } else {
                         dd('The record in file are not matched with database. Please Contact Administrator!');
                     }
 
-                    if ($studentWithRedouble){
+                    if ($studentWithRedouble) {
                         $lastYear = '';
-                        $student_id_cards = collect($studentWithRedouble)->map(function ($item, $key) use(&$lastYear) {
-                            $lastYear = ''.($item['academic_year_id']-1);
-                           return $item['id_card'];
+                        $student_id_cards = collect($studentWithRedouble)->map(function ($item, $key) use (&$lastYear) {
+                            $lastYear = '' . ($item['academic_year_id'] - 1);
+                            return $item['id_card'];
                         });
                         $existingStudents = DB::table('students')->whereIN('id_card', $student_id_cards);
                         $studentWithKeyIdCards = $existingStudents->pluck('id', 'id_card');
@@ -542,8 +609,8 @@ class StudentAnnualController extends Controller
                                 return [$newItem->redouble_id => $newItem];
                             });
 
-                        if (count($studentWithRedouble) == count($studentAnnuals)){
-                            collect($studentWithRedouble)->each(function ($row) use($redoubleStudents,$redoubles,$studentWithKeyIdCards, $studentAnnuals, $departments, $options, $groups){
+                        if (count($studentWithRedouble) == count($studentAnnuals)) {
+                            collect($studentWithRedouble)->each(function ($row) use ($redoubleStudents, $redoubles, $studentWithKeyIdCards, $studentAnnuals, $departments, $options, $groups) {
                                 $student_id = $studentWithKeyIdCards[$row['id_card']];
                                 $studentAnnual = $studentAnnuals[$student_id];
                                 $rec = [
@@ -561,8 +628,8 @@ class StudentAnnualController extends Controller
                                 ];
                                 $saveStudentAnnual = StudentAnnual::create($rec);
                                 if (isset($row['group_code']) && $row['group_code'] != "" && $row['group_code'] != " ") {
-                                    $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row['group_code']]->id],['semester_id' => 1]);
-                                    $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row['group_code']]->id],['semester_id' => 2]);
+                                    $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row['group_code']]->id], ['semester_id' => 1]);
+                                    $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row['group_code']]->id], ['semester_id' => 2]);
                                 }
                                 // check if the record have redouble for specific student
                                 if (isset($redoubles[$row['general_remark']])) {
@@ -592,7 +659,7 @@ class StudentAnnualController extends Controller
         }
     }
 
-    public function updateScholarship (Request $request)
+    public function updateScholarship(Request $request)
     {
         $scholarships = collect(DB::table('scholarships')->get())->keyBy('code');
         $studentAnnuals = StudentAnnual::where('academic_year_id', '=', $request->academic_year_id)
@@ -604,14 +671,14 @@ class StudentAnnualController extends Controller
             ->get();
         $studentScholarships = collect($studentScholarships)->keyBy('student_annual_id');
         foreach ($studentAnnuals as $studentAnnual) {
-            if ($studentAnnual->general_remark != null){
-                if (isset($scholarships[$studentAnnual->general_remark])){
+            if ($studentAnnual->general_remark != null) {
+                if (isset($scholarships[$studentAnnual->general_remark])) {
                     $scholarship = $scholarships[$studentAnnual->general_remark];
-                    if (!isset($studentScholarships[$studentAnnual->id])){
+                    if (!isset($studentScholarships[$studentAnnual->id])) {
                         // create new scholarship student annual here
                         $rec = [
-                            'student_annual_id'    => $studentAnnual->id,
-                            'scholarship_id'       => $scholarship->id
+                            'student_annual_id' => $studentAnnual->id,
+                            'scholarship_id' => $scholarship->id
                         ];
                         DB::table('scholarship_student_annual')->insert($rec);
                     }
@@ -678,8 +745,8 @@ class StudentAnnualController extends Controller
                             ];
                             $saveStudentAnnual = StudentAnnual::create($rec);
                             if (isset($row->group_code) && $row->group_code != "" && $row->group_code != " ") {
-                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 1]);
-                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 2]);
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id], ['semester_id' => 1]);
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id], ['semester_id' => 2]);
                             }
                         });
                     } else {
@@ -763,8 +830,8 @@ class StudentAnnualController extends Controller
                             ];
                             $saveStudentAnnual = StudentAnnual::create($rec);
                             if (isset($row->group_code) && $row->group_code != "" && $row->group_code != " ") {
-                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 1]);
-                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id],['semester_id' => 2]);
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id], ['semester_id' => 1]);
+                                $saveStudentAnnual->groupStudentAnnuals()->attach([$groups[$row->group_code]->id], ['semester_id' => 2]);
                             }
                             // check if the record have redouble for specific student
                             if (isset($redoubles[$row->general_remark])) {
@@ -775,7 +842,7 @@ class StudentAnnualController extends Controller
                                     DB::table('redouble_student')->insert(
                                         [
                                             'redouble_id' => $redouble->id,
-                                            'student_id'  => $student_id,
+                                            'student_id' => $student_id,
                                             'academic_year_id' => $studentAnnual->academic_year_id
                                         ]
                                     );

@@ -65,6 +65,7 @@
                         <li><a href="{!! route('admin.student.request_import_custom_I1_student') !!}"> Import-Custom I1&T1 </a></li>
                         <li><a href="{!! route('admin.student.request_import_upgrade_T2_to_I3_student') !!}"> Import Upgrade T2 to I3 </a></li>
                         <li><a href="{!! route('admin.student.request_import_upgrade_student') !!}"> Import Upgrade Student </a></li>
+                        <li><a href="{!! route('admin.student.import_update_scholarship_student') !!}"> Request Import Update Scholarship Student </a></li>
                         @endauth
 
                     </ul>

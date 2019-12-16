@@ -22,14 +22,40 @@
         </div><!-- /.box-header -->
 
         <div class="box-body">
+
             <div class="row no-margin">
                 <div class="form-group col-sm-12" style="padding: 20px;">
-                    <span>Select an excel with right format and make sure that this is to import update scholarship student <strong class="text-danger"> From I1-I5 </strong> </span>
+                    <div class="col-sm-2">
+                        <select name="academic_year_id" class="form-control" id="academic_year_id">
+                            <option value=""> Select AcademicYear ID</option>
+                            <option value="2020"> 2019-2020</option>
+                            <option value="2021"> 2020-2021</option>
+                            <option value="2022"> 2021-2022</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2">
+                        <select name="grade_id" class="form-control" id="grade_id">
+                            <option value=""> Select Grade ID</option>
+                            <option value="1"> Year 1</option>
+                            <option value="2"> Year 2</option>
+                            <option value="3"> Year 3</option>
+                            <option value="4"> Year 4</option>
+                            <option value="5"> Year 5</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row no-margin">
+                <div class="form-group col-sm-12" style="padding: 20px;">
+                    <span>Select an excel with right format and make sure that this is to import update scholarship student <strong
+                                class="text-danger"> From I1-I5 </strong> </span>
                 </div>
             </div>
 
             <div class="row no-margin" style="padding-left: 20px;padding-right: 20px;">
-                <div class="form-group col-sm-12 box-body with-border text-muted well well-sm no-shadow" style="padding: 20px;">
+                <div class="form-group col-sm-12 box-body with-border text-muted well well-sm no-shadow"
+                     style="padding: 20px;">
                     {!! Form::label('import','Selected File (csv, xls, xlsx)') !!}
                     {!! Form::file('import', null) !!}
                 </div>
@@ -41,11 +67,13 @@
     <div class="box box-success">
         <div class="box-body">
             <div class="pull-left">
-                <a href="{!! route('admin.studentAnnuals.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                <a href="{!! route('admin.studentAnnuals.index') !!}"
+                   class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
             </div>
 
             <div class="pull-right">
-                <input type="submit" class="btn btn-success btn-xs" id="submit_student_import" value="{{ trans('buttons.general.crud.create') }}" />
+                <input type="submit" class="btn btn-success btn-xs" id="submit_student_import"
+                       value="{{ trans('buttons.general.crud.create') }}"/>
             </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
@@ -58,8 +86,8 @@
     {!! Html::script('js/backend/access/roles/script.js') !!}
 
     <script>
-        $(function(){
-            $('#submit_student_import').on('click',function(){
+        $(function () {
+            $('#submit_student_import').on('click', function () {
                 toggleLoading(true);
             });
         });
